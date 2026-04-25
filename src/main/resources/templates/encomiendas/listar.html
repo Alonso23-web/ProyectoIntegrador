@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head('Encomiendas - Nueva Ases Express')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <div class="container my-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primario">Paquetería y Encomiendas</h2>
+        <a href="/encomiendas/nuevo" class="btn btn-amarillo fw-bold"
+          ><i class="bi bi-plus-lg me-1"></i>Nueva Encomienda</a
+        >
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>Código</th>
+              <th>Remitente</th>
+              <th>Destinatario</th>
+              <th>Destino</th>
+              <th>Peso (kg)</th>
+              <th>Precio</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="e : ${encomiendas}">
+              <td>
+                <span
+                  class="badge bg-primary"
+                  th:text="${e.codigoRastreo}"
+                ></span>
+              </td>
+              <td th:text="${e.remitente}"></td>
+              <td th:text="${e.destinatario}"></td>
+              <td th:text="${e.destino}"></td>
+              <td th:text="${e.peso}"></td>
+              <td>S/ <span th:text="${e.precio}"></span></td>
+              <td>
+                <span
+                  class="badge"
+                  th:classappend="${e.estado == 'ENTREGADO' ? 'bg-success' : (e.estado == 'EN_TRANSITO' ? 'bg-info' : (e.estado == 'EN_DESTINO' ? 'bg-warning' : 'bg-secondary'))}"
+                  th:text="${e.estado}"
+                ></span>
+              </td>
+              <td>
+                <a
+                  th:href="@{'/encomiendas/editar/' + ${e.id}}"
+                  class="btn btn-sm btn-outline-primary"
+                  ><i class="bi bi-pencil me-1"></i>Editar</a
+                >
+                <a
+                  th:href="@{'/encomiendas/eliminar/' + ${e.id}}"
+                  class="btn btn-sm btn-outline-danger"
+                  onclick="
+                    return confirm(
+                      '¿Estás seguro de eliminar esta encomienda?',
+                    );
+                  "
+                  ><i class="bi bi-trash me-1"></i>Eliminar</a
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>

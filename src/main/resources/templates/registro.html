@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout :: head('Registro - Nueva Ases Express')}"></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <div class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-md-7">
+          <div
+            class="card shadow-lg border-0"
+            style="border-radius: 20px; overflow: hidden"
+          >
+            <div class="card-header bg-primario text-white text-center py-4">
+              <img
+                th:src="@{/img/logonuevaases.png}"
+                alt="Nueva Ases Express"
+                style="
+                  height: 60px;
+                  background: white;
+                  padding: 5px;
+                  border-radius: 12px;
+                  margin-bottom: 1rem;
+                "
+                onerror="this.style.display = 'none'"
+              />
+              <h4 class="mb-0 fw-bold">Crear Cuenta</h4>
+              <small class="text-white-50"
+                >Regístrate como cliente, administrador o conductor</small
+              >
+            </div>
+            <div class="card-body p-4">
+              <div
+                th:if="${error}"
+                class="alert alert-danger d-flex align-items-center"
+              >
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span th:text="${error}"></span>
+              </div>
+
+              <form th:action="@{/registro}" method="post">
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Nombre Completo</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"
+                        ><i class="bi bi-person"></i
+                      ></span>
+                      <input
+                        type="text"
+                        name="nombreCompleto"
+                        class="form-control"
+                        th:value="${usuario != null ? usuario.nombreCompleto : ''}"
+                        placeholder="Juan Pérez"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">DNI</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"
+                        ><i class="bi bi-card-text"></i
+                      ></span>
+                      <input
+                        type="text"
+                        name="dni"
+                        class="form-control"
+                        th:value="${usuario != null ? usuario.dni : ''}"
+                        placeholder="12345678"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Correo Electrónico</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"
+                        ><i class="bi bi-envelope"></i
+                      ></span>
+                      <input
+                        type="email"
+                        name="email"
+                        class="form-control"
+                        th:value="${usuario != null ? usuario.email : ''}"
+                        placeholder="correo@ejemplo.com"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Teléfono</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"
+                        ><i class="bi bi-telephone"></i
+                      ></span>
+                      <input
+                        type="tel"
+                        name="telefono"
+                        class="form-control"
+                        th:value="${usuario != null ? usuario.telefono : ''}"
+                        placeholder="+51 999 888 777"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Tipo de Cuenta</label>
+                  <div class="row g-2">
+                    <div class="col-md-4">
+                      <div
+                        class="form-check card p-3 text-center"
+                        style="border-radius: 12px; cursor: pointer"
+                      >
+                        <input
+                          class="form-check-input mx-auto d-block mb-2"
+                          type="radio"
+                          name="rol"
+                          id="rolCliente"
+                          value="CLIENTE"
+                          th:checked="${usuario == null or usuario.rol == 'CLIENTE'}"
+                        />
+                        <label
+                          class="form-check-label fw-bold"
+                          for="rolCliente"
+                        >
+                          <i
+                            class="bi bi-person-badge fs-3 text-primario d-block mb-1"
+                          ></i>
+                          Cliente
+                        </label>
+                        <small class="text-muted d-block"
+                          >Compra pasajes y envía encomiendas</small
+                        >
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div
+                        class="form-check card p-3 text-center"
+                        style="border-radius: 12px; cursor: pointer"
+                      >
+                        <input
+                          class="form-check-input mx-auto d-block mb-2"
+                          type="radio"
+                          name="rol"
+                          id="rolAdministrador"
+                          value="ADMINISTRADOR"
+                          th:checked="${usuario != null and usuario.rol == 'ADMINISTRADOR'}"
+                        />
+                        <label
+                          class="form-check-label fw-bold"
+                          for="rolAdministrador"
+                        >
+                          <i
+                            class="bi bi-shield-lock fs-3 text-primario d-block mb-1"
+                          ></i>
+                          Administrador
+                        </label>
+                        <small class="text-muted d-block"
+                          >Gestiona la empresa y flota</small
+                        >
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div
+                        class="form-check card p-3 text-center"
+                        style="border-radius: 12px; cursor: pointer"
+                      >
+                        <input
+                          class="form-check-input mx-auto d-block mb-2"
+                          type="radio"
+                          name="rol"
+                          id="rolConductor"
+                          value="CONDUCTOR"
+                          th:checked="${usuario != null and usuario.rol == 'CONDUCTOR'}"
+                        />
+                        <label
+                          class="form-check-label fw-bold"
+                          for="rolConductor"
+                        >
+                          <i
+                            class="bi bi-truck-front fs-3 text-primario d-block mb-1"
+                          ></i>
+                          Conductor
+                        </label>
+                        <small class="text-muted d-block"
+                          >Alquila vehículos y conduce</small
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Contraseña</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"
+                        ><i class="bi bi-lock"></i
+                      ></span>
+                      <input
+                        type="password"
+                        name="password"
+                        class="form-control"
+                        placeholder="Mínimo 6 caracteres"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold"
+                      >Confirmar Contraseña</label
+                    >
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"
+                        ><i class="bi bi-lock-fill"></i
+                      ></span>
+                      <input
+                        type="password"
+                        name="confirmarPassword"
+                        class="form-control"
+                        placeholder="Repite tu contraseña"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-amarillo fw-bold">
+                    <i class="bi bi-person-plus me-2"></i>Crear Cuenta
+                  </button>
+                </div>
+              </form>
+              <div class="text-center mt-3">
+                <p class="mb-0">
+                  ¿Ya tienes una cuenta?
+                  <a href="/login" class="fw-bold text-primario"
+                    >Inicia sesión aquí</a
+                  >
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>

@@ -1,12 +1,264 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head('Inicio - Nueva Ases Express')}"></head>
 <body>
-    <h1>Hola de spring boot</h1>
-    
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <!-- Hero Section -->
+    <section class="hero text-center" th:style="'background-image: url(' + @{/img/nuevaasesInicio.jpg} + ');'">
+        <div class="hero-overlay"></div>
+        <div class="container hero-content">
+            <img th:src="@{/img/logonuevaases.png}" alt="Nueva Ases Express" class="hero-logo" onerror="this.style.display='none'">
+            <h1 class="display-3 fw-bold mb-3 fade-in-up">Nueva Ases Express</h1>
+            <p class="lead mb-2 fs-4">Tu empresa de transportes de confianza en Perú</p>
+            <p class="mb-4 fs-5 text-white-50">Conectando Trujillo con Chepén y más destinos desde 2015</p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <a href="/rastrear" class="btn btn-amarillo btn-lg fw-bold">
+                    <i class="bi bi-geo-alt-fill me-2"></i>Rastrear mi Encomienda
+                </a>
+                <a href="/nosotros" class="btn btn-outline-light btn-lg fw-bold">
+                    <i class="bi bi-info-circle me-2"></i>Conócenos
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-5 bg-primario text-white">
+        <div class="container">
+            <div class="row text-center g-4">
+                <div class="col-md-3 col-6">
+                    <div class="stat-number">9+</div>
+                    <p class="mb-0 text-white-50">Años de Experiencia</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-number">50K+</div>
+                    <p class="mb-0 text-white-50">Clientes Satisfechos</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-number">25+</div>
+                    <p class="mb-0 text-white-50">Vehículos en Flota</p>
+                </div>
+                <div class="col-md-3 col-6">
+                    <div class="stat-number">15+</div>
+                    <p class="mb-0 text-white-50">Rutas Disponibles</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="fw-bold text-primario section-title">Nuestros Servicios</h2>
+                    <p class="text-muted fs-5">Soluciones de transporte integrales para cada necesidad</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card card-servicio h-100 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="icono-servicio">
+                                <i class="bi bi-bus-front"></i>
+                            </div>
+                            <h4 class="card-title fw-bold text-primario">Alquiler de Vehículos</h4>
+                            <p class="card-text text-muted">Flota moderna de buses, minivans y camiones para tu empresa, evento o viaje especial. Conductores profesionales incluidos.</p>
+                            <a href="/vehiculos" class="btn btn-outline-amarillo">Ver Vehículos</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-servicio h-100 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="icono-servicio">
+                                <i class="bi bi-ticket-perforated"></i>
+                            </div>
+                            <h4 class="card-title fw-bold text-primario">Venta de Pasajes</h4>
+                            <p class="card-text text-muted">Viaja de Trujillo a Chepén con horarios convenientes, asientos cómodos y precios justos. Reserva tu asiento ahora.</p>
+                            <a href="/pasajes" class="btn btn-outline-amarillo">Ver Pasajes</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-servicio h-100 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="icono-servicio">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+                            <h4 class="card-title fw-bold text-primario">Paquetería y Encomiendas</h4>
+                            <p class="card-text text-muted">Envía paquetes con rastreo en tiempo real. Seguro, confiable y con entrega garantizada a todo el norte peruano.</p>
+                            <a href="/rastrear" class="btn btn-outline-amarillo">Rastrear Ahora</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Preview Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <img th:src="@{/img/nuevaasesInicio.jpg}" alt="Nueva Ases Express" class="img-fluid rounded-4 shadow-lg" style="object-fit: cover; height: 400px; width: 100%;" onerror="this.src='https://via.placeholder.com/600x400?text=Nueva+Ases+Express'">
+                </div>
+                <div class="col-lg-6">
+                    <h6 class="text-amarillo fw-bold text-uppercase ls-2">Sobre Nosotros</h6>
+                    <h2 class="fw-bold text-primario mb-3">Transportando Sueños y Conectando Destinos</h2>
+                    <p class="text-muted fs-5">En <strong>Nueva Ases Express</strong> nos enorgullece ser la empresa de transporte líder en la región La Libertad. Desde nuestros inicios en 2015, hemos trabajado incansablemente para ofrecer un servicio seguro, puntual y de calidad.</p>
+                    <p class="text-muted">Nuestra flota moderna y nuestro equipo de profesionales dedicados garantizan que cada viaje y cada envío lleguen a su destino con la máxima satisfacción.</p>
+                    <div class="row g-3 mt-3">
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-amarillo fs-4 me-2"></i>
+                                <span class="fw-semibold">Puntualidad Garantizada</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-amarillo fs-4 me-2"></i>
+                                <span class="fw-semibold">Seguridad Total</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-amarillo fs-4 me-2"></i>
+                                <span class="fw-semibold">Precios Competitivos</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-check-circle-fill text-amarillo fs-4 me-2"></i>
+                                <span class="fw-semibold">Atención 24/7</span>
+                            </div>
+                        </div>
+                    </div>
+                    <a href="/nosotros" class="btn btn-amarillo mt-4 fw-bold">
+                        <i class="bi bi-arrow-right me-2"></i>Conoce Más de Nosotros
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="fw-bold text-primario section-title">¿Por qué elegir Nueva Ases Express?</h2>
+                    <p class="text-muted fs-5">Comprometidos con la excelencia en cada kilómetro</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="text-center p-4">
+                        <div class="icono-servicio mx-auto">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <h5 class="fw-bold text-primario">Puntualidad</h5>
+                        <p class="text-muted small">Cumplimos con los tiempos de entrega y salida programados. Tu tiempo es valioso para nosotros.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center p-4">
+                        <div class="icono-servicio mx-auto">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h5 class="fw-bold text-primario">Seguridad</h5>
+                        <p class="text-muted small">Tu carga y tu familia viajan seguras con nosotros. Vehículos con GPS y conductores certificados.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center p-4">
+                        <div class="icono-servicio mx-auto">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <h5 class="fw-bold text-primario">Rastreo 24/7</h5>
+                        <p class="text-muted small">Sigue tus encomiendas en cualquier momento desde nuestra plataforma web o contactando con nosotros.</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center p-4">
+                        <div class="icono-servicio mx-auto">
+                            <i class="bi bi-cash-coin"></i>
+                        </div>
+                        <h5 class="fw-bold text-primario">Precios Justos</h5>
+                        <p class="text-muted small">La mejor relación calidad-precio del mercado. Sin cargos ocultos ni sorpresas.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row text-center mb-5">
+                <div class="col-12">
+                    <h2 class="fw-bold text-primario section-title">Lo que dicen nuestros clientes</h2>
+                    <p class="text-muted fs-5">Experiencias reales de quienes confían en nosotros</p>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="testimonial-card h-100">
+                        <i class="bi bi-quote quote-icon"></i>
+                        <p class="text-muted mb-3">"Excelente servicio de transporte. Siempre viajo de Trujillo a Chepén con Nueva Ases Express. Los buses son cómodos, puntuales y el personal es muy amable."</p>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primario text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 45px; height: 45px;">MR</div>
+                            <div class="ms-3">
+                                <h6 class="mb-0 fw-bold">María Rodríguez</h6>
+                                <small class="text-muted">Viajera frecuente</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="testimonial-card h-100">
+                        <i class="bi bi-quote quote-icon"></i>
+                        <p class="text-muted mb-3">"Envío encomiendas semanalmente para mi negocio y nunca han fallado. El sistema de rastreo me da tranquilidad y siempre llegan a tiempo."</p>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primario text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 45px; height: 45px;">CL</div>
+                            <div class="ms-3">
+                                <h6 class="mb-0 fw-bold">Carlos López</h6>
+                                <small class="text-muted">Empresario</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="testimonial-card h-100">
+                        <i class="bi bi-quote quote-icon"></i>
+                        <p class="text-muted mb-3">"Alquilamos una minivan para un evento familiar y todo salió perfecto. El conductor fue muy profesional y el vehículo impecable."</p>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-primario text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 45px; height: 45px;">AG</div>
+                            <div class="ms-3">
+                                <h6 class="mb-0 fw-bold">Ana García</h6>
+                                <small class="text-muted">Cliente particular</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-5 bg-primario text-white text-center">
+        <div class="container">
+            <h2 class="fw-bold mb-3">¿Necesitas rastrear tu encomienda?</h2>
+            <p class="fs-5 text-white-50 mb-4">Ingresa tu código de rastreo y sigue el estado de tu envío en tiempo real</p>
+            <a href="/rastrear" class="btn btn-amarillo btn-lg fw-bold">
+                <i class="bi bi-search me-2"></i>Rastrear Ahora
+            </a>
+        </div>
+    </section>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
 </body>
 </html>
+
