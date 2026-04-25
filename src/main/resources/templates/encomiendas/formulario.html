@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head(${encomienda.id} != null ? 'Editar Encomienda' : 'Nueva Encomienda')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+    <div class="container my-4">
+      <div class="row justify-content-center">
+        <div class="col-md-8">
+          <div
+            class="card shadow border-0"
+            style="border-radius: 16px; overflow: hidden"
+          >
+            <div class="card-header bg-primario text-white">
+              <h4
+                class="mb-0 fw-bold"
+                th:text="${encomienda.id} != null ? 'Editar Encomienda' : 'Nueva Encomienda'"
+              ></h4>
+            </div>
+            <div class="card-body p-4">
+              <form
+                th:action="@{/encomiendas/guardar}"
+                th:object="${encomienda}"
+                method="post"
+              >
+                <input type="hidden" th:field="*{id}" />
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Código de Rastreo</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    th:field="*{codigoRastreo}"
+                    readonly
+                  />
+                  <small class="text-muted"
+                    >Este código se genera automáticamente</small
+                  >
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Remitente</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:field="*{remitente}"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">DNI Remitente</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:field="*{dniRemitente}"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Destinatario</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:field="*{destinatario}"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">DNI Destinatario</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:field="*{dniDestinatario}"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Origen</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:field="*{origen}"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Destino</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:field="*{destino}"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Descripción</label>
+                  <textarea
+                    class="form-control"
+                    th:field="*{descripcion}"
+                    rows="2"
+                  ></textarea>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Peso (kg)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      class="form-control"
+                      th:field="*{peso}"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Precio (S/)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      class="form-control"
+                      th:field="*{precio}"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Fecha de Envío</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      th:field="*{fechaEnvio}"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold"
+                      >Fecha Estimada Entrega</label
+                    >
+                    <input
+                      type="date"
+                      class="form-control"
+                      th:field="*{fechaEstimadaEntrega}"
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Estado</label>
+                    <select class="form-select" th:field="*{estado}" required>
+                      <option value="REGISTRADO">Registrado</option>
+                      <option value="EN_TRANSITO">En Tránsito</option>
+                      <option value="EN_DESTINO">En Destino</option>
+                      <option value="ENTREGADO">Entregado</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Observaciones</label>
+                  <textarea
+                    class="form-control"
+                    th:field="*{observaciones}"
+                    rows="2"
+                  ></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-amarillo fw-bold">
+                    Guardar
+                  </button>
+                  <a href="/encomiendas" class="btn btn-outline-secondary"
+                    >Cancelar</a
+                  >
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>

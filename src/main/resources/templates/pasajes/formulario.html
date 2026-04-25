@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head(${pasaje.id} != null ? 'Editar Pasaje' : 'Nuevo Pasaje')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+    <div class="container my-4">
+      <div class="row justify-content-center">
+        <div class="col-md-7">
+          <div
+            class="card shadow border-0"
+            style="border-radius: 16px; overflow: hidden"
+          >
+            <div class="card-header bg-primario text-white">
+              <h4
+                class="mb-0 fw-bold"
+                th:text="${pasaje.id} != null ? 'Editar Pasaje' : 'Nuevo Pasaje'"
+              ></h4>
+            </div>
+            <div class="card-body p-4">
+              <form
+                th:action="@{/pasajes/guardar}"
+                th:object="${pasaje}"
+                method="post"
+              >
+                <input type="hidden" th:field="*{id}" />
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold"
+                      >Nombre del Pasajero</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:field="*{nombrePasajero}"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">DNI</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:field="*{dni}"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Origen</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:field="*{origen}"
+                      value="Trujillo"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Destino</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      th:field="*{destino}"
+                      value="Chepén"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Fecha de Viaje</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      th:field="*{fechaViaje}"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Hora</label>
+                    <select
+                      class="form-select"
+                      th:field="*{horaViaje}"
+                      required
+                    >
+                      <option value="08:00">08:00 AM</option>
+                      <option value="12:00">12:00 PM</option>
+                      <option value="16:00">04:00 PM</option>
+                      <option value="20:00">08:00 PM</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Asiento</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      th:field="*{asiento}"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Precio (S/)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      class="form-control"
+                      th:field="*{precio}"
+                      required
+                    />
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Estado</label>
+                    <select class="form-select" th:field="*{estado}" required>
+                      <option value="RESERVADO">Reservado</option>
+                      <option value="PAGADO">Pagado</option>
+                      <option value="CANCELADO">Cancelado</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-amarillo fw-bold">
+                    Guardar
+                  </button>
+                  <a href="/pasajes" class="btn btn-outline-secondary"
+                    >Cancelar</a
+                  >
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>

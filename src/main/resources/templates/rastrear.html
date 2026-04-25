@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head('Rastrear Encomienda - Nueva Ases Express')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <!-- Page Header -->
+    <section class="bg-primario text-white py-5">
+      <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-2">
+          <i class="bi bi-geo-alt-fill me-2 text-amarillo"></i>Rastrear
+          Encomienda
+        </h1>
+        <p class="lead text-white-50 mb-0">
+          Ingresa tu código de rastreo y conoce el estado de tu envío
+        </p>
+      </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="py-5">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0" style="border-radius: 20px">
+              <div class="card-body p-4 p-md-5">
+                <h4 class="fw-bold text-primario text-center mb-4">
+                  Consulta el estado de tu envío
+                </h4>
+                <form th:action="@{/rastrear}" method="get">
+                  <div class="input-group input-group-lg mb-3">
+                    <span class="input-group-text bg-primario text-white"
+                      ><i class="bi bi-upc-scan"></i
+                    ></span>
+                    <input
+                      type="text"
+                      name="codigo"
+                      class="form-control"
+                      placeholder="Ej: NAE-123456"
+                      th:value="${codigoBuscado}"
+                      required
+                    />
+                    <button type="submit" class="btn btn-amarillo fw-bold">
+                      <i class="bi bi-search me-1"></i>Buscar
+                    </button>
+                  </div>
+                  <div class="text-center">
+                    <small class="text-muted"
+                      >Ingresa el código de rastreo que te proporcionamos al
+                      momento del envío</small
+                    >
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="pb-5" th:if="${encomienda != null or error != null}">
+      <div class="container">
+        <!-- Error Message -->
+        <div class="row justify-content-center" th:if="${error != null}">
+          <div class="col-md-8">
+            <div
+              class="alert alert-danger d-flex align-items-center"
+              role="alert"
+            >
+              <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+              <div>
+                <h5 class="alert-heading mb-1">Encomienda no encontrada</h5>
+                <p class="mb-0" th:text="${error}"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Result -->
+        <div class="row justify-content-center" th:if="${encomienda != null}">
+          <div class="col-md-8">
+            <div
+              class="card shadow border-0"
+              style="border-radius: 20px; overflow: hidden"
+            >
+              <div class="card-header bg-primario text-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-box-seam me-2"></i>Resultado del Rastreo
+                  </h5>
+                  <span
+                    class="badge bg-white text-primario fs-6"
+                    th:text="${encomienda.codigoRastreo}"
+                  ></span>
+                </div>
+              </div>
+              <div class="card-body p-4">
+                <!-- Status Badge -->
+                <div class="text-center mb-4">
+                  <span
+                    class="badge fs-5 px-4 py-2"
+                    style="border-radius: 50px"
+                    th:classappend="${encomienda.estado == 'ENTREGADO' ? 'bg-success' : (encomienda.estado == 'EN_TRANSITO' ? 'bg-info' : (encomienda.estado == 'EN_DESTINO' ? 'bg-warning' : 'bg-secondary'))}"
+                    th:text="${encomienda.estado}"
+                  >
+                  </span>
+                </div>
+
+                <!-- Timeline -->
+                <div class="mb-4">
+                  <div class="d-flex justify-content-between position-relative">
+                    <div
+                      class="text-center flex-fill"
+                      th:classappend="${encomienda.estado == 'REGISTRADO' or encomienda.estado == 'EN_TRANSITO' or encomienda.estado == 'EN_DESTINO' or encomienda.estado == 'ENTREGADO' ? 'text-success' : 'text-muted'}"
+                    >
+                      <div
+                        class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                        style="
+                          width: 50px;
+                          height: 50px;
+                          border: 3px solid currentColor;
+                        "
+                        th:styleappend="${encomienda.estado == 'REGISTRADO' or encomienda.estado == 'EN_TRANSITO' or encomienda.estado == 'EN_DESTINO' or encomienda.estado == 'ENTREGADO' ? 'background-color: #198754; color: white; border-color: #198754;' : ''}"
+                      >
+                        <i class="bi bi-clipboard-check fs-4"></i>
+                      </div>
+                      <small class="fw-bold">Registrado</small>
+                    </div>
+                    <div
+                      class="text-center flex-fill"
+                      th:classappend="${encomienda.estado == 'EN_TRANSITO' or encomienda.estado == 'EN_DESTINO' or encomienda.estado == 'ENTREGADO' ? 'text-success' : 'text-muted'}"
+                    >
+                      <div
+                        class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                        style="
+                          width: 50px;
+                          height: 50px;
+                          border: 3px solid currentColor;
+                        "
+                        th:styleappend="${encomienda.estado == 'EN_TRANSITO' or encomienda.estado == 'EN_DESTINO' or encomienda.estado == 'ENTREGADO' ? 'background-color: #0dcaf0; color: white; border-color: #0dcaf0;' : ''}"
+                      >
+                        <i class="bi bi-truck fs-4"></i>
+                      </div>
+                      <small class="fw-bold">En Tránsito</small>
+                    </div>
+                    <div
+                      class="text-center flex-fill"
+                      th:classappend="${encomienda.estado == 'EN_DESTINO' or encomienda.estado == 'ENTREGADO' ? 'text-success' : 'text-muted'}"
+                    >
+                      <div
+                        class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                        style="
+                          width: 50px;
+                          height: 50px;
+                          border: 3px solid currentColor;
+                        "
+                        th:styleappend="${encomienda.estado == 'EN_DESTINO' or encomienda.estado == 'ENTREGADO' ? 'background-color: #ffc107; color: #000; border-color: #ffc107;' : ''}"
+                      >
+                        <i class="bi bi-shop fs-4"></i>
+                      </div>
+                      <small class="fw-bold">En Destino</small>
+                    </div>
+                    <div
+                      class="text-center flex-fill"
+                      th:classappend="${encomienda.estado == 'ENTREGADO' ? 'text-success' : 'text-muted'}"
+                    >
+                      <div
+                        class="rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center"
+                        style="
+                          width: 50px;
+                          height: 50px;
+                          border: 3px solid currentColor;
+                        "
+                        th:styleappend="${encomienda.estado == 'ENTREGADO' ? 'background-color: #198754; color: white; border-color: #198754;' : ''}"
+                      >
+                        <i class="bi bi-check-circle fs-4"></i>
+                      </div>
+                      <small class="fw-bold">Entregado</small>
+                    </div>
+                  </div>
+                </div>
+
+                <hr />
+
+                <!-- Details -->
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-1">Remitente</h6>
+                    <p
+                      class="fw-bold mb-0"
+                      th:text="${encomienda.remitente}"
+                    ></p>
+                    <small
+                      class="text-muted"
+                      th:text="'DNI: ' + ${encomienda.dniRemitente}"
+                    ></small>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-1">Destinatario</h6>
+                    <p
+                      class="fw-bold mb-0"
+                      th:text="${encomienda.destinatario}"
+                    ></p>
+                    <small
+                      class="text-muted"
+                      th:text="'DNI: ' + ${encomienda.dniDestinatario}"
+                    ></small>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-1">Origen</h6>
+                    <p class="fw-bold mb-0">
+                      <i class="bi bi-geo-alt-fill text-primario me-1"></i
+                      ><span th:text="${encomienda.origen}"></span>
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-1">Destino</h6>
+                    <p class="fw-bold mb-0">
+                      <i class="bi bi-geo-alt-fill text-amarillo me-1"></i
+                      ><span th:text="${encomienda.destino}"></span>
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-1">Fecha de Envío</h6>
+                    <p
+                      class="fw-bold mb-0"
+                      th:text="${encomienda.fechaEnvio}"
+                    ></p>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-1">Fecha Estimada de Entrega</h6>
+                    <p
+                      class="fw-bold mb-0"
+                      th:text="${encomienda.fechaEstimadaEntrega != null ? encomienda.fechaEstimadaEntrega : 'Por confirmar'}"
+                    ></p>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-1">Peso</h6>
+                    <p
+                      class="fw-bold mb-0"
+                      th:text="${encomienda.peso} + ' kg'"
+                    ></p>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="text-muted mb-1">Precio</h6>
+                    <p
+                      class="fw-bold mb-0"
+                      th:text="'S/ ' + ${encomienda.precio}"
+                    ></p>
+                  </div>
+                  <div
+                    class="col-12"
+                    th:if="${encomienda.descripcion != null and !encomienda.descripcion.isEmpty()}"
+                  >
+                    <h6 class="text-muted mb-1">Descripción</h6>
+                    <p
+                      class="fw-bold mb-0"
+                      th:text="${encomienda.descripcion}"
+                    ></p>
+                  </div>
+                  <div
+                    class="col-12"
+                    th:if="${encomienda.observaciones != null and !encomienda.observaciones.isEmpty()}"
+                  >
+                    <h6 class="text-muted mb-1">Observaciones</h6>
+                    <p
+                      class="fw-bold mb-0"
+                      th:text="${encomienda.observaciones}"
+                    ></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>

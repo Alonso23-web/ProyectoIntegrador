@@ -1,0 +1,78 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>500 - Error Interno</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <style>
+      :root {
+        --color-primario: #0d1b4c;
+        --color-secundario: #f4b400;
+      }
+      body {
+        background: linear-gradient(
+          135deg,
+          var(--color-primario) 0%,
+          #1a2d6b 100%
+        );
+        min-height: 100vh;
+      }
+      .error-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+      .error-code {
+        font-size: 8rem;
+        font-weight: 800;
+        color: #dc3545;
+        line-height: 1;
+      }
+      .btn-amarillo {
+        background: linear-gradient(
+          135deg,
+          var(--color-secundario) 0%,
+          #e8a000 100%
+        );
+        border: none;
+        color: #1a1a1a;
+        font-weight: 700;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+      }
+    </style>
+  </head>
+  <body class="d-flex align-items-center">
+    <div class="container text-center py-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card error-card p-5">
+            <div class="error-code mb-3">500</div>
+            <h2 class="mb-3 fw-bold text-danger">Error interno del servidor</h2>
+            <p class="lead mb-4 text-muted">
+              Estamos experimentando problemas técnicos. Por favor, inténtalo de
+              nuevo más tarde.
+            </p>
+            <div
+              class="alert alert-secondary text-start mb-4"
+              th:if="${message}"
+            >
+              <strong>Detalle técnico:</strong>
+              <span th:text="${message}">Error inesperado</span>
+            </div>
+            <a href="/" class="btn btn-amarillo"
+              ><i class="bi bi-house-door me-2"></i>Volver al Inicio</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

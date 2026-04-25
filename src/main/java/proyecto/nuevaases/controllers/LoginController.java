@@ -3,12 +3,11 @@ package proyecto.nuevaases.controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
 @Controller
-public class inicio {
+public class LoginController {
 
-@GetMapping("/")
-String holaMundo(){
-    return "index";
-}
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
 }
