@@ -1,4 +1,4 @@
-package proyecto.proyecto1;
+package proyecto.nuevaases;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

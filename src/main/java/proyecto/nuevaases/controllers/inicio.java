@@ -1,4 +1,4 @@
-package proyecto.proyecto1.controllers;
+package proyecto.nuevaases.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
