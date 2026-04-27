@@ -1,4 +1,4 @@
-package proyecto.proyecto1;
+package proyecto.nuevaases;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

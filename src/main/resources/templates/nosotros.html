@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head('Sobre Nosotros - Nueva Ases Express')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <!-- Page Header -->
+    <section class="bg-primario text-white py-5">
+      <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-2">Sobre Nosotros</h1>
+        <p class="lead text-white-50 mb-0">
+          Conoce la historia y los valores que nos impulsan
+        </p>
+      </div>
+    </section>
+
+    <!-- History & Mission -->
+    <section class="py-5">
+      <div class="container">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-6">
+            <img
+              th:src="@{/img/nuevaasesInicio.jpg}"
+              alt="Nueva Ases Express"
+              class="img-fluid rounded-4 shadow-lg"
+              style="object-fit: cover; height: 450px; width: 100%"
+              onerror="
+                this.src =
+                  'https://via.placeholder.com/600x450?text=Nueva+Ases+Express'
+              "
+            />
+          </div>
+          <div class="col-lg-6">
+            <h6 class="text-amarillo fw-bold text-uppercase ls-2">
+              Nuestra Historia
+            </h6>
+            <h2 class="fw-bold text-primario mb-3">
+              De un sueño a la empresa de transporte líder del norte
+            </h2>
+            <p class="text-muted fs-5">
+              Nueva Ases Express nació en el año 2015 en la ciudad de Trujillo,
+              con la visión de ofrecer un servicio de transporte diferente: más
+              seguro, más puntual y más cercano a las necesidades de las
+              personas y empresas de la región La Libertad.
+            </p>
+            <p class="text-muted">
+              Lo que comenzó como una pequeña operación con apenas tres
+              vehículos, hoy se ha convertido en una flota moderna de más de 25
+              unidades que conecta Trujillo con Chepén y múltiples destinos del
+              norte peruano.
+            </p>
+            <p class="text-muted">
+              Nuestro compromiso con la excelencia y la satisfacción del cliente
+              nos ha permitido crecer año tras año, ganándonos la confianza de
+              más de 50,000 clientes satisfechos.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Mission, Vision, Values -->
+    <section class="py-5 bg-light">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="card card-servicio h-100 shadow-sm p-4">
+              <div class="icono-servicio">
+                <i class="bi bi-bullseye"></i>
+              </div>
+              <h4 class="fw-bold text-primario">Misión</h4>
+              <p class="text-muted">
+                Brindar servicios de transporte de pasajeros, alquiler de
+                vehículos y paquetería con los más altos estándares de
+                seguridad, puntualidad y calidad, superando las expectativas de
+                nuestros clientes y contribuyendo al desarrollo de la región.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card card-servicio h-100 shadow-sm p-4">
+              <div class="icono-servicio">
+                <i class="bi bi-eye"></i>
+              </div>
+              <h4 class="fw-bold text-primario">Visión</h4>
+              <p class="text-muted">
+                Ser la empresa de transporte más confiable y reconocida del
+                norte del Perú para el año 2030, expandiendo nuestras rutas y
+                servicios a nivel nacional con tecnología de punta y un equipo
+                humano altamente calificado.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card card-servicio h-100 shadow-sm p-4">
+              <div class="icono-servicio">
+                <i class="bi bi-heart"></i>
+              </div>
+              <h4 class="fw-bold text-primario">Valores</h4>
+              <ul class="text-muted list-unstyled mb-0">
+                <li class="mb-2">
+                  <i class="bi bi-check-circle-fill text-amarillo me-2"></i
+                  ><strong>Integridad:</strong> Actuamos con honestidad y
+                  transparencia.
+                </li>
+                <li class="mb-2">
+                  <i class="bi bi-check-circle-fill text-amarillo me-2"></i
+                  ><strong>Compromiso:</strong> Cumplimos lo que prometemos.
+                </li>
+                <li class="mb-2">
+                  <i class="bi bi-check-circle-fill text-amarillo me-2"></i
+                  ><strong>Seguridad:</strong> Priorizamos la vida en cada
+                  viaje.
+                </li>
+                <li class="mb-2">
+                  <i class="bi bi-check-circle-fill text-amarillo me-2"></i
+                  ><strong>Innovación:</strong> Mejoramos continuamente.
+                </li>
+                <li class="mb-0">
+                  <i class="bi bi-check-circle-fill text-amarillo me-2"></i
+                  ><strong>Servicio:</strong> El cliente es nuestra razón de
+                  ser.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fleet Highlight -->
+    <section class="py-5">
+      <div class="container">
+        <div class="row text-center mb-5">
+          <div class="col-12">
+            <h2 class="fw-bold text-primario section-title">Nuestra Flota</h2>
+            <p class="text-muted fs-5">
+              Vehículos modernos y equipados para tu seguridad y comodidad
+            </p>
+          </div>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="card card-servicio h-100 shadow-sm">
+              <div class="card-body text-center p-4">
+                <div class="icono-servicio mx-auto">
+                  <i class="bi bi-bus-front"></i>
+                </div>
+                <h5 class="fw-bold text-primario">Buses Interprovinciales</h5>
+                <p class="text-muted">
+                  Unidades con aire acondicionado, asientos reclinables, baño
+                  químico y sistema de entretenimiento a bordo.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card card-servicio h-100 shadow-sm">
+              <div class="card-body text-center p-4">
+                <div class="icono-servicio mx-auto">
+                  <i class="bi bi-car-front"></i>
+                </div>
+                <h5 class="fw-bold text-primario">Minivans Ejecutivas</h5>
+                <p class="text-muted">
+                  Perfectas para grupos pequeños, traslados empresariales y
+                  viajes familiares con máximo confort.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card card-servicio h-100 shadow-sm">
+              <div class="card-body text-center p-4">
+                <div class="icono-servicio mx-auto">
+                  <i class="bi bi-truck"></i>
+                </div>
+                <h5 class="fw-bold text-primario">Camiones de Carga</h5>
+                <p class="text-muted">
+                  Equipados para transportar encomiendas y mercancía de forma
+                  segura y eficiente a cualquier destino.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Coverage -->
+    <section class="py-5 bg-primario text-white">
+      <div class="container text-center">
+        <h2 class="fw-bold mb-4">Cobertura y Rutas Principales</h2>
+        <p class="fs-5 text-white-50 mb-5">
+          Conectamos las principales ciudades de la región La Libertad y el
+          norte peruano
+        </p>
+        <div class="row g-4 justify-content-center">
+          <div class="col-md-3 col-6">
+            <div
+              class="p-3 rounded-3"
+              style="background: rgba(255, 255, 255, 0.1)"
+            >
+              <i class="bi bi-geo-alt-fill fs-2 text-amarillo mb-2"></i>
+              <h5 class="fw-bold mb-0">Trujillo</h5>
+              <small class="text-white-50">Sede Principal</small>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div
+              class="p-3 rounded-3"
+              style="background: rgba(255, 255, 255, 0.1)"
+            >
+              <i class="bi bi-geo-alt-fill fs-2 text-amarillo mb-2"></i>
+              <h5 class="fw-bold mb-0">Chepén</h5>
+              <small class="text-white-50">Ruta Principal</small>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div
+              class="p-3 rounded-3"
+              style="background: rgba(255, 255, 255, 0.1)"
+            >
+              <i class="bi bi-geo-alt-fill fs-2 text-amarillo mb-2"></i>
+              <h5 class="fw-bold mb-0">Pacasmayo</h5>
+              <small class="text-white-50">Ruta Frecuente</small>
+            </div>
+          </div>
+          <div class="col-md-3 col-6">
+            <div
+              class="p-3 rounded-3"
+              style="background: rgba(255, 255, 255, 0.1)"
+            >
+              <i class="bi bi-geo-alt-fill fs-2 text-amarillo mb-2"></i>
+              <h5 class="fw-bold mb-0">Guadalupe</h5>
+              <small class="text-white-50">Ruta Frecuente</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>

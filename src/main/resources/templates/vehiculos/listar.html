@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout :: head('Vehículos - Nueva Ases Express')}"></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <div class="container my-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primario">Nuestra Flota de Vehículos</h2>
+        <a href="/vehiculos/nuevo" class="btn btn-amarillo fw-bold"
+          ><i class="bi bi-plus-lg me-1"></i>Nuevo Vehículo</a
+        >
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4" th:each="v : ${vehiculos}">
+          <div class="card card-servicio h-100 shadow-sm">
+            <img
+              th:src="${v.imagen != null and !v.imagen.isEmpty()} ? ${v.imagen} : 'https://via.placeholder.com/400x250?text=' + ${v.tipo}"
+              class="card-img-top"
+              alt="Vehículo"
+              style="height: 200px; object-fit: cover"
+            />
+            <div class="card-body">
+              <div
+                class="d-flex justify-content-between align-items-start mb-2"
+              >
+                <h5
+                  class="card-title fw-bold text-primario mb-0"
+                  th:text="${v.marca} + ' ' + ${v.modelo}"
+                ></h5>
+                <span
+                  class="badge"
+                  style="border-radius: 50px"
+                  th:classappend="${v.estado == 'DISPONIBLE' ? 'bg-success' : (v.estado == 'ALQUILADO' ? 'bg-danger' : 'bg-warning')}"
+                  th:text="${v.estado}"
+                ></span>
+              </div>
+              <p class="text-muted mb-2">
+                <i class="bi bi-car-front me-1"></i
+                ><span th:text="${v.tipo}"></span> |
+                <i class="bi bi-calendar me-1"></i
+                ><span th:text="${v.anio}"></span> |
+                <i class="bi bi-people me-1"></i
+                ><span th:text="${v.capacidad} + ' pasajeros'"></span>
+              </p>
+              <p class="text-muted mb-2">
+                <i class="bi bi-upc me-1"></i>Placa:
+                <strong th:text="${v.placa}"></strong>
+              </p>
+              <h6 class="text-amarillo fw-bold">
+                S/ <span th:text="${v.precioPorDia}"></span> / día
+              </h6>
+            </div>
+            <div class="card-footer bg-white border-0 pt-0 pb-3 px-3">
+              <div class="d-flex gap-2">
+                <a
+                  th:href="@{'/vehiculos/editar/' + ${v.id}}"
+                  class="btn btn-sm btn-outline-primary flex-fill"
+                  ><i class="bi bi-pencil me-1"></i>Editar</a
+                >
+                <a
+                  th:href="@{'/vehiculos/eliminar/' + ${v.id}}"
+                  class="btn btn-sm btn-outline-danger flex-fill"
+                  onclick="
+                    return confirm('¿Estás seguro de eliminar este vehículo?');
+                  "
+                  ><i class="bi bi-trash me-1"></i>Eliminar</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center py-5" th:if="${#lists.isEmpty(vehiculos)}">
+        <i class="bi bi-car-front fs-1 text-muted"></i>
+        <h4 class="text-muted mt-3">No hay vehículos registrados</h4>
+        <a href="/vehiculos/nuevo" class="btn btn-amarillo mt-2"
+          >Registrar primer vehículo</a
+        >
+      </div>
+    </div>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>
