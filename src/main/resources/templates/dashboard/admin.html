@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head('Dashboard Administrador - Nueva Ases Express')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+    <section class="py-5 dashboard-page">
+      <div class="container">
+        <div class="row g-4">
+          <aside class="col-xl-3">
+            <div class="dashboard-sidebar">
+              <h5 class="sidebar-title">Menú administrador</h5>
+              <a class="sidebar-link active" href="/dashboard">Inicio</a>
+              <a class="sidebar-link" href="/vehiculos">Vehículos</a>
+              <a class="sidebar-link" href="/pasajes">Pasajes</a>
+              <a class="sidebar-link" href="/encomiendas">Encomiendas</a>
+              <a class="sidebar-link" href="/rastrear">Rastrear envíos</a>
+            </div>
+          </aside>
+          <main class="col-xl-9 dashboard-main">
+            <div class="dashboard-banner mb-5 text-white">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <span class="dashboard-icon">
+                    <i class="bi bi-shield-lock-fill"></i>
+                  </span>
+                  <h1 class="fw-bold">Panel de Administrador</h1>
+                  <p class="lead mb-0">
+                    Bienvenido, <span th:text="${nombreUsuario}"></span>. Aquí
+                    puedes monitorear la actividad del sistema y administrar a
+                    tus usuarios.
+                  </p>
+                </div>
+                <div class="col-md-4 text-md-end mt-4 mt-md-0">
+                  <span class="badge bg-light text-dark p-3 fs-6"
+                    >Administrador</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+              <div class="col-lg-3 col-md-6">
+                <div class="operation-summary bg-white h-100">
+                  <h6 class="text-uppercase text-muted">Usuarios totales</h6>
+                  <p
+                    class="display-6 fw-bold mb-0"
+                    th:text="${totalUsuarios}"
+                  ></p>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="operation-summary bg-white h-100">
+                  <h6 class="text-uppercase text-muted">Pasajes</h6>
+                  <p
+                    class="display-6 fw-bold mb-0"
+                    th:text="${totalPasajes}"
+                  ></p>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="operation-summary bg-white h-100">
+                  <h6 class="text-uppercase text-muted">Encomiendas</h6>
+                  <p
+                    class="display-6 fw-bold mb-0"
+                    th:text="${totalEncomiendas}"
+                  ></p>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="operation-summary bg-white h-100">
+                  <h6 class="text-uppercase text-muted">Vehículos</h6>
+                  <p
+                    class="display-6 fw-bold mb-0"
+                    th:text="${totalVehiculos}"
+                  ></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-4">
+              <div class="col-lg-6">
+                <div class="operation-list bg-white p-4">
+                  <h5 class="fw-bold">Últimos pasajes registrados</h5>
+                  <div class="table-responsive mt-3">
+                    <table class="table table-borderless align-middle mb-0">
+                      <thead>
+                        <tr>
+                          <th>Pasajero</th>
+                          <th>Ruta</th>
+                          <th>Fecha</th>
+                          <th>Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr th:each="pasaje : ${ultimosPasajes}">
+                          <td th:text="${pasaje.nombrePasajero}"></td>
+                          <td>
+                            <span th:text="${pasaje.origen}"></span> →
+                            <span th:text="${pasaje.destino}"></span>
+                          </td>
+                          <td th:text="${pasaje.fechaViaje}"></td>
+                          <td>
+                            <span
+                              class="badge bg-primario text-white"
+                              th:text="${pasaje.estado}"
+                            ></span>
+                          </td>
+                        </tr>
+                        <tr th:if="${ultimosPasajes.empty}">
+                          <td colspan="4" class="text-center text-muted">
+                            No hay pasajes recientes.
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-6">
+                <div class="operation-list bg-white p-4">
+                  <h5 class="fw-bold">Últimas encomiendas registradas</h5>
+                  <div class="table-responsive mt-3">
+                    <table class="table table-borderless align-middle mb-0">
+                      <thead>
+                        <tr>
+                          <th>Código</th>
+                          <th>Remitente</th>
+                          <th>Destino</th>
+                          <th>Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr th:each="enc : ${ultimasEncomiendas}">
+                          <td th:text="${enc.codigoRastreo}"></td>
+                          <td th:text="${enc.remitente}"></td>
+                          <td th:text="${enc.destino}"></td>
+                          <td>
+                            <span
+                              class="badge bg-primario text-white"
+                              th:text="${enc.estado}"
+                            ></span>
+                          </td>
+                        </tr>
+                        <tr th:if="${ultimasEncomiendas.empty}">
+                          <td colspan="4" class="text-center text-muted">
+                            No hay encomiendas recientes.
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

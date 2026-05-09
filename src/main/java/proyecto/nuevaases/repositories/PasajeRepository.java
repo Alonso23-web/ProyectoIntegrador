@@ -10,7 +10,14 @@ import java.util.List;
 @Repository
 public interface PasajeRepository extends JpaRepository<Pasaje, Long> {
     List<Pasaje> findByEstado(String estado);
-    List<Pasaje> findByFechaViaje(LocalDate fechaViaje);
-    List<Pasaje> findByFechaViajeAndHoraViaje(LocalDate fechaViaje, String horaViaje);
-}
 
+    List<Pasaje> findByFechaViaje(LocalDate fechaViaje);
+
+    List<Pasaje> findByFechaViajeAndHoraViaje(LocalDate fechaViaje, String horaViaje);
+
+    long countByDni(String dni);
+
+    List<Pasaje> findTop5ByDniOrderByFechaViajeDesc(String dni);
+
+    List<Pasaje> findTop5ByOrderByFechaViajeDesc();
+}

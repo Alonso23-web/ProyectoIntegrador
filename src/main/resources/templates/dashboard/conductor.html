@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head('Panel Conductor - Nueva Ases Express')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+    <section class="py-5 dashboard-page">
+      <div class="container">
+        <div class="row g-4">
+          <aside class="col-xl-3">
+            <div class="dashboard-sidebar">
+              <h5 class="sidebar-title">Menú conductor</h5>
+              <a class="sidebar-link active" href="/dashboard">Inicio</a>
+              <a class="sidebar-link" href="/vehiculos">Vehículos</a>
+              <a class="sidebar-link" href="/encomiendas">Encomiendas</a>
+              <a class="sidebar-link" href="/rastrear">Rastrear</a>
+            </div>
+          </aside>
+          <main class="col-xl-9 dashboard-main">
+            <div class="dashboard-banner mb-5 text-white">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <span class="dashboard-icon">
+                    <i class="bi bi-car-front-fill"></i>
+                  </span>
+                  <h1 class="fw-bold">Panel de Conductor</h1>
+                  <p class="lead mb-0">
+                    Bienvenido, <span th:text="${nombreUsuario}"></span>.
+                    Consulta rápidamente tu actividad y disponibilidad.
+                  </p>
+                </div>
+                <div class="col-md-4 text-md-end mt-4 mt-md-0">
+                  <span class="badge bg-light text-dark p-3 fs-6"
+                    >Conductor</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+              <div class="col-md-6 col-lg-4">
+                <div class="operation-summary bg-white h-100">
+                  <h6 class="text-uppercase text-muted">Vehículos totales</h6>
+                  <p
+                    class="display-6 fw-bold mb-0"
+                    th:text="${totalVehiculos}"
+                  ></p>
+                </div>
+              </div>
+              <div class="col-md-6 col-lg-4">
+                <div class="operation-summary bg-white h-100">
+                  <h6 class="text-uppercase text-muted">Pasajes totales</h6>
+                  <p
+                    class="display-6 fw-bold mb-0"
+                    th:text="${totalPasajes}"
+                  ></p>
+                </div>
+              </div>
+              <div class="col-md-6 col-lg-4">
+                <div class="operation-summary bg-white h-100">
+                  <h6 class="text-uppercase text-muted">Encomiendas totales</h6>
+                  <p
+                    class="display-6 fw-bold mb-0"
+                    th:text="${totalEncomiendas}"
+                  ></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-4">
+              <div class="col-lg-6">
+                <div class="operation-list bg-white p-4">
+                  <h5 class="fw-bold">Acciones principales</h5>
+                  <ul class="list-group list-group-flush mt-3">
+                    <li
+                      class="list-group-item d-flex justify-content-between align-items-center"
+                    >
+                      Acceder a vehículos
+                      <a href="/vehiculos" class="btn btn-link">Ir</a>
+                    </li>
+                    <li
+                      class="list-group-item d-flex justify-content-between align-items-center"
+                    >
+                      Ver envíos
+                      <a href="/encomiendas" class="btn btn-link">Ir</a>
+                    </li>
+                    <li
+                      class="list-group-item d-flex justify-content-between align-items-center"
+                    >
+                      Rastrear estado
+                      <a href="/rastrear" class="btn btn-link">Ir</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div class="col-lg-6">
+                <div class="operation-list bg-white p-4">
+                  <h5 class="fw-bold">Datos rápidos</h5>
+                  <p class="mb-2">
+                    Accede al estado de los vehículos, el total de viajes y
+                    envíos disponibles desde el sistema.
+                  </p>
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <span class="badge badge-light-blue p-3 text-uppercase"
+                        >Tu usuario</span
+                      >
+                      <div
+                        class="mt-2 fw-semibold"
+                        th:text="${nombreUsuario}"
+                      ></div>
+                    </div>
+                    <div class="col-12">
+                      <span class="badge badge-light-blue p-3 text-uppercase"
+                        >Estado</span
+                      >
+                      <div class="mt-2 text-muted">Conductor activo</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

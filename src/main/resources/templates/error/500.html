@@ -67,6 +67,10 @@
               <strong>Detalle técnico:</strong>
               <span th:text="${message}">Error inesperado</span>
             </div>
+            <div class="alert alert-light text-start mb-4" th:if="${trace}">
+              <strong>Stack trace:</strong>
+              <pre th:text="${trace}"></pre>
+            </div>
             <a href="/" class="btn btn-amarillo"
               ><i class="bi bi-house-door me-2"></i>Volver al Inicio</a
             >

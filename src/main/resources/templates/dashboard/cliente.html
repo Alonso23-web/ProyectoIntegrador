@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head('Dashboard Cliente - Nueva Ases Express')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+    <section class="py-5 dashboard-page">
+      <div class="container">
+        <div class="row g-4">
+          <aside class="col-xl-3">
+            <div class="dashboard-sidebar">
+              <h5 class="sidebar-title">Menú cliente</h5>
+              <a class="sidebar-link active" href="/dashboard">Inicio</a>
+              <a class="sidebar-link" href="/pasajes">Mis pasajes</a>
+              <a class="sidebar-link" href="/encomiendas">Mis encomiendas</a>
+              <a class="sidebar-link" href="/pasajes/nuevo">Comprar pasaje</a>
+              <a class="sidebar-link" href="/encomiendas/nuevo"
+                >Enviar encomienda</a
+              >
+              <a class="sidebar-link" href="/rastrear">Rastrear envío</a>
+            </div>
+          </aside>
+          <main class="col-xl-9 dashboard-main">
+            <div class="dashboard-banner mb-5 text-white">
+              <div class="row align-items-center">
+                <div class="col-md-8">
+                  <span class="dashboard-icon">
+                    <i class="bi bi-person-fill"></i>
+                  </span>
+                  <h1 class="fw-bold">Panel de Cliente</h1>
+                  <p class="lead mb-0">
+                    Hola, <span th:text="${nombreUsuario}"></span>. Revisa tu
+                    historial de viajes y envíos recientes.
+                  </p>
+                </div>
+                <div class="col-md-4 text-md-end mt-4 mt-md-0">
+                  <span class="badge bg-light text-dark p-3 fs-6">Cliente</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+              <div class="col-md-6 col-lg-4">
+                <div class="operation-summary bg-white h-100">
+                  <h6 class="text-uppercase text-muted">Pasajes registrados</h6>
+                  <p
+                    class="display-6 fw-bold mb-0"
+                    th:text="${pasajesComprados}"
+                  ></p>
+                </div>
+              </div>
+              <div class="col-md-6 col-lg-4">
+                <div class="operation-summary bg-white h-100">
+                  <h6 class="text-uppercase text-muted">
+                    Encomiendas registradas
+                  </h6>
+                  <p
+                    class="display-6 fw-bold mb-0"
+                    th:text="${encomiendasRegistradas}"
+                  ></p>
+                </div>
+              </div>
+              <div class="col-md-6 col-lg-4">
+                <div class="operation-summary bg-white h-100">
+                  <h6 class="text-uppercase text-muted">Acceso rápido</h6>
+                  <p class="mb-0">Revisa tus viajes y envíos desde aquí.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-4">
+              <div class="col-lg-6">
+                <div class="operation-list bg-white p-4">
+                  <h5 class="fw-bold">Últimos viajes reservados</h5>
+                  <div class="table-responsive mt-3">
+                    <table class="table table-borderless align-middle mb-0">
+                      <thead>
+                        <tr>
+                          <th>Pasajero</th>
+                          <th>Origen</th>
+                          <th>Destino</th>
+                          <th>Fecha</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr th:each="pasaje : ${ultimosPasajes}">
+                          <td th:text="${pasaje.nombrePasajero}"></td>
+                          <td th:text="${pasaje.origen}"></td>
+                          <td th:text="${pasaje.destino}"></td>
+                          <td th:text="${pasaje.fechaViaje}"></td>
+                        </tr>
+                        <tr th:if="${ultimosPasajes.empty}">
+                          <td colspan="4" class="text-center text-muted">
+                            Aún no tienes viajes registrados.
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-6">
+                <div class="operation-list bg-white p-4">
+                  <h5 class="fw-bold">Últimas encomiendas</h5>
+                  <div class="table-responsive mt-3">
+                    <table class="table table-borderless align-middle mb-0">
+                      <thead>
+                        <tr>
+                          <th>Código</th>
+                          <th>Destino</th>
+                          <th>Estado</th>
+                          <th>Envío</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr th:each="enc : ${ultimasEncomiendas}">
+                          <td th:text="${enc.codigoRastreo}"></td>
+                          <td th:text="${enc.destino}"></td>
+                          <td>
+                            <span
+                              class="badge bg-primario text-white"
+                              th:text="${enc.estado}"
+                            ></span>
+                          </td>
+                          <td th:text="${enc.fechaEnvio}"></td>
+                        </tr>
+                        <tr th:if="${ultimasEncomiendas.empty}">
+                          <td colspan="4" class="text-center text-muted">
+                            Aún no tienes encomiendas registradas.
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

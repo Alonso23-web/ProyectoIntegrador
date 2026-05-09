@@ -16,6 +16,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public String handleGeneralException(Exception ex, Model model) {
         model.addAttribute("message", ex.getMessage());
+        StringBuilder traceBuilder = new StringBuilder();
+        for (StackTraceElement element : ex.getStackTrace()) {
+            traceBuilder.append(element.toString()).append("\n");
+        }
+        model.addAttribute("trace", traceBuilder.toString());
+        ex.printStackTrace();
         return "error/500";
     }
 }

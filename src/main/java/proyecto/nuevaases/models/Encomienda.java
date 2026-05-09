@@ -1,5 +1,6 @@
 package proyecto.nuevaases.models;
 
+
 import jakarta.persistence.*;
 import lombok.*;
 
