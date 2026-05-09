@@ -43,13 +43,11 @@ public class DashboardController {
         }
 
         if (rol.equals("CLIENTE")) {
-            String dni = usuarioOpt.map(u -> u.getDni()).orElse("");
-            model.addAttribute("pasajesComprados", pasajeRepository.countByDni(dni));
-            model.addAttribute("encomiendasRegistradas",
-                    encomiendaRepository.countByDniRemitenteOrDniDestinatario(dni, dni));
-            model.addAttribute("ultimosPasajes", pasajeRepository.findTop5ByDniOrderByFechaViajeDesc(dni));
+            model.addAttribute("pasajesComprados", pasajeRepository.countByCreadoPorEmail(email));
+            model.addAttribute("encomiendasRegistradas", encomiendaRepository.countByCreadoPorEmail(email));
+            model.addAttribute("ultimosPasajes", pasajeRepository.findTop5ByCreadoPorEmailOrderByFechaViajeDesc(email));
             model.addAttribute("ultimasEncomiendas",
-                    encomiendaRepository.findTop5ByDniRemitenteOrDniDestinatarioOrderByFechaEnvioDesc(dni, dni));
+                    encomiendaRepository.findTop5ByCreadoPorEmailOrderByFechaEnvioDesc(email));
             return "dashboard/cliente";
         }
 

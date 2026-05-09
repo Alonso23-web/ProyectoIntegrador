@@ -41,6 +41,10 @@ public class EncomiendaService {
         return encomiendaRepository.findByDniRemitenteOrDniDestinatario(dni, dni);
     }
 
+    public List<Encomienda> buscarPorCreadoPorEmail(String creadoPorEmail) {
+        return encomiendaRepository.findByCreadoPorEmail(creadoPorEmail);
+    }
+
     public double calcularPrecio(String origen, String destino, double peso) {
         // Tarifa base según ruta
         double tarifaBase = obtenerTarifaBase(origen, destino);

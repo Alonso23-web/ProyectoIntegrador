@@ -43,5 +43,6 @@ public class Pasaje {
 
     @Column(nullable = false)
     private String estado; // RESERVADO, PAGADO, CANCELADO
-}
 
+    private String creadoPorEmail;
+}

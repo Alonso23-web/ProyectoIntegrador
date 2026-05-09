@@ -31,18 +31,7 @@ public class SecurityConfig {
                                                                 "/images/**", "/img/**", "/node_modules/**",
                                                                 "/webjars/**")
                                                 .permitAll()
-                                                .requestMatchers("/api/**").permitAll() // ← AGREGAR ESTA LÍNEA
-                                                .requestMatchers(HttpMethod.GET, "/vehiculos/**", "/pasajes/**",
-                                                                "/encomiendas/**", "/rastrear")
-                                                .permitAll()
                                                 .requestMatchers("/h2-console/**").permitAll()
-                                                .requestMatchers("/encomiendas/nuevo", "/encomiendas/editar/**",
-                                                                "/encomiendas/eliminar/**",
-                                                                "/pasajes/nuevo", "/pasajes/editar/**",
-                                                                "/pasajes/eliminar/**",
-                                                                "/vehiculos/nuevo", "/vehiculos/editar/**",
-                                                                "/vehiculos/eliminar/**")
-                                                .hasAnyRole("ADMINISTRADOR", "CLIENTE", "CONDUCTOR")
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
                                                 .loginPage("/login")

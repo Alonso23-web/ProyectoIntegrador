@@ -1,6 +1,5 @@
 package proyecto.nuevaases.models;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -56,5 +55,6 @@ public class Encomienda {
     private String estado; // REGISTRADO, EN_TRANSITO, EN_DESTINO, ENTREGADO
 
     private String observaciones;
-}
 
+    private String creadoPorEmail;
+}

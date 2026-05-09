@@ -1,13 +1,23 @@
+﻿HTTP/1.1 200 
+X-Content-Type-Options: nosniff
+X-XSS-Protection: 0
+Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: SAMEORIGIN
+Content-Type: text/html;charset=UTF-8
+Content-Language: es-PE
+Transfer-Encoding: chunked
+Date: Fri, 08 May 2026 05:13:15 GMT
+Connection: close
+
+2000
 <!doctype html>
-<html
-  lang="es"
-  xmlns:th="http://www.thymeleaf.org"
-  xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
->
-  <head th:fragment="head(title)">
+<html lang="es">
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title th:text="${title}">Nueva Ases Express</title>
+    <title>Iniciar Sesión - Nueva Ases Express</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -111,48 +121,6 @@
       .text-primario {
         color: var(--color-primario) !important;
       }
-      .dashboard-page {
-        min-height: calc(100vh - 130px);
-      }
-      .dashboard-sidebar {
-        background: white;
-        border-radius: 24px;
-        padding: 1.8rem;
-        box-shadow: 0 18px 40px rgba(13, 27, 76, 0.08);
-      }
-      .dashboard-sidebar .sidebar-title {
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-        font-size: 0.85rem;
-        font-weight: 700;
-        margin-bottom: 1.5rem;
-        color: var(--color-primario);
-      }
-      .dashboard-sidebar .sidebar-link {
-        display: block;
-        color: #0d1b4c;
-        padding: 0.95rem 1.1rem;
-        border-radius: 16px;
-        background: rgba(13, 27, 76, 0.04);
-        margin-bottom: 0.75rem;
-        transition:
-          background 0.2s ease,
-          transform 0.2s ease;
-        text-decoration: none;
-        font-weight: 600;
-      }
-      .dashboard-sidebar .sidebar-link:hover {
-        background: rgba(13, 27, 76, 0.08);
-        transform: translateX(2px);
-        text-decoration: none;
-      }
-      .dashboard-sidebar .sidebar-link.active {
-        background: var(--color-primario);
-        color: white;
-      }
-      .dashboard-main {
-        min-height: 100%;
-      }
       /* Footer */
       .footer-main {
         background: linear-gradient(
@@ -245,65 +213,6 @@
       .card-servicio:hover {
         transform: translateY(-8px);
         box-shadow: 0 20px 40px rgba(13, 27, 76, 0.15) !important;
-      }
-      .dashboard-banner {
-        border-radius: 30px;
-        background: linear-gradient(
-          135deg,
-          rgba(13, 27, 76, 0.95),
-          rgba(244, 180, 0, 0.95)
-        );
-        color: white;
-        padding: 3rem 2rem;
-        position: relative;
-        overflow: hidden;
-      }
-      .dashboard-banner::after {
-        content: "";
-        position: absolute;
-        right: -50px;
-        top: -40px;
-        width: 260px;
-        height: 260px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 50%;
-      }
-      .dashboard-icon {
-        width: 100px;
-        height: 100px;
-        border-radius: 24px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 3rem;
-        background: rgba(255, 255, 255, 0.18);
-        color: white;
-        margin-bottom: 1rem;
-      }
-      .operation-summary {
-        border-radius: 20px;
-        padding: 1.8rem;
-        box-shadow: 0 18px 40px rgba(13, 27, 76, 0.08);
-        transition: transform 0.2s ease;
-      }
-      .operation-summary:hover {
-        transform: translateY(-4px);
-      }
-      .operation-list {
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 18px 40px rgba(13, 27, 76, 0.08);
-      }
-      .operation-list table {
-        margin-bottom: 0;
-      }
-      .operation-list th,
-      .operation-list td {
-        vertical-align: middle;
-      }
-      .badge-light-blue {
-        background: rgba(13, 27, 76, 0.1);
-        color: #0d1b4c;
       }
       .icono-servicio {
         width: 80px;
@@ -401,7 +310,9 @@
       .section-title {
         position: relative;
         display: inline-block;
-        margin-bottom: 3rem;
+        margin
+1362
+-bottom: 3rem;
       }
       .section-title::after {
         content: "";
@@ -417,11 +328,11 @@
     </style>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-custom" th:fragment="navbar">
+    <nav class="navbar navbar-expand-lg navbar-custom">
       <div class="container">
         <a class="navbar-brand" href="/">
           <img
-            th:src="@{/img/logonuevaases.png}"
+            src="/img/logonuevaases.png"
             alt="Nueva Ases Express"
             onerror="this.style.display = 'none'"
           />
@@ -441,108 +352,123 @@
             <li class="nav-item">
               <a class="nav-link" href="/nosotros">Nosotros</a>
             </li>
-            <li class="nav-item" sec:authorize="isAuthenticated()">
-              <a class="nav-link" href="/dashboard">Dashboard</a>
-            </li>
-            <li class="nav-item" sec:authorize="isAuthenticated()">
-              <a class="nav-link" href="/vehiculos">Vehículos</a>
-            </li>
-            <li class="nav-item" sec:authorize="isAuthenticated()">
-              <a class="nav-link" href="/pasajes">Pasajes</a>
-            </li>
-            <li class="nav-item" sec:authorize="!isAuthenticated()">
+            
+            
+            <li class="nav-item">
               <a class="nav-link" href="/registro">Registrarse</a>
             </li>
-            <li class="nav-item" sec:authorize="!isAuthenticated()">
+            <li class="nav-item">
               <a class="nav-link" href="/login">Iniciar Sesión</a>
             </li>
-            <li class="nav-item" sec:authorize="isAuthenticated()">
-              <form th:attr="action=@{/logout}" method="post" class="d-inline">
-                <input
-                  type="hidden"
-                  th:name="${_csrf.parameterName}"
-                  th:value="${_csrf.token}"
-                />
-                <button
-                  type="submit"
-                  class="btn btn-link nav-link"
-                  style="border: none; background: none"
-                >
-                  Cerrar Sesión
-                </button>
-              </form>
-            </li>
+            
           </ul>
         </div>
       </div>
     </nav>
 
-    <footer th:fragment="footer" class="footer-main">
-      <div class="container">
-        <div class="row g-4">
-          <div class="col-lg-4 col-md-6">
-            <h5><i class="bi bi-bus-front-fill me-2"></i>Nueva Ases Express</h5>
-            <p class="text-white-50 mb-3">
-              Tu empresa de transportes de confianza en Perú. Conectando
-              Trujillo con Chepén y más destinos con seguridad y puntualidad
-              desde 2015.
-            </p>
-            <div>
-              <a href="#" class="social-icon"><i class="bi bi-facebook"></i></a>
-              <a href="#" class="social-icon"
-                ><i class="bi bi-instagram"></i
-              ></a>
-              <a href="#" class="social-icon"><i class="bi bi-whatsapp"></i></a>
-              <a href="#" class="social-icon"><i class="bi bi-tiktok"></i></a>
+    <div class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-md-5">
+          <div
+            class="card shadow-lg border-0"
+            style="border-radius: 20px; overflow: hidden"
+          >
+            <div class="card-header bg-primario text-white text-center py-4">
+              <img
+                src="/img/logonuevaases.png"
+                alt="Nueva Ases Express"
+                style="
+                  height: 60px;
+                  background: white;
+                  padding: 5px;
+                  border-radius: 12px;
+                  margin-bottom: 1rem;
+                "
+                onerror="this.style.display = 'none'"
+              />
+              <h4 class="mb-0 fw-bold">Iniciar Sesión</h4>
+              <small class="text-white-50"
+                >Acceso al sistema administrativo</small
+              >
             </div>
-          </div>
-          <div class="col-lg-2 col-md-6">
-            <h5>Enlaces</h5>
-            <a href="/">Inicio</a>
-            <a href="/nosotros">Nosotros</a>
-            <a href="/vehiculos">Vehículos</a>
-            <a href="/pasajes">Pasajes</a>
-            <a href="/rastrear">Rastrear Encomienda</a>
-          </div>
-          <div class="col-lg-3 col-md-6">
-            <h5>Servicios</h5>
-            <a href="/vehiculos"
-              ><i class="bi bi-bus-front me-2"></i>Alquiler de Vehículos</a
-            >
-            <a href="/pasajes"
-              ><i class="bi bi-ticket-perforated me-2"></i>Venta de Pasajes</a
-            >
-            <a href="/encomiendas"
-              ><i class="bi bi-box-seam me-2"></i>Paquetería y Encomiendas</a
-            >
-          </div>
-          <div class="col-lg-3 col-md-6">
-            <h5>Contacto</h5>
-            <p class="text-white-50 mb-2">
-              <i class="bi bi-telephone-fill me-2 text-amarillo"></i>+51 999 888
-              777
+            <div class="card-body p-4">
+              <!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>500 - Error Interno</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <style>
+      :root {
+        --color-primario: #0d1b4c;
+        --color-secundario: #f4b400;
+      }
+      body {
+        background: linear-gradient(
+          135deg,
+          var(--color-primario) 0%,
+          #1a2d6b 100%
+        );
+        min-height: 100vh;
+      }
+      .error-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+      .error-code {
+        font-size: 8rem;
+        font-weight: 800;
+        color: #dc3545;
+        line-height: 1;
+      }
+      .btn-amarillo {
+        background: linear-gradient(
+          135deg,
+          var(--color-secundario) 0%,
+          #e8a000 100%
+        );
+        border: none;
+        color: #1a1a1a;
+        font-weight: 700;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+      }
+    </style>
+  </head>
+  <body class="d-flex align-items-center">
+    <div class="container text-center py-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="card error-card p-5">
+            <div class="error-code mb-3">500</div>
+            <h2 class="mb-3 fw-bold text-danger">Error interno del servidor</h2>
+            <p class="lead mb-4 text-muted">
+              Estamos experimentando problemas técnicos. Por favor, inténtalo de
+              nuevo más tarde.
             </p>
-            <p class="text-white-50 mb-2">
-              <i class="bi bi-envelope-fill me-2 text-amarillo"></i
-              >contacto@nuevaasesexpress.pe
-            </p>
-            <p class="text-white-50 mb-0">
-              <i class="bi bi-geo-alt-fill me-2 text-amarillo"></i>Trujillo, La
-              Libertad, Perú
-            </p>
+            <div
+              class="alert alert-secondary text-start mb-4"
+            >
+              <strong>Detalle técnico:</strong>
+              <span>No converter for [class java.util.LinkedHashMap] with preset Content-Type &#39;text/html;charset=UTF-8&#39;</span>
+            </div>
+            
+            <a href="/" class="btn btn-amarillo"
+              ><i class="bi bi-house-door me-2"></i>Volver al Inicio</a
+            >
           </div>
-        </div>
-        <div class="footer-bottom text-center">
-          <p class="mb-0 text-white-50">
-            &copy; 2024 Nueva Ases Express. Todos los derechos reservados. |
-            Diseñado con <i class="bi bi-heart-fill text-danger"></i> en Perú
-          </p>
         </div>
       </div>
-    </footer>
-
-    <div th:fragment="scripts">
-      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </div>
   </body>
 </html>
+
+

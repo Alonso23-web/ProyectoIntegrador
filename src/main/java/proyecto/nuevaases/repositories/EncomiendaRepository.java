@@ -20,5 +20,11 @@ public interface EncomiendaRepository extends JpaRepository<Encomienda, Long> {
         List<Encomienda> findTop5ByDniRemitenteOrDniDestinatarioOrderByFechaEnvioDesc(
                         String dniRemitente, String dniDestinatario);
 
+        long countByCreadoPorEmail(String creadoPorEmail);
+
+        List<Encomienda> findTop5ByCreadoPorEmailOrderByFechaEnvioDesc(String creadoPorEmail);
+
+        List<Encomienda> findByCreadoPorEmail(String creadoPorEmail);
+
         List<Encomienda> findTop5ByOrderByFechaEnvioDesc();
 }

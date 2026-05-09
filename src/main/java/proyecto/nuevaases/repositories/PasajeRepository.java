@@ -17,7 +17,11 @@ public interface PasajeRepository extends JpaRepository<Pasaje, Long> {
 
     long countByDni(String dni);
 
+    long countByCreadoPorEmail(String creadoPorEmail);
+
     List<Pasaje> findTop5ByDniOrderByFechaViajeDesc(String dni);
+
+    List<Pasaje> findTop5ByCreadoPorEmailOrderByFechaViajeDesc(String creadoPorEmail);
 
     List<Pasaje> findTop5ByOrderByFechaViajeDesc();
 }

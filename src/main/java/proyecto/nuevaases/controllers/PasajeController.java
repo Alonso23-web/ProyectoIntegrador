@@ -1,11 +1,13 @@
 package proyecto.nuevaases.controllers;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import proyecto.nuevaases.models.Pasaje;
 import proyecto.nuevaases.services.PasajeService;
+import proyecto.nuevaases.services.UsuarioService;
 
 @Controller
 @RequestMapping("/pasajes")
@@ -13,6 +15,7 @@ import proyecto.nuevaases.services.PasajeService;
 public class PasajeController {
 
     private final PasajeService pasajeService;
+    private final UsuarioService usuarioService;
 
     @GetMapping
     public String listar(Model model) {
@@ -33,7 +36,19 @@ public class PasajeController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Pasaje pasaje) {
+    public String guardar(@ModelAttribute Pasaje pasaje, Authentication authentication) {
+        if (authentication != null && authentication.isAuthenticated()) {
+            var email = authentication.getName();
+            pasaje.setCreadoPorEmail(email);
+            usuarioService.obtenerPorEmail(email).ifPresent(usuario -> {
+                if (pasaje.getNombrePasajero() == null || pasaje.getNombrePasajero().isBlank()) {
+                    pasaje.setNombrePasajero(usuario.getNombreCompleto());
+                }
+                if (pasaje.getDni() == null || pasaje.getDni().isBlank()) {
+                    pasaje.setDni(usuario.getDni());
+                }
+            });
+        }
         if (pasaje.getOrigen() == null || pasaje.getOrigen().isEmpty()) {
             pasaje.setOrigen("Trujillo");
         }
