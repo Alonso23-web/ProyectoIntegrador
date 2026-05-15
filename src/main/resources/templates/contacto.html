@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout :: head('Contacto - Nueva Ases Express')}"></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <section class="py-5 bg-primario text-white text-center">
+      <div class="container">
+        <h1 class="fw-bold">Contáctanos</h1>
+        <p class="lead">Estamos para ayudarte en cada kilómetro de tu viaje</p>
+      </div>
+    </section>
+
+    <section class="py-5">
+      <div class="container">
+        <div class="row g-5">
+          <div class="col-lg-6">
+            <div
+              class="card shadow-sm p-4 border-0"
+              style="border-radius: 20px"
+            >
+              <h4 class="fw-bold text-primario mb-4">Envíanos un mensaje</h4>
+              <form action="/contacto" method="POST">
+                <div class="mb-3">
+                  <label class="form-label">Nombre Completo</label>
+                  <input type="text" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Correo Electrónico</label>
+                  <input type="email" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Teléfono</label>
+                  <input type="tel" class="form-control" />
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">Mensaje</label>
+                  <textarea class="form-control" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-amarillo w-100 fw-bold">
+                  Enviar Mensaje
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <h4 class="fw-bold text-primario mb-4">Información de Contacto</h4>
+            <div class="d-flex mb-3">
+              <i class="bi bi-geo-alt-fill text-amarillo fs-4 me-3"></i>
+              <p>Av. Nicolás de Piérola 1234, Trujillo, La Libertad, Perú</p>
+            </div>
+            <div class="d-flex mb-3">
+              <i class="bi bi-telephone-fill text-amarillo fs-4 me-3"></i>
+              <p>+51 999 888 777 / (044) 123456</p>
+            </div>
+            <div class="d-flex mb-4">
+              <i class="bi bi-envelope-fill text-amarillo fs-4 me-3"></i>
+              <p>atencion@nuevaasesexpress.pe</p>
+            </div>
+
+            <h4 class="fw-bold text-primario mb-3">Nuestra Ubicación</h4>
+            <div
+              class="rounded-4 overflow-hidden shadow-sm"
+              style="height: 250px"
+            >
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3950.39058514!2d-79.0289!3d-8.11!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOMKwMDYnMzYuMCJTIDc5wrAwMSc0NC40Ilc!5e0!3m2!1ses!2spe!4v1634567890123"
+                width="100%"
+                height="100%"
+                style="border: 0"
+                allowfullscreen=""
+                loading="lazy"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mt-5">
+          <div class="col-12">
+            <h3 class="text-center fw-bold text-primario mb-4">
+              Preguntas Frecuentes (FAQ)
+            </h3>
+            <div class="accordion" id="faqAccordion">
+              <div
+                class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden"
+              >
+                <h2 class="accordion-header">
+                  <button
+                    class="accordion-button collapsed fw-bold"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#f1"
+                  >
+                    ¿Con cuánta anticipación debo llegar al terminal?
+                  </button>
+                </h2>
+                <div
+                  id="f1"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#faqAccordion"
+                >
+                  <div class="accordion-body text-muted">
+                    Recomendamos llegar al menos 30 minutos antes de la hora de
+                    salida programada para el embarque y control de equipaje.
+                  </div>
+                </div>
+              </div>
+              <div
+                class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden"
+              >
+                <h2 class="accordion-header">
+                  <button
+                    class="accordion-button collapsed fw-bold"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#f2"
+                  >
+                    ¿Puedo cambiar la fecha de mi pasaje?
+                  </button>
+                </h2>
+                <div
+                  id="f2"
+                  class="accordion-collapse collapse"
+                  data-bs-parent="#faqAccordion"
+                >
+                  <div class="accordion-body text-muted">
+                    Sí, puedes solicitar reprogramaciones hasta 24 horas antes
+                    del viaje de forma gratuita en nuestras oficinas físicas.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>

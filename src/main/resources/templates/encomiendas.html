@@ -21,28 +21,28 @@
     <section class="py-5">
       <div class="container">
         <div class="position-relative mb-4">
-          <ul class="nav nav-pills gap-2 d-inline-flex position-relative" id="encTabs" style="left: 260px;">
+          <ul class="nav nav-pills gap-2 d-flex justify-content-center" id="encTabs">
             <li class="nav-item">
               <button class="nav-link active btn-tab" data-tab="mis-registros">
-                <i class="bi bi-list-check me-1"></i> Mis Registros
+                <i class="bi bi-boxes me-1"></i> Mis envíos
               </button>
             </li>
             <li class="nav-item">
               <button class="nav-link btn-tab" data-tab="registrar">
-                <i class="bi bi-plus-circle me-1"></i> Registrar
+                <i class="bi bi-plus-circle me-1"></i> Registrar envío
               </button>
             </li>
             <li class="nav-item">
               <button class="nav-link btn-tab" data-tab="calcular">
-                <i class="bi bi-calculator me-1"></i> Calcular precio
+                <i class="bi bi-calculator me-1"></i> Cotizar envío
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link btn-tab" data-tab="rastrear">
+                <i class="bi bi-upc-scan me-1"></i> Rastrear encomienda
               </button>
             </li>
           </ul>
-
-          <a href="/rastrear" class="btn btn-outline-primary px-3 py-2 position-absolute end-0 top-50 translate-middle-y" style="margin-right: 240px;">
-            <i class="bi bi-search me-1"></i>
-            Rastrear
-          </a>
         </div>
 
         <!-- MIS REGISTROS -->
@@ -174,7 +174,7 @@
           </div>
         </div>
 
-        <!-- CALCULAR -->
+        <!-- COTIZAR / CALCULAR -->
         <div id="tab-calcular" class="tab-panel d-none">
           <div class="card shadow-sm mx-auto" style="max-width: 500px">
             <div class="card-body p-4">
@@ -292,55 +292,6 @@
         });
       });
 
-      function alerta(id, tipo, html) {
-        document.getElementById(id).innerHTML =
-          `<div class="alert alert-${tipo} mt-2">${html}</div>`;
-      }
-
-      async function rastrear() {
-        const codigo = document.getElementById("track-codigo").value.trim();
-        if (!codigo)
-          return alerta(
-            "track-result",
-            "warning",
-            "Ingresa un código de rastreo.",
-          );
-        alerta(
-          "track-result",
-          "info",
-          '<div class="spinner-border spinner-border-sm me-2"></div> Buscando...',
-        );
-        try {
-          const r = await fetch(`${API}/${encodeURIComponent(codigo)}`);
-          if (!r.ok) throw new Error();
-          const d = await r.json();
-          alerta(
-            "track-result",
-            "success",
-            `
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <strong>${d.codigoRastreo}</strong>
-                    <span class="estado-badge estado-${d.estado}">${d.estado.replace("_", " ")}</span>
-                </div>
-                <div class="row g-2 small">
-                    <div class="col-6"><i class="bi bi-person me-1"></i><strong>De:</strong> ${d.remitente}</div>
-                    <div class="col-6"><i class="bi bi-person-check me-1"></i><strong>Para:</strong> ${d.destinatario}</div>
-                    <div class="col-6"><i class="bi bi-arrow-right-circle me-1"></i>${d.origen} → ${d.destino}</div>
-                    <div class="col-6"><i class="bi bi-box me-1"></i>${d.peso} kg · S/ ${d.precio.toFixed(2)}</div>
-                    ${d.descripcion ? `<div class="col-12"><i class="bi bi-tag me-1"></i>${d.descripcion}</div>` : ""}
-                    ${d.fechaEstimadaEntrega ? `<div class="col-12"><i class="bi bi-calendar-check me-1"></i>Entrega estimada: ${d.fechaEstimadaEntrega}</div>` : ""}
-                </div>
-            `,
-          );
-        } catch (e) {
-          alerta(
-            "track-result",
-            "danger",
-            '<i class="bi bi-exclamation-circle me-2"></i>No se encontró ninguna encomienda con ese código.',
-          );
-        }
-      }
-
       async function cargarMisRegistros() {
         alerta(
           "mis-registros-result",
@@ -365,8 +316,8 @@
                     <td>${e.origen} → ${e.destino}</td>
                     <td>${e.remitente}</td>
                     <td>${e.destinatario}</td>
-                    <td>${e.peso} kg</td>
-                    <td>S/ ${e.precio.toFixed(2)}</td>
+                    <td>${e.pesoEstimado} kg</td>
+                    <td>S/ ${e.costoEstimado.toFixed(2)}</td>
                     <td><span class="estado-badge estado-${e.estado}">${e.estado.replace("_", " ")}</span></td>
                     <td>${e.fechaEnvio || "-"}</td>
                 </tr>
@@ -396,36 +347,85 @@
         }
       }
 
+      // Función unificada para mostrar alertas
+      function alerta(id, tipo, html) {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = `<div class="alert alert-${tipo} mt-2">${html}</div>`;
+      }
+
+      function calcular() {
+        const peso = parseFloat(document.getElementById("calc-peso").value) || 0;
+        const origen = document.getElementById("calc-origen").value;
+        const destino = document.getElementById("calc-destino").value;
+        
+        if(peso <= 0) return;
+
+        // Lógica de simulación realista
+        const tarifaBase = 10.00;
+        const precioKg = 2.50;
+        const factorDistancia = (origen === destino) ? 0 : 5.00;
+        
+        const total = (peso > 0) ? (tarifaBase + (peso * precioKg) + factorDistancia) : 0;
+        
+        alerta("calc-result", "info", `
+            <div class="text-center">
+                <div class="display-6 fw-bold text-primario">S/ ${total.toFixed(2)}</div>
+                <p class="mb-1 text-muted">Costo estimado de envío</p>
+                <div class="alert alert-warning py-2 mb-0 small">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    El costo es referencial y será validado en oficina.
+                </div>
+            </div>
+        `);
+      }
+
+      // Agregar listener para cálculo en tiempo real
+      document.getElementById("calc-peso").addEventListener("input", calcular);
+      document.getElementById("calc-origen").addEventListener("change", calcular);
+      document.getElementById("calc-destino").addEventListener("change", calcular);
+
+      // Lógica para registrar encomienda
       async function registrar() {
+        const remitente = document.getElementById("reg-remitente").value.trim();
+        const dniRemitente = document.getElementById("reg-dni-rem").value.trim();
+        const destinatario = document.getElementById("reg-destinatario").value.trim();
+        const dniDestinatario = document.getElementById("reg-dni-dest").value.trim();
+        const origen = document.getElementById("reg-origen").value;
+        const destino = document.getElementById("reg-destino").value;
+        const peso = parseFloat(document.getElementById("reg-peso").value);
+        const descripcion = document.getElementById("reg-descripcion").value.trim();
+        const telefonoContacto = document.getElementById("reg-telefono").value.trim();
+
+        if (!remitente || !dniRemitente || !destinatario || !dniDestinatario || !origen || !destino || isNaN(peso) || peso <= 0 || !descripcion) {
+          return alerta("reg-result", "warning", "Por favor, completa todos los campos obligatorios y asegúrate de que el peso sea válido.");
+        }
+
+        alerta("reg-result", "info", '<div class="spinner-border spinner-border-sm me-2"></div> Registrando encomienda...');
+
         const body = {
-          remitente: document.getElementById("reg-remitente").value,
-          dniRemitente: document.getElementById("reg-dni-rem").value,
-          destinatario: document.getElementById("reg-destinatario").value,
-          dniDestinatario: document.getElementById("reg-dni-dest").value,
-          origen: document.getElementById("reg-origen").value,
-          destino: document.getElementById("reg-destino").value,
-          peso: parseFloat(document.getElementById("reg-peso").value),
-          descripcion: document.getElementById("reg-descripcion").value,
-          observaciones: document.getElementById("reg-telefono").value,
+          remitente: remitente,
+          dniRemitente: dniRemitente,
+          destinatario: destinatario,
+          dniDestinatario: dniDestinatario,
+          origen: origen,
+          destino: destino,
+          pesoEstimado: peso,
+          tipoPaquete: descripcion, // Usamos descripción como tipo de paquete
+          observaciones: telefonoContacto // Usamos teléfono de contacto como observaciones
         };
-        if (!body.remitente || !body.destinatario || !body.peso)
-          return alerta(
-            "reg-result",
-            "warning",
-            "Completa los campos obligatorios.",
-          );
-        alerta(
-          "reg-result",
-          "info",
-          '<div class="spinner-border spinner-border-sm me-2"></div> Registrando...',
-        );
+
         try {
           const r = await fetch(API, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(body),
           });
-          if (!r.ok) throw new Error();
+
+          if (!r.ok) {
+            const errorText = await r.text();
+            throw new Error(`Error al registrar: ${errorText}`);
+          }
+
           const d = await r.json();
           alerta(
             "reg-result",
@@ -433,58 +433,200 @@
             `
                 <i class="bi bi-check-circle-fill me-2"></i><strong>Encomienda registrada exitosamente</strong><br>
                 Código de rastreo: <strong>${d.codigoRastreo}</strong><br>
-                Precio: <strong>S/ ${d.precio.toFixed(2)}</strong>
+                Precio estimado: <strong>S/ ${d.costoEstimado.toFixed(2)}</strong>
             `,
           );
+          // Limpiar formulario después de un registro exitoso
+          document.getElementById("reg-remitente").value = "";
+          document.getElementById("reg-dni-rem").value = "";
+          document.getElementById("reg-destinatario").value = "";
+          document.getElementById("reg-dni-dest").value = "";
+          document.getElementById("reg-peso").value = "";
+          document.getElementById("reg-descripcion").value = "";
+          document.getElementById("reg-telefono").value = "";
+
         } catch (e) {
           alerta(
             "reg-result",
             "danger",
-            '<i class="bi bi-exclamation-circle me-2"></i>Error al registrar. Revisa los datos.',
+            `<i class="bi bi-exclamation-circle me-2"></i>Error al registrar. ${e.message || 'Revisa los datos.'}`,
           );
         }
       }
 
-      async function calcular() {
-        const origen = document.getElementById("calc-origen").value;
-        const destino = document.getElementById("calc-destino").value;
-        const peso = document.getElementById("calc-peso").value;
-        if (!peso)
+      // Lógica para rastrear encomienda
+      async function rastrear() {
+        const codigo = document.getElementById("track-codigo").value.trim();
+        if (!codigo)
           return alerta(
-            "calc-result",
+            "track-result",
             "warning",
-            "Ingresa el peso del paquete.",
+            "Ingresa un código de rastreo.",
           );
         alerta(
-          "calc-result",
+          "track-result",
           "info",
-          '<div class="spinner-border spinner-border-sm me-2"></div> Calculando...',
+          '<div class="spinner-border spinner-border-sm me-2"></div> Buscando...',
         );
         try {
-          const r = await fetch(
-            `${API}/precio?origen=${origen}&destino=${destino}&peso=${peso}`,
-          );
+          const r = await fetch(`${API}/${encodeURIComponent(codigo)}`);
           if (!r.ok) throw new Error();
           const d = await r.json();
+
+          // Mapeo de estados para el badge
+          let estadoBadgeClass = 'bg-secondary';
+          switch (d.estado) {
+            case 'REGISTRADO': estadoBadgeClass = 'estado-REGISTRADO'; break;
+            case 'VERIFICADO': estadoBadgeClass = 'estado-VERIFICADO'; break; // Asumiendo que VERIFICADO es un estado posible
+            case 'EN_TRANSITO': estadoBadgeClass = 'estado-EN_TRANSITO'; break;
+            case 'EN_DESTINO': estadoBadgeClass = 'estado-EN_DESTINO'; break; // Asumiendo que EN_DESTINO es un estado posible
+            case 'ENTREGADO': estadoBadgeClass = 'estado-ENTREGADO'; break;
+          }
+
           alerta(
-            "calc-result",
-            "info",
+            "track-result",
+            "success",
             `
-                <div class="text-center">
-                    <div class="text-muted small">${d.origen} → ${d.destino} · ${d.peso} kg</div>
-                    <div class="display-6 fw-bold text-primario">S/ ${(+d.precio).toFixed(2)}</div>
-                    <div class="text-muted small">Precio estimado de envío</div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <strong>${d.codigoRastreo}</strong>
+                    <span class="estado-badge ${estadoBadgeClass}">${d.estado.replace("_", " ")}</span>
+                </div>
+                <div class="row g-2 small">
+                    <div class="col-6"><i class="bi bi-person me-1"></i><strong>De:</strong> ${d.remitente}</div>
+                    <div class="col-6"><i class="bi bi-person-check me-1"></i><strong>Para:</strong> ${d.destinatario}</div>
+                    <div class="col-6"><i class="bi bi-arrow-right-circle me-1"></i>${d.origen} → ${d.destino}</div>
+                    <div class="col-6"><i class="bi bi-box me-1"></i>${d.pesoEstimado} kg · S/ ${d.costoEstimado.toFixed(2)}</div>
+                    ${d.tipoPaquete ? `<div class="col-12"><i class="bi bi-tag me-1"></i>${d.tipoPaquete}</div>` : ""}
+                    ${d.fechaEstimadaEntrega ? `<div class="col-12"><i class="bi bi-calendar-check me-1"></i>Entrega estimada: ${d.fechaEstimadaEntrega}</div>` : ""}
                 </div>
             `,
           );
         } catch (e) {
           alerta(
-            "calc-result",
+            "track-result",
             "danger",
-            '<i class="bi bi-exclamation-circle me-2"></i>No se pudo calcular el precio.',
+            '<i class="bi bi-exclamation-circle me-2"></i>No se encontró ninguna encomienda con ese código.',
           );
         }
       }
+
+      // Lógica para cargar "Mis Registros"
+      async function cargarMisRegistros() {
+        alerta(
+          "mis-registros-result",
+          "info",
+          '<div class="spinner-border spinner-border-sm me-2"></div> Cargando tus registros...',
+        );
+        try {
+          const r = await fetch(`${API}/mis-registros`);
+          if (!r.ok) throw new Error();
+          const lista = await r.json();
+          if (!lista.length)
+            return alerta(
+              "mis-registros-result",
+              "warning",
+              "No tienes encomiendas registradas aún.",
+            );
+          const filas = lista
+            .map(
+              (e) => `
+                <tr>
+                    <td><code>${e.codigoRastreo}</code></td>
+                    <td>${e.origen} → ${e.destino}</td>
+                    <td>${e.remitente}</td>
+                    <td>${e.destinatario}</td>
+                    <td>${e.pesoEstimado} kg</td>
+                    <td>S/ ${e.costoEstimado.toFixed(2)}</td>
+                    <td><span class="estado-badge estado-${e.estado}">${e.estado.replace("_", " ")}</span></td>
+                    <td>${e.fechaEnvio || "-"}</td>
+                </tr>
+            `,
+            )
+            .join("");
+          document.getElementById("mis-registros-result").innerHTML = `
+                <div class="table-responsive mt-2">
+                    <table class="table table-hover align-middle small">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Código</th><th>Ruta</th><th>Remitente</th>
+                                <th>Destinatario</th><th>Peso</th><th>Precio</th>
+                                <th>Estado</th><th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>${filas}</tbody>
+                    </table>
+                </div>
+            `;
+        } catch (e) {
+          alerta(
+            "mis-registros-result",
+            "danger",
+            '<i class="bi bi-exclamation-circle me-2"></i>Error al cargar tus registros.',
+          );
+        }
+      }
+
+      // Inicializar la pestaña activa al cargar la página
+      document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const activeTab = urlParams.get('tab');
+        if (activeTab) {
+          const targetButton = document.querySelector(`.btn-tab[data-tab="${activeTab}"]`);
+          if (targetButton) {
+            targetButton.click();
+            if (activeTab === 'mis-registros') {
+              cargarMisRegistros();
+            } else if (activeTab === 'cotizar') {
+              calcular(); // Realizar un cálculo inicial si la pestaña de cotizar está activa
+            }
+          }
+        } else {
+          // Si no hay tab en la URL, activar la primera por defecto (Mis Registros)
+          document.querySelector('.btn-tab[data-tab="mis-registros"]').click();
+        }
+      });
     </script>
+
+    <style>
+      .btn-tab {
+        border-radius: 50px;
+        padding: 8px 20px;
+        border: 2px solid #1b2a5e;
+        color: #1b2a5e;
+        background: transparent;
+        font-weight: 600;
+      }
+      .btn-tab.active {
+        background: #f5a623;
+        border-color: #f5a623;
+        color: #1a0f00;
+      }
+      .btn-tab:hover:not(.active) {
+        background: #1b2a5e;
+        color: white;
+      }
+      .estado-badge {
+        font-size: 12px;
+        padding: 4px 12px;
+        border-radius: 50px;
+        font-weight: 600;
+      }
+      .estado-REGISTRADO {
+        background: #e2e8f0;
+        color: #475569;
+      }
+      .estado-EN_TRANSITO {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .estado-EN_DESTINO {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .estado-ENTREGADO {
+        background: #dcfce7;
+        color: #166534;
+      }
+    </style>
   </body>
 </html>
