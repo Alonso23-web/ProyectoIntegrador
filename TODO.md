@@ -1,22 +1,15 @@
-# Plan de Correcciones y Nuevas Funcionalidades
+# TODO - Cliente (Pasajes / Encomiendas / Contacto)
 
-## Problemas a corregir:
+- [x] 1. Actualizar navbar con dropdowns profesionales (Pasajes, Encomiendas, Perfil) sin modificar Inicio/Nosotros.
+- [x] 2. Encomiendas (frontend): ajustar `encomiendas.html` para incluir tabs requeridos (Registrar envío, Cotizar, Mis envíos, Rastrear) y timeline de estados dentro del módulo.
 
-1. [ ] **RastrearController.java** — Completar controller (está vacío)
-2. [ ] **rastrear.html** — Crear template de rastreo de encomiendas
-3. [ ] **EncomiendaService.java** — Agregar método buscarPorCodigoRastreo
-4. [ ] **VehiculoController.java** — Completar controller (está vacío)
-5. [ ] **vehiculos/listar.html** — Crear template para listar vehículos
-6. [ ] **Usuario.java** — Crear entidad con roles (CLIENTE, ADMINISTRADOR, CONDUCTOR)
-7. [ ] **UsuarioRepository.java** — Crear repositorio
-8. [ ] **UsuarioService.java** — Crear servicio de usuarios
-9. [ ] **RegistroController.java** — Controller para registro
-10. [ ] **registro.html** — Template de registro con selector de roles
-11. [ ] **SecurityConfig.java** — Actualizar para registro, roles y logout a login
-12. [ ] **layout.html** — Agregar enlace a registro en navbar
+- [x] 3. Encomiendas (frontend): que el navbar no lleve a `/rastrear` (seguir rastreo dentro de `encomiendas.html`).
 
-## Estado
+- [ ] 4. Encomiendas (backend): asegurar que `/api/encomiendas/{codigo}` devuelve y mapea correctamente estados para timeline.
+- [x] 5. Pasajes: modelar entidades `Viaje` y `Reserva` (backend) y ajustar servicios/repositorios.
 
-- [ ] Paso 1-3: Sistema de rastreo
-- [ ] Paso 4-5: Sistema de vehículos
-- [ ] Paso 6-12: Sistema de registro con roles
+- [ ] 6. Pasajes (frontend): implementar buscador, listado, selección de asientos, compra, boleto/QR descargable, mis viajes y estado con timeline.
+
+- [ ] 7. Contacto: implementar/ajustar formulario, datos de contacto, Google Maps embebido y FAQ.
+- [ ] 8. Validaciones + mensajes success/error + loading (JS) en cada módulo.
+- [ ] 9. Pruebas: ejecutar app y verificar flujos cliente end-to-end.
