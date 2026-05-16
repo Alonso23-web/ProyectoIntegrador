@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout :: head('Mi Perfil - Nueva Ases Express')}"></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <style>
+      .profile-card {
+        border: 1px solid rgba(13, 27, 76, 0.08);
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: 22px;
+        box-shadow: 0 18px 40px rgba(13, 27, 76, 0.08);
+      }
+
+      .profile-avatar {
+        width: 84px;
+        height: 84px;
+        border-radius: 24px;
+        background: linear-gradient(135deg, #0d1b4c 0%, #1a2d6b 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.5rem;
+        box-shadow: 0 10px 30px rgba(13, 27, 76, 0.22);
+      }
+
+      .profile-title {
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        color: #0d1b4c;
+      }
+
+      .label {
+        color: rgba(13, 27, 76, 0.65);
+        font-weight: 700;
+        font-size: 0.9rem;
+      }
+
+      .value {
+        color: #0d1b4c;
+        font-weight: 600;
+      }
+
+      .badge-rol {
+        background: rgba(244, 180, 0, 0.18);
+        color: #6a4a00;
+        border: 1px solid rgba(244, 180, 0, 0.35);
+        font-weight: 800;
+      }
+    </style>
+
+    <main class="container py-5 dashboard-page">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+          <div class="profile-card p-4 p-md-5">
+            <div class="d-flex align-items-center gap-3">
+              <div class="profile-avatar">
+                <i class="bi bi-person-circle"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div
+                  class="d-flex flex-wrap align-items-center justify-content-between gap-3"
+                >
+                  <div>
+                    <h2 class="profile-title mb-1">Mi perfil</h2>
+                    <div class="text-secondary fw-semibold">
+                      Bienvenido/a:
+                      <span
+                        th:text="${usuario != null ? usuario.nombreCompleto : nombreUsuario}"
+                      ></span>
+                    </div>
+                  </div>
+                  <span
+                    class="badge badge-rol px-3 py-2"
+                    th:text="${usuario != null ? usuario.rol : 'CLIENTE'}"
+                  ></span>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="label mb-1">Email</div>
+                <div
+                  class="value"
+                  th:text="${usuario != null ? usuario.email : ''}"
+                ></div>
+              </div>
+              <div class="col-md-6">
+                <div class="label mb-1">Teléfono</div>
+                <div
+                  class="value"
+                  th:text="${usuario != null ? usuario.telefono : ''}"
+                ></div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="label mb-1">DNI</div>
+                <div
+                  class="value"
+                  th:text="${usuario != null ? usuario.dni : ''}"
+                ></div>
+              </div>
+              <div class="col-md-6">
+                <div class="label mb-1">Rol</div>
+                <div
+                  class="value"
+                  th:text="${usuario != null ? usuario.rol : 'CLIENTE'}"
+                ></div>
+              </div>
+            </div>
+
+            <div class="mt-4 d-flex flex-wrap gap-2">
+              <a class="btn btn-amarillo" href="/dashboard">
+                <i class="bi bi-house-door me-2"></i>Ir al dashboard
+              </a>
+              <a class="btn btn-outline-amarillo" href="/">
+                <i class="bi bi-arrow-left me-2"></i>Volver al inicio
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>
