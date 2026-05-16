@@ -1,5 +1,6 @@
 package proyecto.nuevaases.services;
 
+import proyecto.nuevaases.controllers.api.PasajesApiController;
 import proyecto.nuevaases.models.Reserva;
 import proyecto.nuevaases.models.Viaje;
 
@@ -10,7 +11,13 @@ public interface ReservaService {
 
     List<Integer> asientosOcupados(Viaje viaje);
 
-    Reserva reservar(String usuarioEmail, Viaje viaje, int asiento, double precio);
+    Reserva reservar(String usuarioEmail, Viaje viaje, int asiento, String nombrePasajero, String dniPasajero);
+
+    List<Reserva> reservarMultiples(
+            String usuarioEmail,
+            Viaje viaje,
+            List<PasajesApiController.PasajeroReservaDTO> pasajeros
+    );
 
     Optional<Reserva> obtenerPorCodigoBoleto(String codigoBoleto);
 

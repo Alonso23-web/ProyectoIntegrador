@@ -1,6 +1,6 @@
 /* Pasajes - flujo cliente */
 
-const API_PASAJE = "/api/pasajes"; // Asegúrate de que esta URL sea correcta
+const API_PASAJE = "/api/pasajes";
 
 function escapeHtml(str) {
     return String(str ?? "")
@@ -10,9 +10,14 @@ function escapeHtml(str) {
         .replace(/\"/g, "\"")
         .replace(/'/g, "&#039;");
 }
-// pasajesUI es un objeto global que contendrá toda la lógica de UI para pasajes
+
 const pasajesUI = {
-    estado: { resultados: [], viajeSeleccionado: null, ocupacion: [], asientoSeleccionado: null },
+    estado: {
+        resultados: [],
+        viajeSeleccionado: null,
+        ocupacion: [],
+        asientosSeleccionados: [],
+    },
 
     setLoading(isLoading, containerId) {
         const el = document.getElementById(containerId);
@@ -30,6 +35,18 @@ const pasajesUI = {
         const el = document.getElementById(containerId);
         if (!el) return;
         el.innerHTML = "";
+    },
+
+    getCantidadPasajeros() {
+        return Number(document.getElementById("cantidad")?.value || 1);
+    },
+
+    getPasajerosForm() {
+        const pasajerosContainer = document.getElementById("pasajerosContainer");
+        if (!pasajerosContainer) return [];
+        return Array.from(
+            pasajerosContainer.querySelectorAll("[data-pasajero-index]")
+        );
     },
 
     renderResultados(lista) {
@@ -72,7 +89,7 @@ const pasajesUI = {
                 <div class="text-end">
                   <div class="text-muted small">Precio</div>
                   <div class="fs-4 fw-bold">S/ ${Number(v.precio).toFixed(2)}</div>
-                </div> 
+                </div>
               </div>
               <div class="mt-3">
                 <button class="btn btn-amarillo w-100 fw-bold" type="button" onclick="pasajesUI.seleccionarViaje(${v.id})">
@@ -95,8 +112,8 @@ const pasajesUI = {
         }
 
         this.estado.viajeSeleccionado = viaje;
-        this.estado.asientoSeleccionado = null;
         this.estado.ocupacion = [];
+        this.estado.asientosSeleccionados = [];
 
         document.getElementById("paso-seleccion")?.classList.remove("d-none");
         document.getElementById("resultados")?.classList.add("d-none");
@@ -118,25 +135,75 @@ const pasajesUI = {
             .then((ocupados) => {
                 this.estado.ocupacion = (ocupados || []).map(Number);
                 this.renderSeatMap();
+                this.renderPasajerosInputs();
             })
             .catch(() => {
                 this.setAlerta("buscar-alert", "danger", "Error al cargar la ocupación de asientos.");
                 this.renderSeatMap();
+                this.renderPasajerosInputs();
             })
             .finally(() => this.setLoading(false, "buscar-loading"));
     },
 
+    renderPasajerosInputs() {
+        const container = document.getElementById("pasajerosContainer");
+        if (!container) return;
+
+        const cantidad = this.getCantidadPasajeros();
+        this.estado.asientosSeleccionados = [];
+
+        container.innerHTML = "";
+
+        for (let i = 0; i < cantidad; i++) {
+            container.innerHTML += `
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Nombre del pasajero ${i + 1}</label>
+          <input
+            class="form-control"
+            required
+            placeholder="Nombre completo"
+            name="nombrePasajero-${i}"
+            data-pasajero-index="${i}"
+          />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">DNI ${i + 1}</label>
+          <input
+            class="form-control"
+            required
+            placeholder="12345678"
+            name="dniPasajero-${i}"
+            data-pasajero-index="${i}"
+          />
+        </div>
+        `;
+
+            // El seat-map usa asientosSeleccionados[i], por eso el índice debe ser estable.
+        }
+
+        // Luego de renderizar, aseguramos que haya campos para mapear.
+        // (El renderSeatMap controla el click y luego aquí mismo se puede reflejar).
+    },
+
+    // UI selección N asientos distintos
     renderSeatMap() {
         const seatMap = document.getElementById("seat-map");
         const warn = document.getElementById("seat-warning");
         if (!seatMap) return;
 
         const total = this.estado.viajeSeleccionado?.totalAsientos || 24;
+        const cantidadPasajeros = this.getCantidadPasajeros();
+
+        // minivan max 15 asientos (en UI lo limitamos)
+        const tipo = String(this.estado.viajeSeleccionado?.tipoBus || "").toUpperCase();
+        const maxUI = tipo === "MINIVAN" ? Math.min(15, total) : total;
+
         const ocupadosSet = new Set(this.estado.ocupacion);
 
         seatMap.innerHTML = "";
+        this.estado.asientosSeleccionados = [];
 
-        for (let i = 1; i <= total; i++) {
+        for (let i = 1; i <= maxUI; i++) {
             const occupied = ocupadosSet.has(i);
             const div = document.createElement("div");
             div.className = `seat ${occupied ? "occupied" : "available"}`;
@@ -145,32 +212,173 @@ const pasajesUI = {
 
             if (!occupied) {
                 div.onclick = () => {
+                    const seatNum = i;
+                    const exists = this.estado.asientosSeleccionados.includes(seatNum);
+
+                    // Toggle: si ya estaba seleccionado, desmarcar
+                    if (exists) {
+                        this.estado.asientosSeleccionados = this.estado.asientosSeleccionados.filter((x) => x !== seatNum);
+                    } else {
+                        // No permitir más de N
+                        if (this.estado.asientosSeleccionados.length >= cantidadPasajeros) {
+                            this.setAlerta(
+                                "compra-alert",
+                                "warning",
+                                `Solo puedes seleccionar hasta ${cantidadPasajeros} asiento(s).`
+                            );
+                            return;
+                        }
+                        // No permitir duplicados (ya evitamos con includes)
+                        this.estado.asientosSeleccionados.push(seatNum);
+                    }
+
+                    // Reordenar para que el índice [0..N-1] sea estable
+                    this.estado.asientosSeleccionados.sort((a, b) => a - b);
+
+                    // Refrescar colores selección
                     seatMap.querySelectorAll(".seat.selected").forEach((s) => s.classList.remove("selected"));
-                    div.classList.add("selected");
-                    this.estado.asientoSeleccionado = i;
-                    document.getElementById("asientoSeleccionado").value = String(i);
-                    if (warn) warn.classList.add("d-none");
+                    this.estado.asientosSeleccionados.forEach((s) => {
+                        const el = seatMap.querySelector(`.seat[data-asiento='${s}']`);
+                        if (el) el.classList.add("selected");
+                    });
+
+                    if (warn) {
+                        warn.classList.toggle("d-none", this.estado.asientosSeleccionados.length === 0);
+                    }
+
+                    // Actualiza inputs placeholder (opcional) - aquí no es necesario
                 };
             }
 
             seatMap.appendChild(div);
         }
 
-        if (warn && this.estado.asientoSeleccionado == null) {
-            warn.classList.remove("d-none");
+        if (warn) warn.classList.remove("d-none");
+    },
+
+    collectPasajerosSeleccionados() {
+        const cantidad = this.getCantidadPasajeros();
+        const formEls = document.getElementById("pasajerosContainer");
+        if (!formEls) return [];
+
+        const asientos = this.estado.asientosSeleccionados;
+        const pasajeros = [];
+
+        // importante: los inputs dinámicos se renderizan en pares y se guardan como:
+        // nombrePasajero-i / dniPasajero-i
+        for (let i = 0; i < cantidad; i++) {
+            const nombreInput = formEls.querySelector(`input[name='nombrePasajero-${i}']`);
+            const dniInput = formEls.querySelector(`input[name='dniPasajero-${i}']`);
+
+
+            pasajeros.push({
+                nombrePasajero: nombreInput?.value?.trim(),
+                dniPasajero: dniInput?.value?.trim(),
+                asiento: asientos[i],
+            });
+        }
+
+        return pasajeros;
+    },
+
+    async confirmarCompra() {
+        const viajeId = document.getElementById("viajeId")?.value;
+        if (!viajeId) {
+            this.setAlerta("compra-alert", "warning", "Selecciona un viaje primero.");
+            return;
+        }
+
+        const pasajerosCantidad = this.getCantidadPasajeros();
+        if (this.estado.asientosSeleccionados.length !== pasajerosCantidad) {
+            this.setAlerta(
+                "compra-alert",
+                "warning",
+                `Debes seleccionar exactamente ${pasajerosCantidad} asiento(s).`
+            );
+            return;
+        }
+
+        const pasajeros = this.collectPasajerosSeleccionados();
+
+        for (const p of pasajeros) {
+            if (!p.nombrePasajero) {
+                this.setAlerta("compra-alert", "warning", "Ingresa nombre de cada pasajero.");
+                return;
+            }
+            if (!p.dniPasajero) {
+                this.setAlerta("compra-alert", "warning", "Ingresa DNI de cada pasajero.");
+                return;
+            }
+            if (!p.asiento) {
+                this.setAlerta("compra-alert", "warning", "Selecciona asientos suficientes para cada pasajero.");
+                return;
+            }
+        }
+
+        this.setAlerta(
+            "compra-alert",
+            "info",
+            '<div class="spinner-border spinner-border-sm me-2"></div> Reservando...'
+        );
+
+        const payload = {
+            // El backend (según el endpoint que mencionaste) espera una lista.
+            // Aquí lo enviamos como JSON.
+            pasajeros,
+        };
+
+        try {
+            const r = await fetch(`${API_PASAJE}/${encodeURIComponent(viajeId)}/reservar-multiples`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json;charset=UTF-8" },
+                body: JSON.stringify(payload),
+            });
+
+            if (!r.ok) throw new Error("reservar-multiples");
+
+            const data = await r.json();
+
+            // data puede venir como {codigos: []} o lista; intentamos flexible.
+            const codigos = Array.isArray(data?.codigos)
+                ? data.codigos
+                : Array.isArray(data)
+                    ? data.map((x) => x.codigoBoleto).filter(Boolean)
+                    : data?.reservas?.map((x) => x.codigoBoleto).filter(Boolean);
+
+            const boletoArea = document.getElementById("boleto-area");
+            const listaEl = document.getElementById("boletosLista");
+
+            boletoArea?.classList.remove("d-none");
+            if (listaEl) {
+                listaEl.innerHTML = "";
+                if (codigos?.length) {
+                    listaEl.innerHTML = `<ul class="mb-0">${codigos.map((c) => `<li><code>${c}</code></li>`).join("")}</ul>`;
+                } else {
+                    listaEl.innerHTML = `<div class="text-muted small">Compra realizada. (No se pudo obtener códigos en la respuesta)</div>`;
+                }
+            }
+
+            this.setAlerta(
+                "compra-alert",
+                "success",
+                `<i class="bi bi-check-circle-fill me-2"></i>Reserva(s) confirmada(s).`
+            );
+
+            // Si quieren QR por cada código, se tendría que generar múltiples QRs.
+            // Por ahora, la validación requerida era mostrar los códigos.
+
+        } catch (err) {
+            this.setAlerta(
+                "compra-alert",
+                "danger",
+                "No se pudo completar la compra. Verifica tu sesión e intenta nuevamente."
+            );
         }
     },
 
-    init() { // Esta función se llama al cargar el DOM
-        // Nota: QRCode debe cargarse desde la página (CDN). Evitamos carga dinámica aquí
-        // para no introducir dependencias/errores de parseo.
-        // Si no está disponible, la compra igual se completa y el QR se mostrará cuando exista la librería.
-        if (window.QRCode === undefined) {
-            // noop
-        }
-
+    init() {
+        // Buscar viajes
         const form = document.getElementById("buscarForm");
-
         if (form) {
             form.addEventListener("submit", (e) => {
                 e.preventDefault();
@@ -185,7 +393,7 @@ const pasajesUI = {
                     return;
                 }
 
-                this.clearAlerta("buscar-alert"); // Limpiar alertas previas
+                this.clearAlerta("buscar-alert");
                 this.setLoading(true, "buscar-loading");
 
                 fetch(`${API_PASAJE}/buscar?origen=${encodeURIComponent(origen)}&destino=${encodeURIComponent(destino)}&fecha=${encodeURIComponent(fecha)}&cantidadPasajeros=${encodeURIComponent(cantidad)}`)
@@ -194,101 +402,32 @@ const pasajesUI = {
                         return r.json();
                     })
                     .then((lista) => {
-                        // Guardar resultados para poder seleccionar viaje
                         this.estado.resultados = lista || [];
                         document.getElementById("resultados")?.classList.remove("d-none");
                         this.renderResultados(this.estado.resultados);
                     })
                     .catch(() => {
-                        this.setAlerta("buscar-alert", "danger", "No se pudo buscar viajes. Verifica los datos e inténtalo nuevamente.");
+                        this.setAlerta(
+                            "buscar-alert",
+                            "danger",
+                            "No se pudo buscar viajes. Verifica los datos e inténtalo nuevamente."
+                        );
                         document.getElementById("resultados")?.classList.add("d-none");
                     })
                     .finally(() => this.setLoading(false, "buscar-loading"));
             });
         }
 
+        // Confirmar compra
         const compraForm = document.getElementById("compraForm");
         if (compraForm) {
             compraForm.addEventListener("submit", async (e) => {
                 e.preventDefault();
-
-                const viajeId = document.getElementById("viajeId")?.value;
-                const precio = document.getElementById("precioSeleccionado")?.value;
-                const asiento = document.getElementById("asientoSeleccionado")?.value;
-                const nombre = document.getElementById("nombrePasajero")?.value?.trim();
-                const dni = document.getElementById("dniPasajero")?.value?.trim();
-
-                if (!viajeId) return this.setAlerta("compra-alert", "warning", "Selecciona un viaje primero.");
-                if (!asiento) return this.setAlerta("compra-alert", "warning", "Selecciona un asiento.");
-                if (!nombre) return this.setAlerta("compra-alert", "warning", "Ingresa el nombre del pasajero.");
-                if (!dni) return this.setAlerta("compra-alert", "warning", "Ingresa el DNI.");
-
-                const precioNum = Number(precio);
-                if (!Number.isFinite(precioNum) || precioNum <= 0) {
-                    return this.setAlerta("compra-alert", "warning", "Precio inválido. Intenta nuevamente.");
-                }
-
-                this.setAlerta(
-                    "compra-alert",
-                    "info",
-                    '<div class="spinner-border spinner-border-sm me-2"></div> Reservando asiento y generando boleto...'
-                );
-
-                try {
-                    const r = await fetch(`${API_PASAJE}/${encodeURIComponent(viajeId)}/reservar`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" }, // Formato esperado por @RequestParam
-                        body: new URLSearchParams({
-                            asiento: String(asiento),
-                            precio: String(precioNum),
-                            nombrePasajero: nombre,
-                            dniPasajero: dni,
-                            // No se envía viajeId aquí, ya está en la URL
-                        }).toString(),
-                    });
-
-                    if (!r.ok) throw new Error("reservar");
-                    const reserva = await r.json();
-
-                    if (!reserva || !reserva.codigoBoleto) {
-                        throw new Error("codigoBoleto");
-                    }
-
-                    document.getElementById("boleto-codigo").textContent = reserva.codigoBoleto; // Mostrar código de boleto
-                    document.getElementById("boleto-area").classList.remove("d-none");
-
-                    const qrTarget = document.getElementById("boleto-qr");
-
-                    // Si existe librería QR en la página, generamos QR.
-                    if (window.QRCode && qrTarget) {
-                        await window.QRCode.toDataURL(reserva.codigoBoleto, { margin: 1, width: 220, errorCorrectionLevel: "M" })
-                            .then((url) => {
-                                qrTarget.src = url; // Mostrar QR
-                                qrTarget.dataset.qrDataUrl = url;
-                            });
-                    } else if (qrTarget) {
-                        qrTarget.src = "https://via.placeholder.com/200?text=QR+Generado";
-                    }
-
-                    const btnDesc = document.getElementById("boleto-descargar");
-                    btnDesc.href = qrTarget.src;
-                    btnDesc.download = `boleto-${reserva.codigoBoleto}.png`;
-                    btnDesc.onclick = null; // Quitar el preventDefault previo
-
-                    this.setAlerta(
-                        "compra-alert",
-                        "success",
-                        `\n                        <i class="bi bi-check-circle-fill me-2"></i>Reserva confirmada. Boleto listo.\n                    `
-                    );
-                } catch (err) {
-                    this.setAlerta(
-                        "compra-alert",
-                        "danger", // Mensaje de error
-                        "No se pudo completar la compra. Verifica tu sesión e intenta nuevamente."
-                    );
-                }
+                await this.confirmarCompra();
             });
         }
     },
 };
-document.addEventListener("DOMContentLoaded", () => pasajesUI.init()); // Inicializar la UI al cargar el DOM
+
+document.addEventListener("DOMContentLoaded", () => pasajesUI.init());
+

@@ -1,7 +1,8 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
   <head
-    th:replace="~{layout :: head('Buscar Pasajes - Nueva Ases Express')}"
+    th:replace="~{layout :: head('Buscar Pasajes - Nueva Ases Express')}
+  "
   ></head>
   <body>
     <div th:replace="~{layout :: navbar}"></div>
@@ -13,7 +14,7 @@
           Comprar / Reservar Pasajes
         </h1>
         <p class="lead text-white-50 mb-0">
-          Busca tu viaje, selecciona tu asiento y genera tu boleto.
+          Busca tu viaje, selecciona tus asientos y genera tu boleto.
         </p>
       </div>
     </section>
@@ -69,7 +70,7 @@
                     >
                     <input
                       id="cantidad"
-                      name="cantidad"
+                      name="cantidadPasajeros"
                       type="number"
                       class="form-control"
                       min="1"
@@ -121,7 +122,7 @@
                     class="d-flex justify-content-between align-items-center mb-3"
                   >
                     <h5 class="fw-bold text-primario mb-0">
-                      Selección de asiento
+                      Selección de asientos
                     </h5>
                     <button
                       class="btn btn-outline-secondary btn-sm"
@@ -171,7 +172,7 @@
                             class="alert alert-warning mt-3 mb-0 d-none"
                             id="seat-warning"
                           >
-                            Selecciona un asiento para continuar.
+                            Selecciona los asientos para continuar.
                           </div>
                         </div>
                       </div>
@@ -181,39 +182,27 @@
                       <div class="card shadow-sm">
                         <div class="card-body">
                           <h6 class="fw-bold text-primario">
-                            Compra de pasaje
+                            Compra de pasajes
                           </h6>
                           <p class="text-muted small mb-3">
-                            Selecciona el asiento, completa los datos del
-                            pasajero y confirma.
+                            Selecciona los asientos, completa los datos de los
+                            pasajeros y confirma.
                           </p>
 
                           <form id="compraForm" class="row g-3">
-                            <input type="hidden" id="viajeId" />
-                            <input type="hidden" id="precioSeleccionado" />
-                            <input type="hidden" id="asientoSeleccionado" />
+                            <input type="hidden" id="viajeId" name="viajeId" />
+                            <input
+                              type="hidden"
+                              id="precioSeleccionado"
+                              name="precio"
+                            />
+                            <input
+                              type="hidden"
+                              id="asientosSeleccionadosCsv"
+                              name="asientosSeleccionados"
+                            />
 
-                            <div class="col-12">
-                              <label class="form-label fw-semibold"
-                                >Nombre del pasajero</label
-                              >
-                              <input
-                                id="nombrePasajero"
-                                class="form-control"
-                                required
-                                placeholder="Nombre completo"
-                              />
-                            </div>
-
-                            <div class="col-12">
-                              <label class="form-label fw-semibold">DNI</label>
-                              <input
-                                id="dniPasajero"
-                                class="form-control"
-                                required
-                                placeholder="12345678"
-                              />
-                            </div>
+                            <div class="col-12" id="pasajerosContainer"></div>
 
                             <div class="col-12">
                               <div
@@ -222,6 +211,10 @@
                                 <span class="text-muted small">Precio</span>
                                 <strong id="precioResumen">-</strong>
                               </div>
+                              <div
+                                class="text-muted small mt-1"
+                                id="precioDetalle"
+                              ></div>
                             </div>
 
                             <div class="col-12">
@@ -239,33 +232,12 @@
 
                           <div id="boleto-area" class="mt-4 d-none">
                             <h6 class="fw-bold text-primario">
-                              Boleto generado
+                              Boleto(s) generado(s)
                             </h6>
                             <div class="text-muted small mb-2">
-                              Descarga tu boleto o guarda el código.
+                              Tus códigos están listos.
                             </div>
-                            <div class="mb-3">
-                              <div class="text-muted small">Código</div>
-                              <div class="fw-bold" id="boleto-codigo"></div>
-                            </div>
-                            <div class="text-center mb-3">
-                              <img
-                                id="boleto-qr"
-                                alt="QR boleto"
-                                style="max-width: 220px"
-                              />
-                            </div>
-                            <div class="d-flex gap-2">
-                              <a
-                                id="boleto-descargar"
-                                class="btn btn-outline-amarillo w-100"
-                                href="#"
-                                onclick="return false;"
-                              >
-                                <i class="bi bi-download me-2"></i>Descargar
-                                boleto
-                              </a>
-                            </div>
+                            <div id="boletosLista" class="mt-2"></div>
                           </div>
                         </div>
                       </div>
@@ -273,11 +245,11 @@
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div class="mt-4 text-center text-muted small">
-              <i class="bi bi-shield-check me-1"></i>
-              La disponibilidad de asientos se confirma al reservar.
+              <div class="mt-4 text-center text-muted small">
+                <i class="bi bi-shield-check me-1"></i>
+                La disponibilidad de asientos se confirma al reservar.
+              </div>
             </div>
           </div>
         </div>

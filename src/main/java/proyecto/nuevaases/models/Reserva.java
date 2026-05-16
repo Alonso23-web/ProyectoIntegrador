@@ -23,6 +23,12 @@ public class Reserva {
     private Viaje viaje;
 
     @Column(nullable = false)
+    private String nombrePasajero;
+
+    @Column(nullable = false)
+    private String dniPasajero;
+
+    @Column(nullable = false)
     private int asiento;
 
     @Column(nullable = false)
@@ -34,4 +40,3 @@ public class Reserva {
     @Column(nullable = false)
     private double precio;
 }
-

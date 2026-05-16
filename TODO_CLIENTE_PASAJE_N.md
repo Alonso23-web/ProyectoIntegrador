@@ -1,0 +1,7 @@
+- [x] Validar backend base para precio fijo y ocupación.
+- [ ] Arreglar frontend N pasajes (JS): que use /reservar-multiples y selección N asientos sin duplicar.
+- [ ] Renderizar inputs de pasajeros (nombre/dni) dinámicamente en cliente-buscar.html.
+- [ ] Enviar payload correcto al backend para reservar-multiples.
+- [ ] Generar/mostrar lista de códigos/boletos (o al menos listar códigos).
+- [ ] Confirmar minivan MAX 15 asientos en UI (limitar totalAsientos a 15 si tipo MINIVAN).
+- [ ] Asegurar que “Mis viajes” sea solo lectura (sin botones de editar/eliminar) para cliente.
