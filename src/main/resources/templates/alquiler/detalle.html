@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head('Detalle - Alquiler de Vehículos')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <section class="py-5">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-7">
+            <div class="card shadow-sm border-0">
+              <div class="position-relative">
+                <img
+                  class="card-img-top"
+                  th:src="${vehiculo.imagen != null && !#strings.isEmpty(vehiculo.imagen) ? vehiculo.imagen : @{/img/nuevaasesInicio.jpg}}"
+                  alt="Imagen vehículo"
+                  style="height: 320px; object-fit: cover"
+                />
+              </div>
+
+              <div class="card-body p-4">
+                <div
+                  class="d-flex align-items-start justify-content-between gap-3"
+                >
+                  <div>
+                    <h2
+                      class="fw-bold text-primario mb-1"
+                      th:text="${vehiculo.tipo != null ? vehiculo.tipo : 'Vehículo'}"
+                    ></h2>
+                    <div class="text-muted">
+                      <i class="bi bi-people me-1 text-amarillo"></i>
+                      <span
+                        th:text="${vehiculo.capacidad != null ? vehiculo.capacidad : 'N/D'} + ' personas'"
+                      ></span>
+                    </div>
+                  </div>
+                  <div class="text-end">
+                    <div class="text-muted small">Precio referencial</div>
+                    <div
+                      class="fw-bold fs-4 text-primario"
+                      th:text="${'S/ ' + (vehiculo.precioReferencial != null ? vehiculo.precioReferencial : 0)}"
+                    ></div>
+                  </div>
+                </div>
+
+                <hr />
+
+                <h5 class="fw-bold mb-2">Características</h5>
+                <p
+                  class="text-muted mb-4"
+                  th:text="${vehiculo.caracteristicas != null ? vehiculo.caracteristicas : 'Características referenciales disponibles.'}"
+                ></p>
+
+                <h5 class="fw-bold mb-3">Servicios incluidos</h5>
+                <ul class="list-unstyled mb-0">
+                  <li
+                    class="d-flex align-items-start mb-2"
+                    th:each="s : ${serviciosIncluidos}"
+                  >
+                    <i
+                      class="bi bi-check2-circle me-2 text-success fs-5"
+                      aria-hidden="true"
+                    ></i>
+                    <span class="text-muted" th:text="${s}"></span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="card shadow-sm border-0">
+              <div class="card-body p-4">
+                <h4 class="fw-bold text-primario mb-3">Solicitar cotización</h4>
+
+                <div class="alert alert-info mb-4" style="border-radius: 16px">
+                  <i class="bi bi-info-circle me-2"></i>
+                  Llena el formulario con tus datos y te contactamos con una
+                  propuesta.
+                </div>
+
+                <form
+                  th:action="@{/alquiler/solicitud}"
+                  method="post"
+                  class="needs-validation"
+                  novalidate
+                >
+                  <input
+                    type="hidden"
+                    name="_csrf"
+                    th:value="${_csrf?.token}"
+                  />
+
+                  <input
+                    type="hidden"
+                    name="vehiculoId"
+                    th:value="${vehiculo.id}"
+                  />
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Nombre</label>
+                    <input name="nombre" class="form-control" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold"
+                      >Empresa (opcional)</label
+                    >
+                    <input name="empresa" class="form-control" />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Teléfono</label>
+                    <input name="telefono" class="form-control" required />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Correo</label>
+                    <input
+                      name="correo"
+                      type="email"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold"
+                      >Tipo de vehículo</label
+                    >
+                    <input
+                      name="tipo"
+                      class="form-control"
+                      th:value="${vehiculo.tipo}"
+                      readonly
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold"
+                      >Fecha de inicio</label
+                    >
+                    <input
+                      name="fechaInicio"
+                      type="date"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold"
+                      >Cantidad de personas</label
+                    >
+                    <input
+                      name="personas"
+                      type="number"
+                      min="1"
+                      class="form-control"
+                      required
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Origen</label>
+                    <input
+                      name="origen"
+                      class="form-control"
+                      required
+                      placeholder="Ej: Trujillo"
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Destino</label>
+                    <input
+                      name="destino"
+                      class="form-control"
+                      required
+                      placeholder="Ej: Chepén"
+                    />
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label fw-semibold">Mensaje</label>
+                    <textarea
+                      name="mensaje"
+                      class="form-control"
+                      rows="4"
+                      placeholder="Cuéntanos detalles del servicio"
+                    ></textarea>
+                  </div>
+
+                  <button class="btn btn-amarillo w-100 fw-bold" type="submit">
+                    <i class="bi bi-send-fill me-2"></i>Enviar solicitud
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>

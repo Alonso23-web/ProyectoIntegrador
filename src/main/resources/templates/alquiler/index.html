@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head('Alquiler de Vehículos - Solicitud de Cotización')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <section class="py-5 bg-primario text-white" style="min-height: 260px">
+      <div class="container">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7">
+            <h1 class="fw-bold mb-3">Alquiler de Vehículos</h1>
+            <p class="lead text-white-50 mb-0">
+              Simula un sistema profesional de alquiler para empresas, colegios
+              y eventos. En este módulo no hay compra directa: realizas una
+              <strong>solicitud de cotización</strong>.
+            </p>
+          </div>
+          <div class="col-lg-5">
+            <div
+              class="p-4 rounded-4"
+              style="
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid rgba(255, 255, 255, 0.18);
+              "
+            >
+              <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-send-check-fill fs-3 me-2 text-amarillo"></i>
+                <div>
+                  <div class="fw-bold">Respuesta rápida</div>
+                  <div class="small text-white-50">
+                    Te contactamos con una propuesta.
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-geo-alt-fill fs-3 me-2 text-amarillo"></i>
+                <div>
+                  <div class="fw-bold">Cobertura local</div>
+                  <div class="small text-white-50">
+                    Trujillo y zonas cercanas.
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <i class="bi bi-shield-check fs-3 me-2 text-amarillo"></i>
+                <div>
+                  <div class="fw-bold">Confiabilidad</div>
+                  <div class="small text-white-50">
+                    Servicios incluidos según unidad.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-5">
+      <div class="container">
+        <div class="row text-center mb-4">
+          <div class="col-12">
+            <h2 class="fw-bold text-primario section-title">
+              Buscador de disponibilidad
+            </h2>
+            <p class="text-muted fs-5">
+              Filtra por tipo, fechas y ubicación para ver unidades disponibles.
+            </p>
+          </div>
+        </div>
+
+        <form th:action="@{/alquiler}" method="get" class="mb-4">
+          <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold">Tipo de vehículo</label>
+                  <input
+                    name="tipo"
+                    class="form-control"
+                    placeholder="Ej: Minivan, Bus, Camioneta"
+                    th:value="${param.tipo}"
+                  />
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold">Fecha de inicio</label>
+                  <input
+                    name="fechaInicio"
+                    type="date"
+                    class="form-control"
+                    th:value="${param.fechaInicio}"
+                  />
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold">Fecha fin</label>
+                  <input
+                    name="fechaFin"
+                    type="date"
+                    class="form-control"
+                    th:value="${param.fechaFin}"
+                  />
+                </div>
+
+                <div class="col-md-3">
+                  <label class="form-label fw-semibold"
+                    >Cantidad de personas</label
+                  >
+                  <input
+                    name="personas"
+                    type="number"
+                    min="1"
+                    class="form-control"
+                    placeholder="Ej: 15"
+                    th:value="${param.personas}"
+                  />
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label fw-semibold">Ubicación</label>
+                  <input
+                    name="ubicacion"
+                    class="form-control"
+                    placeholder="Ej: Trujillo"
+                    th:value="${param.ubicacion}"
+                  />
+                </div>
+
+                <div class="col-md-5 d-grid align-items-end">
+                  <button class="btn btn-amarillo btn-lg fw-bold" type="submit">
+                    <i class="bi bi-search me-2"></i>Buscar disponibilidad
+                  </button>
+                </div>
+              </div>
+
+              <input type="hidden" name="_csrf" th:value="${_csrf?.token}" />
+            </div>
+          </div>
+        </form>
+
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h4 class="fw-bold text-primario mb-0">
+            Vehículos disponibles (simulación)
+          </h4>
+          <div class="text-muted small" th:if="${#lists.isEmpty(vehiculos)}">
+            No hay resultados con los filtros actuales.
+          </div>
+          <div
+            class="text-muted small"
+            th:unless="${#lists.isEmpty(vehiculos)}"
+          >
+            Mostrando
+            <span
+              class="fw-bold"
+              th:text="${vehiculos.size()} + ' unidades'"
+            ></span>
+          </div>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-4" th:each="v : ${vehiculos}">
+            <div class="card h-100 shadow-sm border-0 card-servicio">
+              <img
+                class="card-img-top"
+                th:src="${v.imagen != null && !#strings.isEmpty(v.imagen) ? v.imagen : '@{/img/nuevaasesInicio.jpg}'}"
+                alt="Imagen vehículo"
+                style="height: 190px; object-fit: cover"
+              />
+              <div class="card-body p-4">
+                <div class="d-flex align-items-start justify-content-between">
+                  <h5
+                    class="fw-bold text-primario mb-1"
+                    th:text="${v.tipo != null ? v.tipo : 'Vehículo'}"
+                  ></h5>
+                  <span
+                    class="badge rounded-pill text-bg-light-blue fw-semibold"
+                    th:text="${v.capacidad != null ? v.capacidad : 'N/D'} + ' pax'"
+                  ></span>
+                </div>
+
+                <p
+                  class="text-muted mb-3"
+                  style="min-height: 44px"
+                  th:text="${v.caracteristicas != null ? v.caracteristicas : 'Características referenciales disponibles.'}"
+                ></p>
+
+                <div
+                  class="d-flex align-items-center justify-content-between mb-3"
+                >
+                  <div class="text-muted small">Precio referencial</div>
+                  <div
+                    class="fw-bold text-primario"
+                    th:text="${'S/ ' + (v.precioReferencial != null ? v.precioReferencial : 0)}"
+                  ></div>
+                </div>
+
+                <a
+                  th:href="@{'/alquiler/vehiculo/' + ${v.id}}"
+                  class="btn btn-outline-amarillo w-100 fw-bold"
+                >
+                  <i class="bi bi-eye me-2"></i>Ver detalles
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="col-12 text-center py-5"
+            th:if="${#lists.isEmpty(vehiculos)}"
+          >
+            <i class="bi bi-car-front fs-1 text-muted"></i>
+            <h4 class="text-muted mt-3">No hay unidades disponibles</h4>
+            <p class="text-muted">
+              Prueba con otros filtros de tipo, personas o ubicación.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>
