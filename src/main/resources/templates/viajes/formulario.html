@@ -1,52 +1,30 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
   <head
-    th:replace="~{layout :: head(${pasaje.id} != null ? 'Editar Pasaje' : 'Nuevo Pasaje')}"
+    th:replace="~{layout :: head(${viaje.id} != null ? 'Editar Viaje' : 'Nuevo Viaje')}"
   ></head>
   <body>
     <div th:replace="~{layout :: navbar}"></div>
     <div class="container my-4">
       <div class="row justify-content-center">
-        <div class="col-md-7">
-          <div
-            class="card shadow border-0"
-            style="border-radius: 16px; overflow: hidden"
-          >
+        <div class="col-md-8">
+          <div class="card shadow">
             <div class="card-header bg-primario text-white">
               <h4
                 class="mb-0 fw-bold"
-                th:text="${pasaje.id} != null ? 'Editar Pasaje' : 'Nuevo Pasaje'"
-              ></h4>
+                th:text="${viaje.id} != null ? 'Editar Viaje' : 'Nuevo Viaje'"
+              >
+                Formulario
+              </h4>
             </div>
             <div class="card-body p-4">
               <form
-                th:action="@{/pasajes/guardar}"
-                th:object="${pasaje}"
+                th:action="@{/viajes/guardar}"
+                th:object="${viaje}"
                 method="post"
               >
                 <input type="hidden" th:field="*{id}" />
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold"
-                      >Nombre del Pasajero</label
-                    >
-                    <input
-                      type="text"
-                      class="form-control"
-                      th:field="*{nombrePasajero}"
-                      required
-                    />
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">DNI</label>
-                    <input
-                      type="text"
-                      class="form-control"
-                      th:field="*{dni}"
-                      required
-                    />
-                  </div>
-                </div>
+
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Origen</label>
@@ -54,7 +32,7 @@
                       type="text"
                       class="form-control"
                       th:field="*{origen}"
-                      value="Trujillo"
+                      placeholder="Ej: Trujillo"
                       required
                     />
                   </div>
@@ -64,71 +42,74 @@
                       type="text"
                       class="form-control"
                       th:field="*{destino}"
-                      value="Chepén"
+                      placeholder="Ej: Chepén"
                       required
                     />
                   </div>
                 </div>
+
                 <div class="row">
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold">Fecha de Viaje</label>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Fecha</label>
                     <input
                       type="date"
                       class="form-control"
-                      th:field="*{fechaViaje}"
+                      th:field="*{fecha}"
                       required
                     />
                   </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold">Hora</label>
-                    <select
-                      class="form-select"
-                      th:field="*{horaViaje}"
-                      required
-                    >
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Hora de Salida</label>
+                    <select class="form-select" th:field="*{horaSalida}" required>
+                      <option value="">Seleccionar hora</option>
                       <option value="08:00">08:00 AM</option>
                       <option value="12:00">12:00 PM</option>
                       <option value="16:00">04:00 PM</option>
                       <option value="20:00">08:00 PM</option>
                     </select>
                   </div>
+                </div>
+
+                <div class="row">
                   <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold">Asiento</label>
+                    <label class="form-label fw-bold">Tipo de Bus</label>
+                    <select class="form-select" th:field="*{tipoBus}" required>
+                      <option value="">Seleccionar tipo</option>
+                      <option value="BUS">Bus</option>
+                      <option value="MINIVAN">Minivan</option>
+                      <option value="CAMION">Camión</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Total Asientos</label>
                     <input
                       type="number"
                       class="form-control"
-                      th:field="*{asiento}"
+                      th:field="*{totalAsientos}"
+                      min="1"
+                      max="60"
                       required
                     />
                   </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Precio (S/) <span class="text-muted fw-normal">— Fijo S/ 12.00</span></label>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Precio (S/)</label>
                     <input
                       type="number"
                       step="0.01"
                       class="form-control"
                       th:field="*{precio}"
-                      value="12.00"
-                      readonly
+                      min="0"
+                      placeholder="25.00"
                       required
                     />
                   </div>
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Estado</label>
-                    <select class="form-select" th:field="*{estado}" required>
-                      <option value="RESERVADO">Reservado</option>
-                      <option value="PAGADO">Pagado</option>
-                      <option value="CANCELADO">Cancelado</option>
-                    </select>
-                  </div>
                 </div>
+
                 <div class="d-flex gap-2">
                   <button type="submit" class="btn btn-amarillo fw-bold">
-                    Guardar
+                    <i class="bi bi-check-lg me-1"></i>Guardar
                   </button>
-                  <a href="/pasajes" class="btn btn-outline-secondary"
+                  <a href="/viajes" class="btn btn-outline-secondary"
                     >Cancelar</a
                   >
                 </div>

@@ -25,7 +25,9 @@ public class PasajeController {
 
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
-        model.addAttribute("pasaje", new Pasaje());
+        Pasaje pasaje = new Pasaje();
+        pasaje.setPrecio(12.00);
+        model.addAttribute("pasaje", pasaje);
         return "pasajes/formulario";
     }
 
@@ -37,6 +39,9 @@ public class PasajeController {
 
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute Pasaje pasaje, Authentication authentication) {
+        // Precio fijo de S/ 12.00
+        pasaje.setPrecio(12.00);
+
         if (authentication != null && authentication.isAuthenticated()) {
             var email = authentication.getName();
             pasaje.setCreadoPorEmail(email);

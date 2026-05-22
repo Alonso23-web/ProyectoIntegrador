@@ -29,7 +29,7 @@ public class SecurityConfig {
                                                 .requestMatchers("/", "/index.html", "/inicio", "/nosotros",
                                                                 "/registro", "/css/**", "/js/**",
                                                                 "/images/**", "/img/**", "/node_modules/**",
-                                                                "/webjars/**", "/api/**")
+                                                                "/webjars/**", "/api/**", "/alquiler/**")
                                                 .permitAll()
                                                 .requestMatchers("/h2-console/**").permitAll()
                                                 .anyRequest().authenticated())

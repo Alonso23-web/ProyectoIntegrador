@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout :: head('Gestión de Viajes - Nueva Ases Express')}"></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <div class="container my-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h2 class="fw-bold text-primario mb-1">
+            <i class="bi bi-bus-front me-2 text-amarillo"></i>Gestión de Viajes
+          </h2>
+          <p class="text-muted mb-0">
+            Administra los viajes programados, precios y disponibilidad.
+          </p>
+        </div>
+        <a href="/viajes/nuevo" class="btn btn-amarillo fw-bold">
+          <i class="bi bi-plus-lg me-1"></i>Nuevo Viaje
+        </a>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-dark">
+                <tr>
+                  <th>ID</th>
+                  <th>Ruta</th>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                  <th>Tipo</th>
+                  <th>Asientos</th>
+                  <th>Precio</th>
+                  <th>Creado por</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="v : ${viajes}">
+                  <td><code th:text="${v.id}"></code></td>
+                  <td>
+                    <span class="fw-semibold" th:text="${v.origen}"></span>
+                    <i class="bi bi-arrow-right text-amarillo mx-1"></i>
+                    <span class="fw-semibold" th:text="${v.destino}"></span>
+                  </td>
+                  <td th:text="${v.fecha}"></td>
+                  <td><span class="badge bg-light text-dark border" th:text="${v.horaSalida}"></span></td>
+                  <td>
+                    <span
+                      class="badge"
+                      th:classappend="${v.tipoBus == 'BUS' ? 'bg-primary' : (v.tipoBus == 'MINIVAN' ? 'bg-info' : 'bg-secondary')}"
+                      th:text="${v.tipoBus}"
+                    ></span>
+                  </td>
+                  <td th:text="${v.totalAsientos}"></td>
+                  <td class="fw-bold text-primario" th:text="'S/ ' + ${v.precio}"></td>
+                  <td class="small text-muted" th:text="${v.creadoPorEmail}"></td>
+                  <td>
+                    <div class="d-flex gap-1">
+                      <a
+                        th:href="@{'/viajes/editar/' + ${v.id}}"
+                        class="btn btn-sm btn-outline-primary"
+                        title="Editar"
+                      >
+                        <i class="bi bi-pencil"></i>
+                      </a>
+                      <a
+                        th:href="@{'/viajes/eliminar/' + ${v.id}}"
+                        class="btn btn-sm btn-outline-danger"
+                        title="Eliminar"
+                        onclick="return confirm('¿Estás seguro de eliminar este viaje? Se eliminarán también las reservas asociadas.');"
+                      >
+                        <i class="bi bi-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div th:if="${#lists.isEmpty(viajes)}" class="text-center py-5">
+            <i class="bi bi-bus-front fs-1 text-muted"></i>
+            <h4 class="text-muted mt-3">No hay viajes registrados</h4>
+            <p class="text-muted">
+              Crea el primer viaje para empezar a vender pasajes.
+            </p>
+            <a href="/viajes/nuevo" class="btn btn-amarillo mt-2"
+              ><i class="bi bi-plus-lg me-1"></i>Crear primer viaje</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>
