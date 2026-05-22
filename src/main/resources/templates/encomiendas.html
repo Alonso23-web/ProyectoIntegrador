@@ -224,6 +224,32 @@
           </div>
         </div>
 
+        <!-- TAB: RASTREAR -->
+        <div id="tab-rastrear" class="tab-panel d-none">
+          <div class="card shadow-sm mx-auto" style="max-width: 700px">
+            <div class="card-body p-4">
+              <h5 class="fw-bold text-primario mb-4">
+                <i class="bi bi-upc-scan text-amarillo me-2"></i>Rastrear
+                Encomienda
+              </h5>
+              <div class="input-group mb-3">
+                <input
+                  type="text"
+                  id="track-codigo"
+                  class="form-control"
+                  placeholder="Ej: NAE-XXXXXXXX"
+                />
+                <button
+                  class="btn btn-amarillo fw-bold"
+                  type="button"
+                  onclick="rastrear()"
+                >
+                  <i class="bi bi-search me-2"></i>Buscar
+                </button>
+              </div>
+              <div id="track-result" class="mt-3"></div>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -316,8 +342,8 @@
                     <td>${e.origen} → ${e.destino}</td>
                     <td>${e.remitente}</td>
                     <td>${e.destinatario}</td>
-                    <td>${e.pesoEstimado} kg</td>
-                    <td>S/ ${e.costoEstimado.toFixed(2)}</td>
+                    <td>${e.peso} kg</td>
+                    <td>S/ ${Number(e.precio).toFixed(2)}</td>
                     <td><span class="estado-badge estado-${e.estado}">${e.estado.replace("_", " ")}</span></td>
                     <td>${e.fechaEnvio || "-"}</td>
                 </tr>
@@ -409,9 +435,9 @@
           dniDestinatario: dniDestinatario,
           origen: origen,
           destino: destino,
-          pesoEstimado: peso,
-          tipoPaquete: descripcion, // Usamos descripción como tipo de paquete
-          observaciones: telefonoContacto // Usamos teléfono de contacto como observaciones
+          peso: peso,
+          descripcion: descripcion,
+          observaciones: telefonoContacto
         };
 
         try {
@@ -433,7 +459,7 @@
             `
                 <i class="bi bi-check-circle-fill me-2"></i><strong>Encomienda registrada exitosamente</strong><br>
                 Código de rastreo: <strong>${d.codigoRastreo}</strong><br>
-                Precio estimado: <strong>S/ ${d.costoEstimado.toFixed(2)}</strong>
+                Precio estimado: <strong>S/ ${Number(d.precio).toFixed(2)}</strong>
             `,
           );
           // Limpiar formulario después de un registro exitoso
@@ -477,9 +503,8 @@
           let estadoBadgeClass = 'bg-secondary';
           switch (d.estado) {
             case 'REGISTRADO': estadoBadgeClass = 'estado-REGISTRADO'; break;
-            case 'VERIFICADO': estadoBadgeClass = 'estado-VERIFICADO'; break; // Asumiendo que VERIFICADO es un estado posible
             case 'EN_TRANSITO': estadoBadgeClass = 'estado-EN_TRANSITO'; break;
-            case 'EN_DESTINO': estadoBadgeClass = 'estado-EN_DESTINO'; break; // Asumiendo que EN_DESTINO es un estado posible
+            case 'EN_DESTINO': estadoBadgeClass = 'estado-EN_DESTINO'; break;
             case 'ENTREGADO': estadoBadgeClass = 'estado-ENTREGADO'; break;
           }
 
@@ -495,8 +520,8 @@
                     <div class="col-6"><i class="bi bi-person me-1"></i><strong>De:</strong> ${d.remitente}</div>
                     <div class="col-6"><i class="bi bi-person-check me-1"></i><strong>Para:</strong> ${d.destinatario}</div>
                     <div class="col-6"><i class="bi bi-arrow-right-circle me-1"></i>${d.origen} → ${d.destino}</div>
-                    <div class="col-6"><i class="bi bi-box me-1"></i>${d.pesoEstimado} kg · S/ ${d.costoEstimado.toFixed(2)}</div>
-                    ${d.tipoPaquete ? `<div class="col-12"><i class="bi bi-tag me-1"></i>${d.tipoPaquete}</div>` : ""}
+                    <div class="col-6"><i class="bi bi-box me-1"></i>${d.peso} kg · S/ ${Number(d.precio).toFixed(2)}</div>
+                    ${d.descripcion ? `<div class="col-12"><i class="bi bi-tag me-1"></i>${d.descripcion}</div>` : ""}
                     ${d.fechaEstimadaEntrega ? `<div class="col-12"><i class="bi bi-calendar-check me-1"></i>Entrega estimada: ${d.fechaEstimadaEntrega}</div>` : ""}
                 </div>
             `,
@@ -506,62 +531,6 @@
             "track-result",
             "danger",
             '<i class="bi bi-exclamation-circle me-2"></i>No se encontró ninguna encomienda con ese código.',
-          );
-        }
-      }
-
-      // Lógica para cargar "Mis Registros"
-      async function cargarMisRegistros() {
-        alerta(
-          "mis-registros-result",
-          "info",
-          '<div class="spinner-border spinner-border-sm me-2"></div> Cargando tus registros...',
-        );
-        try {
-          const r = await fetch(`${API}/mis-registros`);
-          if (!r.ok) throw new Error();
-          const lista = await r.json();
-          if (!lista.length)
-            return alerta(
-              "mis-registros-result",
-              "warning",
-              "No tienes encomiendas registradas aún.",
-            );
-          const filas = lista
-            .map(
-              (e) => `
-                <tr>
-                    <td><code>${e.codigoRastreo}</code></td>
-                    <td>${e.origen} → ${e.destino}</td>
-                    <td>${e.remitente}</td>
-                    <td>${e.destinatario}</td>
-                    <td>${e.pesoEstimado} kg</td>
-                    <td>S/ ${e.costoEstimado.toFixed(2)}</td>
-                    <td><span class="estado-badge estado-${e.estado}">${e.estado.replace("_", " ")}</span></td>
-                    <td>${e.fechaEnvio || "-"}</td>
-                </tr>
-            `,
-            )
-            .join("");
-          document.getElementById("mis-registros-result").innerHTML = `
-                <div class="table-responsive mt-2">
-                    <table class="table table-hover align-middle small">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Código</th><th>Ruta</th><th>Remitente</th>
-                                <th>Destinatario</th><th>Peso</th><th>Precio</th>
-                                <th>Estado</th><th>Fecha</th>
-                            </tr>
-                        </thead>
-                        <tbody>${filas}</tbody>
-                    </table>
-                </div>
-            `;
-        } catch (e) {
-          alerta(
-            "mis-registros-result",
-            "danger",
-            '<i class="bi bi-exclamation-circle me-2"></i>Error al cargar tus registros.',
           );
         }
       }
@@ -587,46 +556,5 @@
       });
     </script>
 
-    <style>
-      .btn-tab {
-        border-radius: 50px;
-        padding: 8px 20px;
-        border: 2px solid #1b2a5e;
-        color: #1b2a5e;
-        background: transparent;
-        font-weight: 600;
-      }
-      .btn-tab.active {
-        background: #f5a623;
-        border-color: #f5a623;
-        color: #1a0f00;
-      }
-      .btn-tab:hover:not(.active) {
-        background: #1b2a5e;
-        color: white;
-      }
-      .estado-badge {
-        font-size: 12px;
-        padding: 4px 12px;
-        border-radius: 50px;
-        font-weight: 600;
-      }
-      .estado-REGISTRADO {
-        background: #e2e8f0;
-        color: #475569;
-      }
-      .estado-EN_TRANSITO {
-        background: #fef3c7;
-        color: #92400e;
-      }
-      .estado-EN_DESTINO {
-        background: #dbeafe;
-        color: #1e40af;
-      }
-      .estado-ENTREGADO {
-        background: #dcfce7;
-        color: #166534;
-      }
-    </style>
   </body>
 </html>

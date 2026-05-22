@@ -444,131 +444,104 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto align-items-center">
-            <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
-            <li class="nav-item">
+
+            <!-- ==================== ADMINISTRADOR ==================== -->
+            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+              <a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+              <a class="nav-link" href="/vehiculos"><i class="bi bi-truck me-1"></i>Vehículos</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+              <a class="nav-link" href="/pasajes"><i class="bi bi-ticket me-1"></i>Pasajes</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+              <a class="nav-link" href="/encomiendas"><i class="bi bi-box me-1"></i>Encomiendas</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+              <a class="nav-link" href="/rastrear"><i class="bi bi-search me-1"></i>Rastrear</a>
+            </li>
+
+            <!-- ==================== CLIENTE ==================== -->
+            <li class="nav-item" sec:authorize="hasRole('CLIENTE')">
+              <a class="nav-link" href="/">Inicio</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('CLIENTE')">
               <a class="nav-link" href="/nosotros">Nosotros</a>
             </li>
 
             <!-- Pasajes dropdown (CLIENTE) -->
-            <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
+            <li class="nav-item dropdown" sec:authorize="hasRole('CLIENTE')">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                 Pasajes
               </a>
               <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="/pasajes/nuevo"
-                    >Comprar pasaje</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="/pasajes?tab=mis-viajes"
-                    >Mis viajes</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="/pasajes?tab=estado-viaje"
-                    >Estado de viaje</a
-                  >
-                </li>
+                <li><a class="dropdown-item" href="/pasajes/nuevo">Comprar pasaje</a></li>
+                <li><a class="dropdown-item" href="/pasajes?tab=mis-viajes">Mis viajes</a></li>
+                <li><a class="dropdown-item" href="/pasajes?tab=estado-viaje">Estado de viaje</a></li>
               </ul>
             </li>
 
             <!-- Encomiendas dropdown (CLIENTE) -->
-            <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
+            <li class="nav-item dropdown" sec:authorize="hasRole('CLIENTE')">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                 Encomiendas
               </a>
               <ul class="dropdown-menu">
-                <li>
-                  <a class="dropdown-item" href="/encomiendas"
-                    >Registrar envío</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="/encomiendas?tab=calcular"
-                    >Cotizar envío</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="/encomiendas?tab=mis-registros"
-                    >Mis envíos</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="/encomiendas?tab=rastrear"
-                    >Rastrear encomienda</a
-                  >
-                </li>
+                <li><a class="dropdown-item" href="/encomiendas">Registrar envío</a></li>
+                <li><a class="dropdown-item" href="/encomiendas?tab=calcular">Cotizar envío</a></li>
+                <li><a class="dropdown-item" href="/encomiendas?tab=mis-registros">Mis envíos</a></li>
+                <li><a class="dropdown-item" href="/encomiendas?tab=rastrear">Rastrear encomienda</a></li>
               </ul>
             </li>
 
-            <li class="nav-item">
+            <li class="nav-item" sec:authorize="hasRole('CLIENTE')">
               <a class="nav-link" href="/contacto">Contacto</a>
             </li>
 
-            <!-- Perfil dropdown (CLIENTE) -->
+            <!-- ==================== CONDUCTOR ==================== -->
+            <li class="nav-item" sec:authorize="hasRole('CONDUCTOR')">
+              <a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('CONDUCTOR')">
+              <a class="nav-link" href="/vehiculos"><i class="bi bi-truck me-1"></i>Vehículos</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('CONDUCTOR')">
+              <a class="nav-link" href="/encomiendas"><i class="bi bi-box me-1"></i>Encomiendas</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('CONDUCTOR')">
+              <a class="nav-link" href="/rastrear"><i class="bi bi-search me-1"></i>Rastrear</a>
+            </li>
+
+            <!-- ==================== PERFIL (todos los roles autenticados) ==================== -->
             <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                role="button"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i class="bi bi-person-circle me-1"></i>Perfil
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle me-1"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
-                <li>
-                  <a class="dropdown-item" href="/perfil">Mi perfil</a>
+                <li><a class="dropdown-item" href="/perfil"><i class="bi bi-person me-2"></i>Mi perfil</a></li>
+                <li sec:authorize="hasRole('ADMINISTRADOR')">
+                  <a class="dropdown-item" href="/dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
                 </li>
-                <li>
-                  <a class="dropdown-item" href="/pasajes?tab=mis-viajes"
-                    >Mis reservas</a
-                  >
+                <li sec:authorize="hasRole('CLIENTE')">
+                  <a class="dropdown-item" href="/pasajes?tab=mis-viajes"><i class="bi bi-ticket me-2"></i>Mis reservas</a>
                 </li>
-                <li>
-                  <a class="dropdown-item" href="/encomiendas?tab=mis-registros"
-                    >Mis encomiendas</a
-                  >
+                <li sec:authorize="hasRole('CLIENTE')">
+                  <a class="dropdown-item" href="/encomiendas?tab=mis-registros"><i class="bi bi-box me-2"></i>Mis encomiendas</a>
                 </li>
+                <li><hr class="dropdown-divider" /></li>
                 <li>
-                  <hr class="dropdown-divider" />
-                </li>
-                <li>
-                  <form
-                    th:attr="action=@{/logout}"
-                    method="post"
-                    class="d-inline"
-                  >
-                    <input
-                      type="hidden"
-                      th:name="${_csrf.parameterName}"
-                      th:value="${_csrf.token}"
-                    />
-                    <button
-                      type="submit"
-                      class="dropdown-item"
-                      style="background: transparent; border: 0"
-                    >
-                      Cerrar sesión
+                  <form th:attr="action=@{/logout}" method="post" class="d-inline">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="dropdown-item" style="background: transparent; border: 0">
+                      <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
                     </button>
                   </form>
                 </li>
               </ul>
             </li>
 
+            <!-- ==================== NO AUTENTICADO ==================== -->
             <li class="nav-item" sec:authorize="!isAuthenticated()">
               <a class="nav-link" href="/registro">Registrarse</a>
             </li>

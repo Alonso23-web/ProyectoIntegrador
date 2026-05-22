@@ -47,8 +47,12 @@ public class AlquilerSolicitudController {
                     ok = ok && cap >= personas;
                 }
             }
-            // Ubicación y fechas: en este mock se omite la lógica real.
+            // Solo mostrar disponibles
+            if (ok) {
+                ok = v.getEstado() != null && v.getEstado().equalsIgnoreCase("DISPONIBLE");
+            }
 
+            // Ubicación y fechas: en este mock se omite la lógica real.
             if (ok) filtered.add(v);
         }
 

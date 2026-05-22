@@ -23,7 +23,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     Optional<Reserva> findByCodigoBoleto(String codigoBoleto);
 
-    // Nota: se deja fuera por mapeo compuesto; se puede refinar después.
     List<Reserva> findByUsuarioEmailOrderByIdDesc(String usuarioEmail);
+
+    List<Reserva> findTop5ByOrderByIdDesc();
 
 }

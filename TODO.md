@@ -1,10 +1,14 @@
-# TODO - Pasajes (compras)
+# TODO - Fix runtime cierre por error MySQL columna 'tipo'
 
-## Pendiente
+## Plan (resumen)
 
-- [x] Ajustar servicio/interfaz para precio fijo (S/ 12.00) sin editar desde el cliente.
-- [ ] Corregir backend para compra de múltiples pasajes (N): endpoint/DTO dedicado + validación asientos.
-- [ ] Frontend: UI para seleccionar N pasajes (cantidad + nombres/dnis por pasajero) y marcar asientos ocupados.
-- [ ] Validar asiento único por pasajero: no permitir seleccionar asientos ya ocupados.
-- [ ] Manejar minivan: máximo 15 asientos; la UI/validación debe respetarlo.
-- [ ] “Mis viajes”: mostrar origen y destino y que sea solo lectura (admin puede editar/eliminar).
+- El build compila OK; el cierre ocurre por runtime.
+- Error: `Field 'tipo' doesn't have a default value`.
+- Hipótesis: mapeo JPA de `Vehiculo.tipo` no coincide con el nombre real de columna en MySQL.
+
+## Pasos
+
+1. Identificar qué sentencia/tabla falla (probablemente `vehiculos`).
+2. Corregir el mapeo en `Vehiculo.java` para que `tipo` apunte a la columna real (probablemente `tipo` en vez de `tipo_propiedad`).
+3. Verificar que `DataInitializer` ya inserta `tipo` correctamente.
+4. Ejecutar app nuevamente y confirmar que ya no aparece el error.

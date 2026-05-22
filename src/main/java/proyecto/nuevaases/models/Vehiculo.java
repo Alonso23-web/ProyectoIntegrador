@@ -30,7 +30,7 @@ public class Vehiculo {
     @Column(nullable = false)
     private int capacidad;
 
-    @Column(nullable = false)
+    @Column(name = "tipo", nullable = false)
     private String tipo; // BUS, MINIVAN, CAMION
 
     @Column(nullable = false)

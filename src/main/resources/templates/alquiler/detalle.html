@@ -14,7 +14,7 @@
               <div class="position-relative">
                 <img
                   class="card-img-top"
-                  th:src="${vehiculo.imagen != null && !#strings.isEmpty(vehiculo.imagen) ? vehiculo.imagen : @{/img/nuevaasesInicio.jpg}}"
+                  th:src="${(vehiculo.imagen != null && !#strings.isEmpty(vehiculo.imagen)) ? (vehiculo.imagen.startsWith('http') || vehiculo.imagen.startsWith('/img/') ? vehiculo.imagen : @{/img/} + vehiculo.imagen) : @{/img/nuevaasesInicio.jpg}}"
                   alt="Imagen vehículo"
                   style="height: 320px; object-fit: cover"
                 />
@@ -40,18 +40,17 @@
                     <div class="text-muted small">Precio referencial</div>
                     <div
                       class="fw-bold fs-4 text-primario"
-                      th:text="${'S/ ' + (vehiculo.precioReferencial != null ? vehiculo.precioReferencial : 0)}"
+                      th:text="${'S/ ' + (vehiculo.precioPorDia != null ? vehiculo.precioPorDia : 0)} + ' /día'"
                     ></div>
                   </div>
                 </div>
 
                 <hr />
 
-                <h5 class="fw-bold mb-2">Características</h5>
-                <p
-                  class="text-muted mb-4"
-                  th:text="${vehiculo.caracteristicas != null ? vehiculo.caracteristicas : 'Características referenciales disponibles.'}"
-                ></p>
+                <h5 class="fw-bold mb-2">Características</h5><p
+                    class="text-muted mb-4"
+                    th:text="${vehiculo.marca != null ? vehiculo.marca + ' ' + vehiculo.modelo + ' - Placa: ' + vehiculo.placa : 'Características referenciales disponibles.'}"
+                  ></p>
 
                 <h5 class="fw-bold mb-3">Servicios incluidos</h5>
                 <ul class="list-unstyled mb-0">

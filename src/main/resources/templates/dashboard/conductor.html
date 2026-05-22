@@ -5,126 +5,363 @@
   ></head>
   <body>
     <div th:replace="~{layout :: navbar}"></div>
-    <section class="py-5 dashboard-page">
+
+    <style>
+      .conductor-dashboard {
+        background: #f0f2f5;
+        min-height: calc(100vh - 130px);
+        padding: 2rem 0;
+      }
+
+      /* Tarjeta de bienvenida */
+      .welcome-card {
+        background: linear-gradient(135deg, #0d1b4c 0%, #1a2d6b 100%);
+        border-radius: 24px;
+        padding: 2.5rem;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+      .welcome-card::after {
+        content: "🚛";
+        position: absolute;
+        right: 30px;
+        bottom: -10px;
+        font-size: 120px;
+        opacity: 0.1;
+      }
+      .welcome-card h1 {
+        font-weight: 800;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+      }
+      .welcome-card p {
+        opacity: 0.85;
+        font-size: 1.05rem;
+        margin-bottom: 0;
+        max-width: 500px;
+      }
+      .welcome-card .badge-rol {
+        background: rgba(255,255,255,0.15);
+        color: white;
+        padding: 0.5rem 1.2rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-top: 0.8rem;
+      }
+
+      /* Sección de acción rápida (Postular / Alquilar) */
+      .accion-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.2rem;
+        margin-bottom: 2.5rem;
+      }
+      .accion-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem 1.5rem;
+        text-align: center;
+        text-decoration: none;
+        color: #0d1b4c;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        border: 2px solid transparent;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+      }
+      .accion-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 30px rgba(13,27,76,0.15);
+        border-color: #f5a623;
+        color: #0d1b4c;
+        text-decoration: none;
+      }
+      .accion-card .accion-icono {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.4rem;
+      }
+      .accion-card .accion-nombre {
+        font-weight: 700;
+        font-size: 1.15rem;
+      }
+      .accion-card .accion-desc {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin: 0;
+        max-width: 240px;
+      }
+      .accion-card .btn-accion {
+        background: #f5a623;
+        color: #1a1a1a;
+        font-weight: 700;
+        border: none;
+        padding: 0.6rem 1.8rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        margin-top: 0.3rem;
+      }
+      .accion-card .btn-accion:hover {
+        background: #e89800;
+        transform: scale(1.05);
+      }
+
+      .icono-postular { background: #e8f4fd; color: #0d6efd; }
+      .icono-alquilar { background: #fff3cd; color: #856404; }
+      .icono-vehiculos-conductor { background: #d4edda; color: #155724; }
+      .icono-encomiendas-conductor { background: #f8d7da; color: #721c24; }
+      .icono-rastrear-conductor { background: #e2d9f3; color: #563d7c; }
+
+      /* Grid de módulos */
+      .modulos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+      }
+      .modulo-card {
+        background: white;
+        border-radius: 18px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        text-decoration: none;
+        color: #0d1b4c;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        border: 2px solid transparent;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .modulo-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(13,27,76,0.12);
+        border-color: #f5a623;
+        color: #0d1b4c;
+        text-decoration: none;
+      }
+      .modulo-card .mod-icono {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+      }
+      .modulo-card .mod-nombre {
+        font-weight: 700;
+        font-size: 0.9rem;
+      }
+      .modulo-card .mod-desc {
+        font-size: 0.75rem;
+        color: #6c757d;
+        margin: 0;
+      }
+
+      .mod-icono-vehiculos { background: #e8f4fd; color: #0d6efd; }
+      .mod-icono-encomiendas { background: #fff3cd; color: #856404; }
+      .mod-icono-rastrear { background: #d4edda; color: #155724; }
+      .mod-icono-perfil { background: #f8d7da; color: #721c24; }
+
+      /* Estadísticas */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .stat-card {
+        background: white;
+        border-radius: 18px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        text-align: center;
+        transition: transform 0.2s ease;
+      }
+      .stat-card:hover {
+        transform: translateY(-3px);
+      }
+      .stat-card .stat-number {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #0d1b4c;
+        line-height: 1.2;
+      }
+      .stat-card .stat-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        color: #6c757d;
+        margin-top: 0.3rem;
+      }
+      .stat-card .stat-icon {
+        font-size: 1.6rem;
+        margin-bottom: 0.3rem;
+        display: block;
+      }
+
+      /* Información del conductor */
+      .info-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        flex-wrap: wrap;
+      }
+      .info-card .avatar-conductor {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0d1b4c, #1a2d6b);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        flex-shrink: 0;
+      }
+      .info-card .info-detalle {
+        flex: 1;
+        min-width: 180px;
+      }
+      .info-card .info-detalle .info-nombre {
+        font-weight: 700;
+        font-size: 1.05rem;
+        color: #0d1b4c;
+      }
+      .info-card .info-detalle .info-rol {
+        font-size: 0.85rem;
+        color: #6c757d;
+      }
+      .info-card .info-estado {
+        background: #d4edda;
+        color: #155724;
+        padding: 0.4rem 1.2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+      }
+    </style>
+
+    <section class="conductor-dashboard">
       <div class="container">
-        <div class="row g-4">
-          <aside class="col-xl-3">
-            <div class="dashboard-sidebar">
-              <h5 class="sidebar-title">Menú conductor</h5>
-              <a class="sidebar-link active" href="/dashboard">Inicio</a>
-              <a class="sidebar-link" href="/vehiculos">Vehículos</a>
-              <a class="sidebar-link" href="/encomiendas">Encomiendas</a>
-              <a class="sidebar-link" href="/rastrear">Rastrear</a>
-            </div>
-          </aside>
-          <main class="col-xl-9 dashboard-main">
-            <div class="dashboard-banner mb-5 text-white">
-              <div class="row align-items-center">
-                <div class="col-md-8">
-                  <span class="dashboard-icon">
-                    <i class="bi bi-car-front-fill"></i>
-                  </span>
-                  <h1 class="fw-bold">Panel de Conductor</h1>
-                  <p class="lead mb-0">
-                    Bienvenido, <span th:text="${nombreUsuario}"></span>.
-                    Consulta rápidamente tu actividad y disponibilidad.
-                  </p>
-                </div>
-                <div class="col-md-4 text-md-end mt-4 mt-md-0">
-                  <span class="badge bg-light text-dark p-3 fs-6"
-                    >Conductor</span
-                  >
-                </div>
-              </div>
-            </div>
 
-            <div class="row g-4 mb-5">
-              <div class="col-md-6 col-lg-4">
-                <div class="operation-summary bg-white h-100">
-                  <h6 class="text-uppercase text-muted">Vehículos totales</h6>
-                  <p
-                    class="display-6 fw-bold mb-0"
-                    th:text="${totalVehiculos}"
-                  ></p>
-                </div>
-              </div>
-              <div class="col-md-6 col-lg-4">
-                <div class="operation-summary bg-white h-100">
-                  <h6 class="text-uppercase text-muted">Pasajes totales</h6>
-                  <p
-                    class="display-6 fw-bold mb-0"
-                    th:text="${totalPasajes}"
-                  ></p>
-                </div>
-              </div>
-              <div class="col-md-6 col-lg-4">
-                <div class="operation-summary bg-white h-100">
-                  <h6 class="text-uppercase text-muted">Encomiendas totales</h6>
-                  <p
-                    class="display-6 fw-bold mb-0"
-                    th:text="${totalEncomiendas}"
-                  ></p>
-                </div>
-              </div>
-            </div>
-
-            <div class="row g-4">
-              <div class="col-lg-6">
-                <div class="operation-list bg-white p-4">
-                  <h5 class="fw-bold">Acciones principales</h5>
-                  <ul class="list-group list-group-flush mt-3">
-                    <li
-                      class="list-group-item d-flex justify-content-between align-items-center"
-                    >
-                      Acceder a vehículos
-                      <a href="/vehiculos" class="btn btn-link">Ir</a>
-                    </li>
-                    <li
-                      class="list-group-item d-flex justify-content-between align-items-center"
-                    >
-                      Ver envíos
-                      <a href="/encomiendas" class="btn btn-link">Ir</a>
-                    </li>
-                    <li
-                      class="list-group-item d-flex justify-content-between align-items-center"
-                    >
-                      Rastrear estado
-                      <a href="/rastrear" class="btn btn-link">Ir</a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div class="col-lg-6">
-                <div class="operation-list bg-white p-4">
-                  <h5 class="fw-bold">Datos rápidos</h5>
-                  <p class="mb-2">
-                    Accede al estado de los vehículos, el total de viajes y
-                    envíos disponibles desde el sistema.
-                  </p>
-                  <div class="row g-3">
-                    <div class="col-12">
-                      <span class="badge badge-light-blue p-3 text-uppercase"
-                        >Tu usuario</span
-                      >
-                      <div
-                        class="mt-2 fw-semibold"
-                        th:text="${nombreUsuario}"
-                      ></div>
-                    </div>
-                    <div class="col-12">
-                      <span class="badge badge-light-blue p-3 text-uppercase"
-                        >Estado</span
-                      >
-                      <div class="mt-2 text-muted">Conductor activo</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </main>
+        <!-- Tarjeta de bienvenida -->
+        <div class="welcome-card">
+          <h1>🚛 ¡Bienvenido, <span th:text="${nombreUsuario}"></span>!</h1>
+          <p>Panel del conductor. Aquí puedes ver los vehículos disponibles, gestionar encomiendas, postular a trabajos y solicitar vehículos para tus rutas.</p>
+          <span class="badge-rol">🧑‍✈️ Conductor</span>
         </div>
+
+        <!-- ACCIONES PRINCIPALES: Postular y Alquilar -->
+        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
+          <i class="bi bi-lightning-fill me-2"></i>Acciones rápidas
+        </h5>
+        <div class="accion-grid">
+          <a href="/alquiler" class="accion-card">
+            <div class="accion-icono icono-postular"><i class="bi bi-briefcase-fill"></i></div>
+            <span class="accion-nombre">💼 Postular a trabajo</span>
+            <p class="accion-desc">Revisa los vehículos disponibles y solicita asignación para tus rutas como conductor.</p>
+            <span class="btn-accion">Ver oportunidades</span>
+          </a>
+          <a href="/alquiler" class="accion-card">
+            <div class="accion-icono icono-alquilar"><i class="bi bi-car-front-fill"></i></div>
+            <span class="accion-nombre">🚗 Alquilar vehículo</span>
+            <p class="accion-desc">Solicita un vehículo de la flota para tus rutas y trabajos asignados.</p>
+            <span class="btn-accion">Ver flota disponible</span>
+          </a>
+        </div>
+
+        <!-- MÓDULOS DEL SISTEMA -->
+        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
+          <i class="bi bi-grid-3x3-gap-fill me-2"></i>Módulos del sistema
+        </h5>
+        <div class="modulos-grid">
+          <a href="/vehiculos" class="modulo-card">
+            <div class="mod-icono mod-icono-vehiculos"><i class="bi bi-truck"></i></div>
+            <span class="mod-nombre">Vehículos</span>
+            <span class="mod-desc">Ver flota disponible</span>
+          </a>
+          <a href="/encomiendas" class="modulo-card">
+            <div class="mod-icono mod-icono-encomiendas"><i class="bi bi-box-seam"></i></div>
+            <span class="mod-nombre">Encomiendas</span>
+            <span class="mod-desc">Gestionar envíos</span>
+          </a>
+          <a href="/rastrear" class="modulo-card">
+            <div class="mod-icono mod-icono-rastrear"><i class="bi bi-search"></i></div>
+            <span class="mod-nombre">Rastrear</span>
+            <span class="mod-desc">Localizar envío</span>
+          </a>
+          <a href="/perfil" class="modulo-card">
+            <div class="mod-icono mod-icono-perfil"><i class="bi bi-person-circle"></i></div>
+            <span class="mod-nombre">Mi Perfil</span>
+            <span class="mod-desc">Ver mis datos</span>
+          </a>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
+          <i class="bi bi-bar-chart-fill me-2"></i>Resumen del sistema
+        </h5>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-icon">🚛</span>
+            <div class="stat-number" th:text="${totalVehiculos}">0</div>
+            <div class="stat-label">Vehículos en flota</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon">🎫</span>
+            <div class="stat-number" th:text="${totalPasajes}">0</div>
+            <div class="stat-label">Pasajes vendidos</div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon">📦</span>
+            <div class="stat-number" th:text="${totalEncomiendas}">0</div>
+            <div class="stat-label">Encomiendas</div>
+          </div>
+        </div>
+
+        <!-- INFORMACIÓN DEL CONDUCTOR -->
+        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
+          <i class="bi bi-person-badge-fill me-2"></i>Mi información
+        </h5>
+        <div class="info-card">
+          <div class="avatar-conductor">
+            <i class="bi bi-person-fill"></i>
+          </div>
+          <div class="info-detalle">
+            <div class="info-nombre" th:text="${nombreUsuario}">conductor@email.com</div>
+            <div class="info-rol">🧑‍✈️ Conductor de flota — Nueva Ases Express</div>
+          </div>
+          <div class="info-estado">
+            <i class="bi bi-check-circle-fill"></i> Activo
+          </div>
+        </div>
+
       </div>
     </section>
+    <div th:replace="~{layout :: scripts}"></div>
   </body>
 </html>
