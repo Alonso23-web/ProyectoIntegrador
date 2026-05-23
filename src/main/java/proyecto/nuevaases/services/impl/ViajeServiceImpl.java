@@ -9,6 +9,7 @@ import proyecto.nuevaases.services.ViajeService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,8 +20,6 @@ public class ViajeServiceImpl implements ViajeService {
 
     @Override
     public List<Viaje> buscar(String origen, String destino, LocalDate fecha, Integer cantidadPasajeros) {
-        // Disponibilidad real por asientos se maneja en el frontend calculando ocupación.
-        // Aquí devolvemos viajes existentes para esa ruta/fecha.
         return viajeRepository.findByOrigenAndDestinoAndFecha(origen, destino, fecha)
                 .stream()
                 .filter(v -> v.getTotalAsientos() >= (cantidadPasajeros != null ? cantidadPasajeros : 1))
@@ -28,8 +27,22 @@ public class ViajeServiceImpl implements ViajeService {
     }
 
     @Override
-    public java.util.Optional<Viaje> obtenerPorId(Long id) {
+    public Optional<Viaje> obtenerPorId(Long id) {
         return viajeRepository.findById(id);
     }
-}
 
+    @Override
+    public List<Viaje> listarTodos() {
+        return viajeRepository.findAll();
+    }
+
+    @Override
+    public void guardar(Viaje viaje) {
+        viajeRepository.save(viaje);
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        viajeRepository.deleteById(id);
+    }
+}

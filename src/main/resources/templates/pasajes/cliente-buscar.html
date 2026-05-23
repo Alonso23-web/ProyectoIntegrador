@@ -1,8 +1,7 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
   <head
-    th:replace="~{layout :: head('Buscar Pasajes - Nueva Ases Express')}
-  "
+    th:replace="~{layout :: head('Buscar Pasajes - Nueva Ases Express')}"
   ></head>
   <body>
     <div th:replace="~{layout :: navbar}"></div>
@@ -14,7 +13,7 @@
           Comprar / Reservar Pasajes
         </h1>
         <p class="lead text-white-50 mb-0">
-          Busca tu viaje, selecciona tus asientos y genera tu boleto.
+          Busca tu viaje, selecciona tus asientos y compra tus boletos.
         </p>
       </div>
     </section>
@@ -26,31 +25,22 @@
             <div class="card shadow-lg border-0" style="border-radius: 20px">
               <div class="card-body p-4 p-md-5">
                 <h4 class="fw-bold text-primario mb-4">
-                  <i class="bi bi-search me-2 text-amarillo"></i>Buscador de
-                  viajes
+                  <i class="bi bi-search me-2 text-amarillo"></i>Buscador de viajes
                 </h4>
 
                 <form id="buscarForm" class="row g-3">
                   <div class="col-md-4">
                     <label class="form-label fw-semibold">Origen</label>
-                    <input
-                      id="origen"
-                      name="origen"
-                      class="form-control"
-                      placeholder="Trujillo"
-                      required
-                    />
+                    <select id="origen" name="origen" class="form-select" required>
+                      <option value="">Seleccionar origen</option>
+                    </select>
                   </div>
 
                   <div class="col-md-4">
                     <label class="form-label fw-semibold">Destino</label>
-                    <input
-                      id="destino"
-                      name="destino"
-                      class="form-control"
-                      placeholder="Chepén"
-                      required
-                    />
+                    <select id="destino" name="destino" class="form-select" required>
+                      <option value="">Seleccionar destino</option>
+                    </select>
                   </div>
 
                   <div class="col-md-4">
@@ -65,15 +55,14 @@
                   </div>
 
                   <div class="col-md-4">
-                    <label class="form-label fw-semibold"
-                      >Cantidad de pasajeros</label
-                    >
+                    <label class="form-label fw-semibold">Cantidad de pasajeros</label>
                     <input
                       id="cantidad"
                       name="cantidadPasajeros"
                       type="number"
                       class="form-control"
                       min="1"
+                      max="40"
                       step="1"
                       value="1"
                       required
@@ -81,10 +70,7 @@
                   </div>
 
                   <div class="col-md-8 d-flex align-items-end">
-                    <button
-                      type="submit"
-                      class="btn btn-amarillo fw-bold w-100"
-                    >
+                    <button type="submit" class="btn btn-amarillo fw-bold w-100">
                       <i class="bi bi-search me-2"></i>Buscar viajes
                     </button>
                   </div>
@@ -118,52 +104,63 @@
                 </div>
 
                 <div id="paso-seleccion" class="mt-4 d-none">
-                  <div
-                    class="d-flex justify-content-between align-items-center mb-3"
-                  >
+                  <div class="d-flex justify-content-between align-items-center mb-3">
                     <h5 class="fw-bold text-primario mb-0">
-                      Selección de asientos
+                      <i class="bi bi-ticket-perforated me-2 text-amarillo"></i>Confirmar compra
                     </h5>
                     <button
                       class="btn btn-outline-secondary btn-sm"
                       type="button"
                       onclick="pasajesUI.volverResultados()"
                     >
-                      Volver
+                      <i class="bi bi-arrow-left me-1"></i>Volver
                     </button>
                   </div>
+
+                  <!-- Resumen visual del viaje -->
+                  <div class="card border-0 shadow-sm mb-3" style="border-radius: 16px; background: linear-gradient(135deg, #0d1b4c 0%, #1a2d6b 100%);">
+                    <div class="card-body p-3 text-white">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <div class="text-white-50 small text-uppercase fw-semibold">Viaje seleccionado</div>
+                          <div class="fw-bold fs-5" id="resumen-ruta">—</div>
+                          <div class="d-flex gap-3 mt-1 small text-white-50">
+                            <span><i class="bi bi-calendar me-1"></i><span id="resumen-fecha">—</span></span>
+                            <span><i class="bi bi-clock me-1"></i><span id="resumen-hora">—</span></span>
+                            <span><i class="bi bi-bus-front me-1"></i><span id="resumen-bus">—</span></span>
+                          </div>
+                        </div>
+                        <div class="text-end">
+                          <div class="text-white-50 small">Precio unitario</div>
+                          <div class="fw-bold fs-4" id="sel-precio-unitario">S/ 12.00</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Disponibilidad -->
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success" id="disp-info">Cargando...</span>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="seat-dot bg-success"></span>
+                        <span class="small">Disponible</span>
+                      </div>
+                      <div class="d-flex align-items-center gap-2">
+                        <span class="seat-dot bg-danger"></span>
+                        <span class="small">Ocupado</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="alert alert-warning d-none" id="disp-warning" role="alert"></div>
 
                   <div class="row g-3">
                     <div class="col-lg-6">
                       <div class="card shadow-sm">
                         <div class="card-body">
-                          <div
-                            class="d-flex align-items-center justify-content-between mb-3"
-                          >
-                            <div>
-                              <div class="text-muted small">Ruta</div>
-                              <div class="fw-bold" id="sel-ruta"></div>
-                            </div>
-                            <span
-                              class="badge bg-primario text-white"
-                              id="sel-hora"
-                            ></span>
-                          </div>
-
-                          <div
-                            class="d-flex align-items-center justify-content-between mb-2"
-                          >
-                            <div class="text-muted small">Mapa de asientos</div>
-                            <div class="d-flex align-items-center gap-3">
-                              <div class="d-flex align-items-center gap-2">
-                                <span class="seat-dot bg-success"></span>
-                                <span class="small">Disponible</span>
-                              </div>
-                              <div class="d-flex align-items-center gap-2">
-                                <span class="seat-dot bg-danger"></span>
-                                <span class="small">Ocupado</span>
-                              </div>
-                            </div>
+                          <div class="text-muted small fw-semibold mb-2">
+                            <i class="bi bi-grid-3x3-gap-fill me-1"></i>Mapa de asientos
                           </div>
 
                           <div id="seat-map" class="seat-map"></div>
@@ -172,7 +169,7 @@
                             class="alert alert-warning mt-3 mb-0 d-none"
                             id="seat-warning"
                           >
-                            Selecciona los asientos para continuar.
+                            <i class="bi bi-hand-index-thumb me-1"></i>Selecciona los asientos para continuar.
                           </div>
                         </div>
                       </div>
@@ -181,49 +178,49 @@
                     <div class="col-lg-6">
                       <div class="card shadow-sm">
                         <div class="card-body">
-                          <h6 class="fw-bold text-primario">
-                            Compra de pasajes
+                          <h6 class="fw-bold text-primario mb-0">
+                            <i class="bi bi-pencil-square me-1 text-amarillo"></i>Datos de pasajeros
                           </h6>
                           <p class="text-muted small mb-3">
-                            Selecciona los asientos, completa los datos de los
-                            pasajeros y confirma.
+                            Completa los datos de cada pasajero y confirma la compra.
                           </p>
 
                           <form id="compraForm" class="row g-3">
                             <input type="hidden" id="viajeId" name="viajeId" />
-                            <input
-                              type="hidden"
-                              id="precioSeleccionado"
-                              name="precio"
-                            />
-                            <input
-                              type="hidden"
-                              id="asientosSeleccionadosCsv"
-                              name="asientosSeleccionados"
-                            />
+                            <input type="hidden" id="precioSeleccionado" name="precio" value="" />
+                            <input type="hidden" id="asientosSeleccionadosCsv" name="asientosSeleccionados" />
+
+                            <!-- N° de pasajes selector -->
+                            <div class="col-12">
+                              <div class="d-flex align-items-center justify-content-between bg-light rounded-3 p-3 mb-2">
+                                <div>
+                                  <span class="fw-semibold">N° de pasajes</span>                                   <span class="text-muted small ms-2" id="precio-unitario-label">— c/u</span>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                  <button type="button" class="btn btn-outline-secondary btn-sm" onclick="pasajesUI.cambiarCantidad(-1)" id="btn-restar">
+                                    <i class="bi bi-dash-lg"></i>
+                                  </button>
+                                  <span class="fs-5 fw-bold text-primario mx-2" id="cantidadDisplay" style="min-width: 32px; text-align: center;">1</span>
+                                  <button type="button" class="btn btn-outline-secondary btn-sm" onclick="pasajesUI.cambiarCantidad(1)" id="btn-sumar">
+                                    <i class="bi bi-plus-lg"></i>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
 
                             <div class="col-12" id="pasajerosContainer"></div>
 
                             <div class="col-12">
-                              <div
-                                class="d-flex align-items-center justify-content-between"
-                              >
-                                <span class="text-muted small">Precio</span>
-                                <strong id="precioResumen">-</strong>
+                              <div class="d-flex align-items-center justify-content-between">
+                                <span class="text-muted small fw-semibold">Total</span>
+                                <strong id="precioResumen" class="fs-5 text-primario">—</strong>
                               </div>
-                              <div
-                                class="text-muted small mt-1"
-                                id="precioDetalle"
-                              ></div>
+                              <div class="text-muted small mt-1" id="precioDetalle"></div>
                             </div>
 
                             <div class="col-12">
-                              <button
-                                type="submit"
-                                class="btn btn-amarillo fw-bold w-100"
-                              >
-                                <i class="bi bi-credit-card me-2"></i>Confirmar
-                                compra
+                              <button type="submit" class="btn btn-amarillo fw-bold w-100 btn-lg">
+                                <i class="bi bi-credit-card me-2"></i>Confirmar compra
                               </button>
                             </div>
                           </form>
@@ -231,13 +228,18 @@
                           <div id="compra-alert" class="mt-3"></div>
 
                           <div id="boleto-area" class="mt-4 d-none">
-                            <h6 class="fw-bold text-primario">
-                              Boleto(s) generado(s)
-                            </h6>
-                            <div class="text-muted small mb-2">
-                              Tus códigos están listos.
+                            <div class="card border-success bg-success bg-opacity-10" style="border-radius: 16px;">
+                              <div class="card-body text-center p-4">
+                                <i class="bi bi-check-circle-fill text-success display-5 mb-2"></i>
+                                <h6 class="fw-bold text-success mb-1">
+                                  <i class="bi bi-ticket me-1"></i>Boleto(s) generado(s)
+                                </h6>
+                                <div class="text-muted small mb-3">
+                                  Tus códigos están listos. Guárdalos para consultar el estado de tu viaje.
+                                </div>
+                                <div id="boletosLista" class="mt-2"></div>
+                              </div>
                             </div>
-                            <div id="boletosLista" class="mt-2"></div>
                           </div>
                         </div>
                       </div>
@@ -248,7 +250,7 @@
 
               <div class="mt-4 text-center text-muted small">
                 <i class="bi bi-shield-check me-1"></i>
-                La disponibilidad de asientos se confirma al reservar.
+                La disponibilidad de asientos se confirma al reservar. Precio fijo de S/ 12.00 por pasajero.
               </div>
             </div>
           </div>
@@ -256,17 +258,54 @@
       </div>
     </section>
 
+    <!-- Modal de confirmación de compra -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0" style="border-radius: 20px;">
+          <div class="modal-header bg-primario text-white border-0" style="border-radius: 20px 20px 0 0;">
+            <h6 class="modal-title fw-bold" id="confirmModalLabel">
+              <i class="bi bi-shield-check me-2"></i>Confirmar compra
+            </h6>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-4">
+            <div class="text-center mb-3">
+              <i class="bi bi-ticket-perforated text-primario display-5 mb-2"></i>
+              <h5 class="fw-bold" id="modal-ruta">—</h5>
+              <div class="d-flex justify-content-center gap-3 text-muted small">
+                <span><i class="bi bi-calendar me-1"></i><span id="modal-fecha">—</span></span>
+                <span><i class="bi bi-clock me-1"></i><span id="modal-hora">—</span></span>
+              </div>
+            </div>
+            <hr />
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Precio unitario</span>
+              <span id="modal-precio-unitario" class="fw-semibold">—</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Cantidad de pasajes</span>
+              <span id="modal-cantidad" class="fw-semibold">1</span>
+            </div>
+            <hr />
+            <div class="d-flex justify-content-between">
+              <span class="fw-bold text-primario fs-5">Total a pagar</span>
+              <span id="modal-total" class="fw-bold text-primario fs-5">—</span>
+            </div>
+          </div>
+          <div class="modal-footer border-0 justify-content-center gap-2 pb-4">
+            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+              <i class="bi bi-x-circle me-1"></i>Cancelar
+            </button>
+            <button type="button" class="btn btn-amarillo fw-bold px-4" id="confirmarReservaBtn">
+              <i class="bi bi-check-circle me-1"></i>Sí, confirmar compra
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div th:replace="~{layout :: footer}"></div>
     <div th:replace="~{layout :: scripts}"></div>
-
-    <script>
-      window.pasajesUI = {
-        volverResultados() {
-          document.getElementById("paso-seleccion").classList.add("d-none");
-          document.getElementById("resultados").classList.remove("d-none");
-        },
-      };
-    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
     <script src="/js/pasajes/cliente-buscar.js"></script>
@@ -319,6 +358,52 @@
         height: 14px;
         border-radius: 50%;
         display: inline-block;
+      }
+
+      /* Timeline */
+      .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        position: relative;
+        padding-left: 24px;
+      }
+      .timeline::before {
+        content: '';
+        position: absolute;
+        left: 10px;
+        top: 8px;
+        bottom: 8px;
+        width: 2px;
+        background: #dee2e6;
+      }
+      .timeline-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding-bottom: 12px;
+        position: relative;
+      }
+      .timeline-item:last-child {
+        padding-bottom: 0;
+      }
+      .timeline-marker {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: white;
+        flex-shrink: 0;
+        position: absolute;
+        left: -24px;
+        z-index: 1;
+      }
+      .timeline-content {
+        flex: 1;
+        padding-top: 2px;
       }
     </style>
   </body>

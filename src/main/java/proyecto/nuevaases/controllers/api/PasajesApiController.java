@@ -27,6 +27,16 @@ public class PasajesApiController {
     private final ReservaService reservaService;
     private final ViajeRepository viajeRepository;
 
+    @GetMapping("/rutas")
+    public ResponseEntity<List<Map<String, String>>> rutas() {
+        List<Viaje> viajes = viajeRepository.findAll();
+        var rutas = viajes.stream()
+                .map(v -> Map.of("origen", v.getOrigen(), "destino", v.getDestino()))
+                .distinct()
+                .toList();
+        return ResponseEntity.ok(rutas);
+    }
+
     @GetMapping("/buscar")
     public ResponseEntity<List<Viaje>> buscar(
             @RequestParam String origen,
@@ -99,35 +109,54 @@ public class PasajesApiController {
     }
 
     @GetMapping("/estado/{codigoBoleto}")
-    public ResponseEntity<Map<String, String>> getEstadoViaje(@PathVariable String codigoBoleto) {
+    public ResponseEntity<Map<String, Object>> getEstadoViaje(@PathVariable String codigoBoleto) {
         Optional<Reserva> reservaOpt = reservaService.obtenerPorCodigoBoleto(codigoBoleto);
         if (reservaOpt.isEmpty()) return ResponseEntity.notFound().build();
         
         Reserva r = reservaOpt.get();
         Viaje v = r.getViaje();
-        String estado = "Programado";
+        
+        // Determinar estado según la fecha/hora actual
+        String estado = r.getEstado(); // Usar el estado real de la reserva (RESERVADO, PAGADO, FINALIZADO)
         String detalles = "Su viaje está programado.";
-
+        
         LocalDate hoy = LocalDate.now();
         LocalTime ahora = LocalTime.now();
         
-        // Parsear horaSalida que es String en el modelo oficial
-        LocalTime horaSalida = LocalTime.parse(v.getHoraSalida());
-
-        if (v.getFecha().isBefore(hoy)) {
-            estado = "Finalizado";
-            detalles = "El viaje ha concluido.";
-        } else if (v.getFecha().isEqual(hoy)) {
-            if (ahora.isAfter(horaSalida)) {
-                estado = "En ruta";
-                detalles = "El bus se encuentra actualmente en trayecto.";
+        try {
+            LocalTime horaSalida = LocalTime.parse(v.getHoraSalida());
+            
+            if (v.getFecha().isBefore(hoy)) {
+                estado = "FINALIZADO";
+                detalles = "El viaje ha concluido.";
+            } else if (v.getFecha().isEqual(hoy)) {
+                if (ahora.isAfter(horaSalida)) {
+                    estado = "EN_RUTA";
+                    detalles = "El bus se encuentra actualmente en trayecto.";
+                } else {
+                    detalles = "El bus sale hoy a las " + v.getHoraSalida();
+                }
             } else {
-                detalles = "El bus sale hoy a las " + v.getHoraSalida();
+                detalles = "Viaje programado para el " + v.getFecha() + " a las " + v.getHoraSalida();
             }
-        } else {
-            detalles = "Viaje programado para el " + v.getFecha();
+        } catch (Exception e) {
+            detalles = "Viaje programado.";
         }
-
-        return ResponseEntity.ok(Map.of("estado", estado, "detalles", detalles));
+        
+        Map<String, Object> response = new java.util.LinkedHashMap<>();
+        response.put("codigoBoleto", r.getCodigoBoleto());
+        response.put("estado", estado);
+        response.put("detalles", detalles);
+        response.put("origen", v.getOrigen());
+        response.put("destino", v.getDestino());
+        response.put("fecha", v.getFecha().toString());
+        response.put("horaSalida", v.getHoraSalida());
+        response.put("tipoBus", v.getTipoBus());
+        response.put("precio", r.getPrecio());
+        response.put("asiento", r.getAsiento());
+        response.put("nombrePasajero", r.getNombrePasajero());
+        response.put("dniPasajero", r.getDniPasajero());
+        
+        return ResponseEntity.ok(response);
     }
 }

@@ -14,7 +14,7 @@
               <div class="position-relative">
                 <img
                   class="card-img-top"
-                  th:src="${(vehiculo.imagen != null && !#strings.isEmpty(vehiculo.imagen)) ? (vehiculo.imagen.startsWith('http') || vehiculo.imagen.startsWith('/img/') ? vehiculo.imagen : @{/img/} + vehiculo.imagen) : @{/img/nuevaasesInicio.jpg}}"
+                  th:src="${vehiculo.imagen != null && !#strings.isEmpty(vehiculo.imagen) ? vehiculo.imagen : '/img/nuevaasesInicio.jpg'}"
                   alt="Imagen vehículo"
                   style="height: 320px; object-fit: cover"
                 />
@@ -32,7 +32,7 @@
                     <div class="text-muted">
                       <i class="bi bi-people me-1 text-amarillo"></i>
                       <span
-                        th:text="${vehiculo.capacidad != null ? vehiculo.capacidad : 'N/D'} + ' personas'"
+                        th:text="${(vehiculo.capacidad != null ? vehiculo.capacidad : 'N/D') + ' personas'}"
                       ></span>
                     </div>
                   </div>
@@ -40,7 +40,7 @@
                     <div class="text-muted small">Precio referencial</div>
                     <div
                       class="fw-bold fs-4 text-primario"
-                      th:text="${'S/ ' + (vehiculo.precioPorDia != null ? vehiculo.precioPorDia : 0)} + ' /día'"
+                      th:text="${'S/ ' + (vehiculo.precioPorDia != null ? vehiculo.precioPorDia : 0) + ' /día'}"
                     ></div>
                   </div>
                 </div>

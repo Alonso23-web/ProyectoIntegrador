@@ -34,7 +34,7 @@ public class ReservaServiceImpl implements ReservaService {
 
     @Override
     public Reserva reservar(String usuarioEmail, Viaje viaje, int asiento, String nombrePasajero, String dniPasajero) {
-        double precioFijo = 12.00;
+        double precioViaje = viaje.getPrecio();
         String codigo = "B" + UUID.randomUUID().toString().substring(0, 10).toUpperCase();
 
         Reserva reserva = Reserva.builder()
@@ -43,7 +43,7 @@ public class ReservaServiceImpl implements ReservaService {
                 .asiento(asiento)
                 .estado("RESERVADO")
                 .codigoBoleto(codigo)
-                .precio(precioFijo)
+                .precio(precioViaje)
                 .nombrePasajero(nombrePasajero)
                 .dniPasajero(dniPasajero)
                 .build();
@@ -58,7 +58,7 @@ public class ReservaServiceImpl implements ReservaService {
             List<PasajesApiController.PasajeroReservaDTO> pasajeros
     ) {
 
-        double precioFijo = 12.00;
+        double precioViaje = viaje.getPrecio();
 
         // Validación: cantidad no nula
         if (pasajeros == null || pasajeros.isEmpty()) {
@@ -98,7 +98,7 @@ public class ReservaServiceImpl implements ReservaService {
                     .asiento(p.asiento())
                     .estado("RESERVADO")
                     .codigoBoleto(codigo)
-                    .precio(precioFijo)
+                    .precio(precioViaje)
                     .nombrePasajero(p.nombrePasajero())
                     .dniPasajero(p.dniPasajero())
                     .build();

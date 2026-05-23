@@ -12,5 +12,9 @@ public interface ViajeService {
 
     Optional<Viaje> obtenerPorId(Long id);
 
-}
+    List<Viaje> listarTodos();
 
+    void guardar(Viaje viaje);
+
+    void eliminar(Long id);
+}

@@ -155,7 +155,7 @@
             Mostrando
             <span
               class="fw-bold"
-              th:text="${vehiculos.size()} + ' unidades'"
+              th:text="${vehiculos.size() + ' unidades'}"
             ></span>
           </div>
         </div>
@@ -165,7 +165,7 @@
             <div class="card h-100 shadow-sm border-0 card-servicio">
               <img
                 class="card-img-top"
-                th:src="${(v.imagen != null && !#strings.isEmpty(v.imagen)) ? (v.imagen.startsWith('http') || v.imagen.startsWith('/img/') ? v.imagen : @{/img/} + v.imagen) : @{/img/nuevaasesInicio.jpg}}"
+                th:src="${v.imagen != null && !#strings.isEmpty(v.imagen) ? v.imagen : '/img/nuevaasesInicio.jpg'}"
                 alt="Imagen vehículo"
                 style="height: 190px; object-fit: cover"
               />
@@ -177,7 +177,7 @@
                   ></h5>
                   <span
                     class="badge rounded-pill text-bg-light-blue fw-semibold"
-                    th:text="${v.capacidad != null ? v.capacidad : 'N/D'} + ' pax'"
+                    th:text="${(v.capacidad != null ? v.capacidad : 'N/D') + ' pax'}"
                   ></span>
                 </div>
 
@@ -193,12 +193,12 @@
                   <div class="text-muted small">Precio referencial</div>
                 <div
                   class="fw-bold text-primario"
-                  th:text="${'S/ ' + (v.precioPorDia != null ? v.precioPorDia : 0)} + ' /día'"
+                  th:text="${'S/ ' + (v.precioPorDia != null ? v.precioPorDia : 0) + ' /día'}"
                 ></div>
                 </div>
 
                 <a
-                  th:href="@{'/alquiler/vehiculo/' + ${v.id}}"
+                  th:href="@{/alquiler/vehiculo/{id}(id=${v.id})}"
                   class="btn btn-outline-amarillo w-100 fw-bold"
                 >
                   <i class="bi bi-eye me-2"></i>Ver detalles
