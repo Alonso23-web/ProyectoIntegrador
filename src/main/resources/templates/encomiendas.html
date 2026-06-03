@@ -379,24 +379,60 @@
         if (el) el.innerHTML = `<div class="alert alert-${tipo} mt-2">${html}</div>`;
       }
 
+      function obtenerTarifaBase(origen, destino) {
+        const ruta = (origen.toLowerCase() + '-' + destino.toLowerCase()).normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        if (ruta === 'trujillo-chepen' || ruta === 'chepen-trujillo') return 5.00;
+        if (ruta === 'trujillo-pacasmayo' || ruta === 'pacasmayo-trujillo') return 4.50;
+        if (ruta === 'chepen-pacasmayo' || ruta === 'pacasmayo-chepen') return 3.50;
+        return 5.00;
+      }
+
+      function calcularPrecio(origen, destino, peso) {
+        const tarifaBase = obtenerTarifaBase(origen, destino);
+        const cargoPeso = peso > 1 ? (peso - 1) * 1.50 : 0;
+        const total = tarifaBase + cargoPeso;
+        return Math.round(total * 100) / 100;
+      }
+
       function calcular() {
         const peso = parseFloat(document.getElementById("calc-peso").value) || 0;
         const origen = document.getElementById("calc-origen").value;
         const destino = document.getElementById("calc-destino").value;
         
-        if(peso <= 0) return;
+        if(peso <= 0) {
+          document.getElementById("calc-result").innerHTML = "";
+          return;
+        }
 
-        // Lógica de simulación realista
-        const tarifaBase = 10.00;
-        const precioKg = 2.50;
-        const factorDistancia = (origen === destino) ? 0 : 5.00;
+        if (origen === destino) {
+          alerta("calc-result", "warning", "El origen y destino no pueden ser iguales.");
+          return;
+        }
+
+        // Fórmula exacta del backend
+        const total = calcularPrecio(origen, destino, peso);
         
-        const total = (peso > 0) ? (tarifaBase + (peso * precioKg) + factorDistancia) : 0;
-        
+        const detalle = `
+          <div class="small text-start mb-2">
+            <div class="d-flex justify-content-between">
+              <span>Tarifa base (${origen} → ${destino})</span>
+              <span>S/ ${obtenerTarifaBase(origen, destino).toFixed(2)}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>Cargo por peso extra${peso > 1 ? ' (' + (peso - 1).toFixed(1) + ' kg × S/ 1.50)' : ''}</span>
+              <span>S/ ${(peso > 1 ? (peso - 1) * 1.50 : 0).toFixed(2)}</span>
+            </div>
+            <hr class="my-1">
+            <div class="d-flex justify-content-between fw-bold fs-5 text-primario">
+              <span>Total</span>
+              <span>S/ ${total.toFixed(2)}</span>
+            </div>
+          </div>
+        `;
+
         alerta("calc-result", "info", `
             <div class="text-center">
-                <div class="display-6 fw-bold text-primario">S/ ${total.toFixed(2)}</div>
-                <p class="mb-1 text-muted">Costo estimado de envío</p>
+                ${detalle}
                 <div class="alert alert-warning py-2 mb-0 small">
                     <i class="bi bi-exclamation-triangle me-2"></i>
                     El costo es referencial y será validado en oficina.

@@ -9,6 +9,7 @@ import proyecto.nuevaases.repositories.EncomiendaRepository;
 import proyecto.nuevaases.services.IEncomiendaService;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -49,6 +50,44 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
         encomiendaRepository.deleteById(id);
     }
 
+    @Override
+    public Optional<EncomiendaDTO> buscarPorCodigoRastreo(String codigoRastreo) {
+        return encomiendaRepository.findByCodigoRastreo(codigoRastreo).map(this::convertToDTO);
+    }
+
+    @Override
+    public List<EncomiendaDTO> buscarPorDni(String dni, String estado) {
+        if (estado != null && !estado.isEmpty()) {
+            return encomiendaRepository.findByDniRemitenteOrDniDestinatarioAndEstado(dni, dni, estado)
+                    .stream().map(this::convertToDTO).collect(Collectors.toList());
+        }
+        return encomiendaRepository.findByDniRemitenteOrDniDestinatario(dni, dni)
+                .stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EncomiendaDTO> buscarPorCreadoPorEmail(String creadoPorEmail) {
+        return encomiendaRepository.findByCreadoPorEmail(creadoPorEmail)
+                .stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public double calcularPrecio(String origen, String destino, double peso) {
+        double tarifaBase = obtenerTarifaBase(origen, destino);
+        double cargoPeso = peso > 1 ? (peso - 1) * 1.50 : 0;
+        return Math.round((tarifaBase + cargoPeso) * 100.0) / 100.0;
+    }
+
+    private double obtenerTarifaBase(String origen, String destino) {
+        String ruta = origen.toLowerCase() + "-" + destino.toLowerCase();
+        return switch (ruta) {
+            case "trujillo-chepén", "chepén-trujillo" -> 5.00;
+            case "trujillo-pacasmayo", "pacasmayo-trujillo" -> 4.50;
+            case "chepén-pacasmayo", "pacasmayo-chepén" -> 3.50;
+            default -> 5.00;
+        };
+    }
+
     private String generarCodigoRastreo() {
         return "NAE-2024-" + (new Random().nextInt(9000) + 1000);
     }
@@ -62,7 +101,8 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
                 .descripcion(entity.getDescripcion()).peso(entity.getPeso())
                 .precio(entity.getPrecio()).fechaEnvio(entity.getFechaEnvio())
                 .fechaEstimadaEntrega(entity.getFechaEstimadaEntrega()).estado(entity.getEstado())
-                .observaciones(entity.getObservaciones()).build();
+                .observaciones(entity.getObservaciones())
+                .creadoPorEmail(entity.getCreadoPorEmail()).build();
     }
 
     private Encomienda convertToEntity(EncomiendaDTO dto) {
@@ -74,6 +114,7 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
                 .descripcion(dto.getDescripcion()).peso(dto.getPeso())
                 .precio(dto.getPrecio()).fechaEnvio(dto.getFechaEnvio())
                 .fechaEstimadaEntrega(dto.getFechaEstimadaEntrega()).estado(dto.getEstado())
-                .observaciones(dto.getObservaciones()).build();
+                .observaciones(dto.getObservaciones())
+                .creadoPorEmail(dto.getCreadoPorEmail()).build();
     }
 }

@@ -6,13 +6,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import proyecto.nuevaases.services.EncomiendaService;
+import proyecto.nuevaases.services.IEncomiendaService;
 
 @Controller
 @RequiredArgsConstructor
 public class RastrearController {
 
-    private final EncomiendaService encomiendaService;
+    private final IEncomiendaService encomiendaService;
 
     @GetMapping("/rastrear")
     public String rastrear(@RequestParam(required = false) String codigo, Model model) {

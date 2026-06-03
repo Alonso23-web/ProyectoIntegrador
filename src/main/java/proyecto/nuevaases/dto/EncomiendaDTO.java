@@ -23,4 +23,5 @@ public class EncomiendaDTO {
     private LocalDate fechaEstimadaEntrega;
     private String estado;
     private String observaciones;
+    private String creadoPorEmail;
 }

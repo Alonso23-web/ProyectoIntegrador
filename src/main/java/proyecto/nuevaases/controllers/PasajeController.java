@@ -5,17 +5,18 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import proyecto.nuevaases.models.Pasaje;
-import proyecto.nuevaases.services.PasajeService;
-import proyecto.nuevaases.services.UsuarioService;
+import proyecto.nuevaases.dto.PasajeDTO;
+import proyecto.nuevaases.dto.UsuarioDTO;
+import proyecto.nuevaases.services.IPasajeService;
+import proyecto.nuevaases.services.IUsuarioService;
 
 @Controller
 @RequestMapping("/pasajes")
 @RequiredArgsConstructor
 public class PasajeController {
 
-    private final PasajeService pasajeService;
-    private final UsuarioService usuarioService;
+    private final IPasajeService pasajeService;
+    private final IUsuarioService usuarioService;
 
     @GetMapping
     public String listar(Model model) {
@@ -25,27 +26,28 @@ public class PasajeController {
 
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
-        Pasaje pasaje = new Pasaje();
-        pasaje.setPrecio(12.00);
+        PasajeDTO pasaje = PasajeDTO.builder()
+                .precio(12.00)
+                .build();
         model.addAttribute("pasaje", pasaje);
         return "pasajes/formulario";
     }
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Long id, Model model) {
-        model.addAttribute("pasaje", pasajeService.obtenerPorId(id).orElseThrow());
+        model.addAttribute("pasaje", pasajeService.buscarPorId(id));
         return "pasajes/formulario";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Pasaje pasaje, Authentication authentication) {
+    public String guardar(@ModelAttribute PasajeDTO pasaje, Authentication authentication) {
         // Precio fijo de S/ 12.00
         pasaje.setPrecio(12.00);
 
         if (authentication != null && authentication.isAuthenticated()) {
             var email = authentication.getName();
             pasaje.setCreadoPorEmail(email);
-            usuarioService.obtenerPorEmail(email).ifPresent(usuario -> {
+            usuarioService.buscarPorEmail(email).ifPresent(usuario -> {
                 if (pasaje.getNombrePasajero() == null || pasaje.getNombrePasajero().isBlank()) {
                     pasaje.setNombrePasajero(usuario.getNombreCompleto());
                 }
