@@ -30,10 +30,10 @@ public class Vehiculo {
     @Column(nullable = false)
     private int capacidad;
 
-    @Column(name = "tipo", nullable = false)
-    private String tipo; // BUS, MINIVAN, CAMION
+    @Column(name = "tipo", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'BUS'")
+    private String tipo = "BUS"; // BUS, MINIVAN, CAMION
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'DISPONIBLE'")
     private String estado; // DISPONIBLE, ALQUILADO, MANTENIMIENTO
 
     @Column(nullable = false)

@@ -2,26 +2,31 @@ package proyecto.nuevaases.services.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import proyecto.nuevaases.dto.ReservaDTO;
+import proyecto.nuevaases.dto.ViajeDTO;
 import proyecto.nuevaases.models.Reserva;
 import proyecto.nuevaases.models.Viaje;
 import proyecto.nuevaases.repositories.ReservaRepository;
+import proyecto.nuevaases.repositories.ViajeRepository;
+import proyecto.nuevaases.dto.PasajeroReservaDTO;
+import proyecto.nuevaases.services.IReservaService;
 import proyecto.nuevaases.services.ReservaService;
-import proyecto.nuevaases.controllers.api.PasajesApiController;
-
-
-
-
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class ReservaServiceImpl implements ReservaService {
+public class ReservaServiceImpl implements ReservaService, IReservaService {
 
     private final ReservaRepository reservaRepository;
+    private final ViajeRepository viajeRepository;
+
+    // ========================================================================
+    // Implementación de ReservaService (entity-based — usada por PasajesApiController)
+    // ========================================================================
 
     @Override
     public List<Integer> asientosOcupados(Viaje viaje) {
@@ -33,7 +38,8 @@ public class ReservaServiceImpl implements ReservaService {
     }
 
     @Override
-    public Reserva reservar(String usuarioEmail, Viaje viaje, int asiento, String nombrePasajero, String dniPasajero) {
+    public Reserva reservar(String usuarioEmail, Viaje viaje, int asiento,
+                             String nombrePasajero, String dniPasajero) {
         double precioViaje = viaje.getPrecio();
         String codigo = "B" + UUID.randomUUID().toString().substring(0, 10).toUpperCase();
 
@@ -55,24 +61,20 @@ public class ReservaServiceImpl implements ReservaService {
     public List<Reserva> reservarMultiples(
             String usuarioEmail,
             Viaje viaje,
-            List<PasajesApiController.PasajeroReservaDTO> pasajeros
+            List<PasajeroReservaDTO> pasajeros
     ) {
-
         double precioViaje = viaje.getPrecio();
 
-        // Validación: cantidad no nula
         if (pasajeros == null || pasajeros.isEmpty()) {
             throw new IllegalArgumentException("Debes indicar pasajeros");
         }
 
-        // Validar duplicados de asiento en el request
-        var asientosSolicitados = pasajeros.stream().map(PasajesApiController.PasajeroReservaDTO::asiento).toList();
+        var asientosSolicitados = pasajeros.stream().map(PasajeroReservaDTO::asiento).toList();
 
         if (asientosSolicitados.size() != new java.util.HashSet<>(asientosSolicitados).size()) {
             throw new IllegalArgumentException("Hay asientos duplicados en la solicitud");
         }
 
-        // Validar disponibilidad (ocupados ya reservados/pagados)
         List<Integer> ocupados = reservaRepository.findByViajeAndEstadoIn(viaje, List.of("RESERVADO", "PAGADO"))
                 .stream()
                 .map(Reserva::getAsiento)
@@ -80,7 +82,6 @@ public class ReservaServiceImpl implements ReservaService {
 
         var ocupadosSet = new java.util.HashSet<>(ocupados);
         for (var p : pasajeros) {
-
             if (ocupadosSet.contains(p.asiento())) {
                 throw new IllegalArgumentException("El asiento " + p.asiento() + " ya se encuentra ocupado");
             }
@@ -89,7 +90,6 @@ public class ReservaServiceImpl implements ReservaService {
             }
         }
 
-        // Crear N reservas
         return pasajeros.stream().map(p -> {
             String codigo = "B" + UUID.randomUUID().toString().substring(0, 10).toUpperCase();
             return Reserva.builder()
@@ -105,11 +105,14 @@ public class ReservaServiceImpl implements ReservaService {
         }).map(reservaRepository::save).toList();
     }
 
-
-
     @Override
     public Optional<Reserva> obtenerPorCodigoBoleto(String codigoBoleto) {
         return reservaRepository.findByCodigoBoleto(codigoBoleto);
+    }
+
+    @Override
+    public Optional<ReservaDTO> obtenerReservaDTOPorCodigo(String codigoBoleto) {
+        return reservaRepository.findByCodigoBoleto(codigoBoleto).map(this::convertToDTO);
     }
 
     @Override
@@ -118,7 +121,59 @@ public class ReservaServiceImpl implements ReservaService {
                 usuarioEmail,
                 List.of("RESERVADO", "PAGADO", "FINALIZADO")
         );
+    }
 
+    // ========================================================================
+    // Implementación de IReservaService (DTO-based)
+    // ========================================================================
+
+    @Override
+    public List<Integer> asientosOcupados(ViajeDTO viajeDTO) {
+        Viaje viaje = viajeRepository.findById(viajeDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Viaje no encontrado"));
+        return asientosOcupados(viaje);
+    }
+
+    @Override
+    public ReservaDTO reservar(String usuarioEmail, ViajeDTO viajeDTO, int asiento,
+                                String nombrePasajero, String dniPasajero) {
+        Viaje viaje = viajeRepository.findById(viajeDTO.getId())
+                .orElseThrow(() -> new RuntimeException("Viaje no encontrado"));
+        Reserva reserva = this.reservar(usuarioEmail, viaje, asiento, nombrePasajero, dniPasajero);
+        return convertToDTO(reserva);
+    }
+
+    @Override
+    public List<ReservaDTO> obtenerReservasDTO(String usuarioEmail) {
+        return misReservas(usuarioEmail).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Convierte una entidad Reserva a su DTO correspondiente, incluyendo el ViajeDTO anidado.
+     */
+    private ReservaDTO convertToDTO(Reserva entity) {
+        return ReservaDTO.builder()
+                .id(entity.getId())
+                .usuarioEmail(entity.getUsuarioEmail())
+                .viaje(ViajeDTO.builder()
+                        .id(entity.getViaje().getId())
+                        .origen(entity.getViaje().getOrigen())
+                        .destino(entity.getViaje().getDestino())
+                        .fecha(entity.getViaje().getFecha())
+                        .horaSalida(entity.getViaje().getHoraSalida())
+                        .tipoBus(entity.getViaje().getTipoBus())
+                        .totalAsientos(entity.getViaje().getTotalAsientos())
+                        .precio(entity.getViaje().getPrecio())
+                        .creadoPorEmail(entity.getViaje().getCreadoPorEmail())
+                        .build())
+                .nombrePasajero(entity.getNombrePasajero())
+                .dniPasajero(entity.getDniPasajero())
+                .asiento(entity.getAsiento())
+                .estado(entity.getEstado())
+                .codigoBoleto(entity.getCodigoBoleto())
+                .precio(entity.getPrecio())
+                .build();
     }
 }
-

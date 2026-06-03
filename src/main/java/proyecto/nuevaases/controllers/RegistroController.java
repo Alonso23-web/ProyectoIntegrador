@@ -6,18 +6,18 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import proyecto.nuevaases.models.Usuario;
-import proyecto.nuevaases.services.UsuarioService;
+import proyecto.nuevaases.dto.UsuarioDTO;
+import proyecto.nuevaases.services.IUsuarioService;
 
 @Controller
 @RequiredArgsConstructor
 public class RegistroController {
 
-    private final UsuarioService usuarioService;
+    private final IUsuarioService usuarioService;
 
     @GetMapping("/registro")
     public String mostrarFormularioRegistro(Model model) {
-        model.addAttribute("usuario", new Usuario());
+        model.addAttribute("usuario", new UsuarioDTO());
         return "registro";
     }
 
@@ -57,28 +57,27 @@ public class RegistroController {
             return "registro";
         }
 
-        Usuario usuario = Usuario.builder()
+        UsuarioDTO usuario = UsuarioDTO.builder()
                 .email(email)
-                .password(password)
                 .nombreCompleto(nombreCompleto)
                 .dni(dni)
                 .telefono(telefono)
                 .rol(rol)
                 .build();
 
-        usuarioService.registrar(usuario);
+        usuarioService.registrar(usuario, password);
         model.addAttribute("exito", "¡Registro exitoso! Ahora puedes iniciar sesión.");
         return "login";
     }
 
-    private Usuario construirUsuarioTemporal(String email, String nombreCompleto, String dni, String telefono, String rol) {
-        Usuario u = new Usuario();
-        u.setEmail(email);
-        u.setNombreCompleto(nombreCompleto);
-        u.setDni(dni);
-        u.setTelefono(telefono);
-        u.setRol(rol);
-        return u;
+    private UsuarioDTO construirUsuarioTemporal(String email, String nombreCompleto, String dni, String telefono, String rol) {
+        return UsuarioDTO.builder()
+                .email(email)
+                .nombreCompleto(nombreCompleto)
+                .dni(dni)
+                .telefono(telefono)
+                .rol(rol)
+                .build();
     }
 }
 

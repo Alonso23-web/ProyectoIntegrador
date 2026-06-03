@@ -57,6 +57,7 @@ public class PasajeServiceImpl implements IPasajeService {
                 .asiento(entity.getAsiento())
                 .precio(entity.getPrecio())
                 .estado(entity.getEstado())
+                .creadoPorEmail(entity.getCreadoPorEmail())
                 .build();
     }
 
@@ -72,6 +73,7 @@ public class PasajeServiceImpl implements IPasajeService {
                 .asiento(dto.getAsiento())
                 .precio(dto.getPrecio())
                 .estado(dto.getEstado())
+                .creadoPorEmail(dto.getCreadoPorEmail())
                 .build();
     }
 }

@@ -8,8 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import proyecto.nuevaases.models.Viaje;
-import proyecto.nuevaases.services.ViajeService;
+import proyecto.nuevaases.dto.ViajeDTO;
+import proyecto.nuevaases.services.IViajeService;
 
 @Controller
 @RequestMapping("/viajes")
@@ -17,20 +17,21 @@ import proyecto.nuevaases.services.ViajeService;
 public class ViajeController {
 
     private static final Logger log = LoggerFactory.getLogger(ViajeController.class);
-    private final ViajeService viajeService;
+    private final IViajeService viajeService;
 
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute("viajes", viajeService.listarTodos());
+        model.addAttribute("viajes", viajeService.listarTodosDTO());
         return "viajes/listar";
     }
 
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
         if (!model.containsAttribute("viaje")) {
-            Viaje viaje = new Viaje();
-            viaje.setTotalAsientos(24);
-            viaje.setPrecio(25.0);
+            ViajeDTO viaje = ViajeDTO.builder()
+                    .totalAsientos(24)
+                    .precio(25.0)
+                    .build();
             model.addAttribute("viaje", viaje);
         }
         return "viajes/formulario";
@@ -38,13 +39,13 @@ public class ViajeController {
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Long id, Model model) {
-        model.addAttribute("viaje", viajeService.obtenerPorId(id)
+        model.addAttribute("viaje", viajeService.obtenerPorIdDTO(id)
                 .orElseThrow(() -> new RuntimeException("Viaje no encontrado")));
         return "viajes/formulario";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Viaje viaje, Authentication authentication,
+    public String guardar(@ModelAttribute ViajeDTO viaje, Authentication authentication,
                           RedirectAttributes redirectAttributes) {
         // Validar que origen y destino no sean iguales
         if (viaje.getOrigen() != null && viaje.getDestino() != null
@@ -60,7 +61,7 @@ public class ViajeController {
                 viaje.setCreadoPorEmail(authentication.getName());
             }
         }
-        viajeService.guardar(viaje);
+        viajeService.guardarDTO(viaje);
         redirectAttributes.addFlashAttribute("success", "Viaje guardado correctamente.");
         return "redirect:/viajes";
     }
@@ -68,7 +69,7 @@ public class ViajeController {
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
-            viajeService.eliminar(id);
+            viajeService.eliminarDTO(id);
             redirectAttributes.addFlashAttribute("success", "Viaje eliminado correctamente.");
         } catch (Exception e) {
             log.warn("No se pudo eliminar el viaje {}: {}", id, e.getMessage());

@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import proyecto.nuevaases.models.Encomienda;
-import proyecto.nuevaases.services.EncomiendaService;
+import proyecto.nuevaases.dto.EncomiendaDTO;
+import proyecto.nuevaases.services.IEncomiendaService;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EncomiendaViewController {
 
-    private final EncomiendaService encomiendaService;
+    private final IEncomiendaService encomiendaService;
 
     @GetMapping("/encomiendas")
     public String encomiendas() {
@@ -29,7 +29,7 @@ public class EncomiendaViewController {
 
     @GetMapping("/encomiendas/nuevo")
     public String nuevo(Model model) {
-        Encomienda encomienda = Encomienda.builder()
+        EncomiendaDTO encomienda = EncomiendaDTO.builder()
                 .codigoRastreo("NAE-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase())
                 .fechaEnvio(LocalDate.now())
                 .estado("REGISTRADO")
@@ -40,14 +40,12 @@ public class EncomiendaViewController {
 
     @GetMapping("/encomiendas/editar/{id}")
     public String editar(@PathVariable Long id, Model model) {
-        Encomienda encomienda = encomiendaService.obtenerPorId(id)
-                .orElseThrow(() -> new RuntimeException("Encomienda no encontrada con ID: " + id));
-        model.addAttribute("encomienda", encomienda);
+        model.addAttribute("encomienda", encomiendaService.buscarPorId(id));
         return "encomiendas/formulario";
     }
 
     @PostMapping("/encomiendas/guardar")
-    public String guardar(@ModelAttribute Encomienda encomienda) {
+    public String guardar(@ModelAttribute EncomiendaDTO encomienda) {
         // Si es nueva (sin ID), generar código y precio
         if (encomienda.getId() == null) {
             if (encomienda.getCodigoRastreo() == null || encomienda.getCodigoRastreo().isBlank()) {

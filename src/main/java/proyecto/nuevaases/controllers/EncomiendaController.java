@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import proyecto.nuevaases.models.Encomienda;
-import proyecto.nuevaases.services.EncomiendaService;
-import proyecto.nuevaases.services.UsuarioService;
+import proyecto.nuevaases.dto.EncomiendaDTO;
+import proyecto.nuevaases.services.IEncomiendaService;
+import proyecto.nuevaases.services.IUsuarioService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -19,11 +19,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EncomiendaController {
 
-    private final EncomiendaService encomiendaService;
-    private final UsuarioService usuarioService;
+    private final IEncomiendaService encomiendaService;
+    private final IUsuarioService usuarioService;
 
     @GetMapping
-    public List<Encomienda> listar() {
+    public List<EncomiendaDTO> listar() {
         return encomiendaService.listarTodos();
     }
 
@@ -35,11 +35,11 @@ public class EncomiendaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> registrar(@RequestBody Encomienda encomienda, Authentication authentication) {
+    public ResponseEntity<?> registrar(@RequestBody EncomiendaDTO encomienda, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             var email = authentication.getName();
             encomienda.setCreadoPorEmail(email);
-            usuarioService.obtenerPorEmail(email).ifPresent(usuario -> {
+            usuarioService.buscarPorEmail(email).ifPresent(usuario -> {
                 if (encomienda.getRemitente() == null || encomienda.getRemitente().isBlank()) {
                     encomienda.setRemitente(usuario.getNombreCompleto());
                 }

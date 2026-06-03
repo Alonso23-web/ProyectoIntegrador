@@ -7,16 +7,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PasajeDTO {
+public class ViajeDTO {
     private Long id;
-    private String nombrePasajero;
-    private String dni;
     private String origen;
     private String destino;
-    private LocalDate fechaViaje;
-    private String horaViaje;
-    private Integer asiento;
-    private Double precio;
-    private String estado;
+    private LocalDate fecha;
+    private String horaSalida;
+    private String tipoBus;
+    private int totalAsientos;
+    private double precio;
     private String creadoPorEmail;
 }

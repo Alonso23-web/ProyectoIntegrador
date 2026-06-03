@@ -518,6 +518,34 @@ const pasajesUI = {
                 }
             }
 
+            // Generar QR para cada boleto
+            if (typeof QRCode !== 'undefined' && codigos?.length) {
+                codigos.forEach((codigo, idx) => {
+                    const qrContainer = document.createElement('div');
+                    qrContainer.id = `qr-${idx}`;
+                    qrContainer.style.cssText = 'margin: 8px auto; max-width: 140px;';
+                    listaEl?.appendChild(qrContainer);
+                    try {
+                        new QRCode(qrContainer, {
+                            text: `${window.location.origin}/api/pasajes/estado/${codigo}`,
+                            width: 130,
+                            height: 130,
+                            colorDark: '#0d1b4c',
+                            colorLight: '#ffffff',
+                            correctLevel: QRCode.CorrectLevel.H
+                        });
+                    } catch (e) {
+                        console.warn('Error generando QR:', e);
+                    }
+                    // Botón de descarga
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.className = 'btn btn-sm btn-outline-primario mt-1 w-100';
+                    downloadBtn.innerHTML = '<i class="bi bi-download me-1"></i>Descargar QR';
+                    downloadBtn.onclick = () => descargarQR(`qr-${idx}`, codigo);
+                    qrContainer.parentNode?.appendChild(downloadBtn);
+                });
+            }
+
             // Hacer scroll hacia el área de boletos
             boletoArea?.scrollIntoView({ behavior: "smooth", block: "center" });
 
@@ -593,10 +621,6 @@ const pasajesUI = {
             precioUnitLabel.textContent = `${this.formatearPrecio(precioUnitario)} c/u`;
         }
     },
-
-    // ─── Mis Viajes (timeline visual) ──────────────────────────
-
-    async cargarMisViajes() {
 
     // ─── Mis Viajes (timeline visual) ──────────────────────────
 
@@ -889,5 +913,21 @@ const pasajesUI = {
         }
     },
 };
+
+/**
+ * Descarga el QR como imagen PNG
+ */
+function descargarQR(containerId, codigo) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    const canvas = container.querySelector('canvas');
+    if (!canvas) return;
+    const link = document.createElement('a');
+    link.download = `boleto-${codigo}.png`;
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 
 document.addEventListener("DOMContentLoaded", () => pasajesUI.init());
