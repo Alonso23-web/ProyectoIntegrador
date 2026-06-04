@@ -10,9 +10,9 @@ public class LoginController {
 
     @GetMapping("/login")
     public String login(@RequestParam(value = "logout", required = false) String logout, Model model) {
-        if (logout != null) {
-            model.addAttribute("exito", "Has cerrado sesión correctamente.");
-        }
+        // El parámetro "logout" lo maneja Thymeleaf vía `${param.logout}` en la vista.
+        // Evitamos añadir aquí el atributo "exito" para no duplicar el mensaje
+        // cuando Spring Security ya agrega el parámetro de query `?logout`.
         return "login";
     }
 }

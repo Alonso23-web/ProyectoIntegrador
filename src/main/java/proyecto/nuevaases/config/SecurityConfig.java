@@ -2,7 +2,6 @@ package proyecto.nuevaases.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -11,22 +10,32 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import proyecto.nuevaases.repositories.UsuarioRepository;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+        private static final String ADMIN_PASSWORD_ENCODED = "$2a$10$BM5/zHCcvhmuH7RgDCMhw.uJMn8rr8.cNzYzV8qrGA7jk9uawMNFm";
+
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-                http
-                                .csrf(csrf -> csrf
-                                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                                                .ignoringRequestMatchers("/h2-console/**", "/api/**"))
+
+               // En securityFilterChain:
+CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+requestHandler.setCsrfRequestAttributeName(null); // ✅ clave: null fuerza resolución inmediata
+
+http
+    .csrf(csrf -> csrf
+        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+        .csrfTokenRequestHandler(requestHandler)
+        .ignoringRequestMatchers("/h2-console/**", "/api/**"))
                                 .headers(headers -> headers
                                                 .frameOptions(frame -> frame.sameOrigin()))
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers("/", "/index.html", "/inicio", "/nosotros",
+                                                .requestMatchers(
+                                                                "/", "/index.html", "/inicio", "/nosotros",
                                                                 "/registro", "/css/**", "/js/**",
                                                                 "/images/**", "/img/**", "/node_modules/**",
                                                                 "/webjars/**", "/api/**", "/alquiler/**")
@@ -49,8 +58,7 @@ public class SecurityConfig {
         }
 
         @Bean
-        public UserDetailsService userDetailsService(UsuarioRepository usuarioRepository,
-                        PasswordEncoder passwordEncoder) {
+        public UserDetailsService userDetailsService(UsuarioRepository usuarioRepository) {
                 return username -> {
                         var usuarioOpt = usuarioRepository.findByEmail(username);
                         if (usuarioOpt.isPresent()) {
@@ -68,7 +76,7 @@ public class SecurityConfig {
                         if ("admin@empresa.com".equals(username)) {
                                 return org.springframework.security.core.userdetails.User.builder()
                                                 .username("admin@empresa.com")
-                                                .password(passwordEncoder.encode("admin123"))
+                                                .password(ADMIN_PASSWORD_ENCODED)
                                                 .roles("ADMINISTRADOR")
                                                 .build();
                         }
