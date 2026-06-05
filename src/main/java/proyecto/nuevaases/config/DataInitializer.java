@@ -123,13 +123,35 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // ==================== VIAJES ====================
-        if (viajeRepository.count() == 0) {
-            LocalDate hoy = LocalDate.now();
-            String[] horas = {"08:00", "12:00", "16:00", "20:00"};
-            double precioBase = 25.0;
+        long count = viajeRepository.count();
 
-            // Crear viajes para los próximos 7 días
-            for (int dia = 0; dia < 7; dia++) {
+        // Si hay viajes viejos (precio != 12.0 o asientos != 15), reemplazarlos
+        boolean hayViajesViejos = false;
+        if (count > 0) {
+            for (Viaje v : viajeRepository.findAll()) {
+                if (v.getPrecio() != 12.0 || v.getTotalAsientos() != 15) {
+                    hayViajesViejos = true;
+                    break;
+                }
+            }
+        }
+
+        if (count == 0 || hayViajesViejos) {
+            // Eliminar viajes viejos si existen (en orden inverso por posibles FK)
+            if (hayViajesViejos) {
+                viajeRepository.deleteAll();
+                log.info("🗑️ Viajes viejos eliminados");
+            }
+
+            LocalDate hoy = LocalDate.now();
+            // Horarios del negocio: 08:00, 10:00, 13:00, 16:00
+            String[] horas = {"08:00", "10:00", "13:00", "16:00"};
+            // Precio fijo: S/ 12.00 por pasaje | Minivan de 15 asientos de pasajeros
+            double precioMinivan = 12.0;
+            int asientosMinivan = 15;
+
+            // Crear viajes para los próximos 30 días
+            for (int dia = 0; dia < 30; dia++) {
                 LocalDate fecha = hoy.plusDays(dia);
                 for (String hora : horas) {
                     viajeRepository.save(Viaje.builder()
@@ -137,9 +159,9 @@ public class DataInitializer implements CommandLineRunner {
                             .destino("Chepén")
                             .fecha(fecha)
                             .horaSalida(hora)
-                            .tipoBus("BUS")
-                            .totalAsientos(40)
-                            .precio(precioBase)
+                            .tipoBus("MINIVAN")
+                            .totalAsientos(asientosMinivan)
+                            .precio(precioMinivan)
                             .creadoPorEmail("admin@empresa.com")
                             .build());
 
@@ -149,15 +171,17 @@ public class DataInitializer implements CommandLineRunner {
                             .fecha(fecha)
                             .horaSalida(hora)
                             .tipoBus("MINIVAN")
-                            .totalAsientos(20)
-                            .precio(precioBase)
+                            .totalAsientos(asientosMinivan)
+                            .precio(precioMinivan)
                             .creadoPorEmail("admin@empresa.com")
                             .build());
                 }
             }
 
             long totalViajes = viajeRepository.count();
-            log.info("✅ {} viajes de ejemplo creados (Trujillo ↔ Chepén, 7 días)", totalViajes);
+            log.info("✅ {} viajes de ejemplo creados (MINIVAN Trujillo ↔ Chepén, 30 días, S/12.00)", totalViajes);
+        } else {
+            log.info("ℹ️ Viajes ya existen y son correctos ({} viajes)", count);
         }
     }
 }

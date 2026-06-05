@@ -3,24 +3,24 @@
   <head
     th:replace="~{layout :: head('Pasajes - Nueva Ases Express')}"
   ></head>
-  <body>
+  <body th:attr="data-current-user-name=${currentUserName},data-current-user-dni=${currentUserDni}">
     <div th:replace="~{layout :: navbar}"></div>
 
-    <section class="py-5 bg-primario text-white text-center">
+    <section class="py-4 bg-primario text-white text-center">
       <div class="container">
-        <i class="bi bi-ticket-perforated display-4 mb-3"></i>
-        <h1 class="fw-bold">Gestión de Pasajes</h1>
-        <p class="text-white-50 fs-5">
-          Busca, compra y gestiona tus viajes con facilidad
+        <i class="bi bi-ticket-perforated display-6 mb-2"></i>
+        <h1 class="fw-bold fs-2">Compra de Pasajes</h1>
+        <p class="text-white-50">
+          Busca tu viaje, selecciona tus asientos y compra tus boletos
         </p>
       </div>
     </section>
 
     <!-- Tabs -->
-    <section class="py-5">
+    <section class="py-4" style="background: #eef0f4;">
       <div class="container">
-        <div class="position-relative mb-4">
-          <ul class="nav nav-pills gap-2 d-inline-flex position-relative" id="pasajesTabs">
+        <div class="mb-3">
+          <ul class="nav nav-pills gap-2 d-inline-flex" id="pasajesTabs">
             <li class="nav-item">
               <button class="nav-link btn-tab" th:classappend="${activeTab == 'buscar' ? 'active' : ''}" data-tab="buscar">
                 <i class="bi bi-search me-1"></i> Buscar viaje
@@ -41,254 +41,253 @@
 
         <!-- TAB: BUSCAR VIAJE -->
         <div id="tab-buscar" class="tab-panel" th:classappend="${activeTab == 'buscar' ? '' : 'd-none'}">
-          <div class="card shadow-lg border-0" style="border-radius: 20px">
-            <div class="card-body p-4 p-md-5">
-              <h4 class="fw-bold text-primario mb-4">
-                <i class="bi bi-search me-2 text-amarillo"></i>Buscador de
-                viajes
-              </h4>
 
-              <form id="buscarForm" class="row g-3">
-                <div class="col-md-4">
-                  <label class="form-label fw-semibold">Origen</label>
-                  <select id="origen" name="origen" class="form-select" required>
-                    <option value="">Seleccionar origen</option>
-                  </select>
-                </div>
+          <!-- ===== DOS COLUMNAS ===== -->
+          <div class="row g-4">
 
-                <div class="col-md-4">
-                  <label class="form-label fw-semibold">Destino</label>
-                  <select id="destino" name="destino" class="form-select" required>
-                    <option value="">Seleccionar destino</option>
-                  </select>
-                </div>
+            <!-- COLUMNA IZQUIERDA: Formulario -->
+            <div class="col-lg-8">
 
-                <div class="col-md-4">
-                  <label class="form-label fw-semibold">Fecha</label>
-                  <input
-                    id="fecha"
-                    name="fecha"
-                    type="date"
-                    class="form-control"
-                    required
-                  />
-                </div>
+              <!-- PASO 1: Búsqueda de ruta y fecha -->
+              <div class="card shadow-sm border-0 mb-3" style="border-radius: 16px;">
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center gap-2 mb-3">
+                    <span class="step-circle">1</span>
+                    <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Ruta y fecha</h5>
+                  </div>
 
-                <div class="col-md-4">
-                  <label class="form-label fw-semibold"
-                    >Cantidad de pasajeros</label
-                  >
-                  <input
-                    id="cantidad"
-                    name="cantidadPasajeros"
-                    type="number"
-                    class="form-control"
-                    min="1"
-                    max="40"
-                    step="1"
-                    value="1"
-                    required
-                  />
-                </div>
+                  <form id="buscarForm" class="row g-3">
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold small">Origen</label>
+                      <select id="origen" name="origen" class="form-select form-select-sm" required>
+                        <option value="">Seleccionar</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold small">Destino</label>
+                      <select id="destino" name="destino" class="form-select form-select-sm" required>
+                        <option value="">Seleccionar</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold small">Fecha</label>
+                      <input id="fecha" name="fecha" type="date" class="form-control form-control-sm" required />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold small">Pasajeros (1-13)</label>
+                      <input id="cantidad" name="cantidadPasajeros" type="number" class="form-control form-control-sm"
+                        min="1" max="13" step="1" value="1" required />
+                    </div>
+                    <div class="col-md-8 d-flex align-items-end">
+                      <button type="submit" class="btn btn-amarillo fw-bold w-100 btn-sm">
+                        <i class="bi bi-search me-2"></i>Buscar viajes
+                      </button>
+                    </div>
+                  </form>
 
-                <div class="col-md-8 d-flex align-items-end">
-                  <button
-                    type="submit"
-                    class="btn btn-amarillo fw-bold w-100"
-                  >
-                    <i class="bi bi-search me-2"></i>Buscar viajes
-                  </button>
-                </div>
-              </form>
-
-              <div id="buscar-alert" class="mt-3"></div>
-
-              <div id="buscar-loading" class="mt-4 d-none">
-                <div
-                  class="alert alert-info d-flex align-items-center mb-0"
-                  role="alert"
-                >
-                  <strong class="me-2">Buscando...</strong>
-                  <div
-                    class="spinner-border spinner-border-sm me-2"
-                    role="status"
-                  ></div>
-                  <span>Consultando disponibilidad de asientos.</span>
+                  <div id="buscar-alert" class="mt-2"></div>
+                  <div id="buscar-loading" class="mt-3 d-none">
+                    <div class="alert alert-info d-flex align-items-center mb-0 py-2 small" role="alert">
+                      <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                      Buscando viajes disponibles...
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div id="resultados" class="mt-4 d-none">
-                <div
-                  class="d-flex justify-content-between align-items-center mb-3"
-                >
-                  <h5 class="fw-bold text-primario mb-0">Resultados</h5>
-                  <div class="text-muted small" id="resultados-meta"></div>
-                </div>
+              <!-- ===== ÁREA DE RESULTADOS (se muestra tras buscar) ===== -->
+              <div id="resultados-area" class="d-none">
 
-                <div class="row g-3" id="resultados-cards"></div>
-              </div>
-
-              <div id="paso-seleccion" class="mt-4 d-none">
-                <div
-                  class="d-flex justify-content-between align-items-center mb-3"
-                >
-                  <h5 class="fw-bold text-primario mb-0">
-                    <i class="bi bi-ticket-perforated me-2 text-amarillo"></i>Confirmar compra
-                  </h5>
-                  <button
-                    class="btn btn-outline-secondary btn-sm"
-                    type="button"
-                    onclick="pasajesUI.volverResultados()"
-                  >
-                    <i class="bi bi-arrow-left me-1"></i>Volver
-                  </button>
-                </div>
-
-                <!-- Resumen visual del viaje -->
-                <div class="card border-0 shadow-sm mb-3" style="border-radius: 16px; background: linear-gradient(135deg, #0d1b4c 0%, #1a2d6b 100%);">
-                  <div class="card-body p-3 text-white">
-                    <div class="d-flex justify-content-between align-items-center">
+                <!-- PASO 2: Cantidad de pasajeros (INDEPENDIENTE, antes del mapa) -->
+                <div class="card shadow-sm border-0 mb-3" style="border-radius: 16px;">
+                  <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                      <span class="step-circle">2</span>
+                      <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Cantidad de pasajeros</h5>
+                    </div>
+                    <p class="text-muted small mb-3">Define cuántas personas viajarán. Luego selecciona esa misma cantidad de asientos en el mapa.</p>
+                    <div class="d-flex align-items-center justify-content-between bg-light rounded-3 p-3">
                       <div>
-                        <div class="text-white-50 small text-uppercase fw-semibold">Viaje seleccionado</div>
-                        <div class="fw-bold fs-5" id="resumen-ruta">—</div>
-                        <div class="d-flex gap-3 mt-1 small text-white-50">
-                          <span><i class="bi bi-calendar me-1"></i><span id="resumen-fecha">—</span></span>
-                          <span><i class="bi bi-clock me-1"></i><span id="resumen-hora">—</span></span>
-                          <span><i class="bi bi-bus-front me-1"></i><span id="resumen-bus">—</span></span>
-                        </div>
+                        <span class="fw-semibold small">Pasajeros</span>
+                        <span class="text-muted small ms-2">S/ 12.00 c/u</span>
                       </div>
-                      <div class="text-end">
-                        <div class="text-white-50 small">Precio unitario</div>
-                        <div class="fw-bold fs-4" id="sel-precio-unitario">S/ 12.00</div>
+                      <div class="d-flex align-items-center gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="pasajesUI.cambiarCantidad(-1)" id="btn-restar">
+                          <i class="bi bi-dash-lg"></i>
+                        </button>
+                        <span class="fs-5 fw-bold mx-2" id="cantidadDisplay" style="min-width: 32px; text-align: center; color: #0d1b3e;">1</span>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="pasajesUI.cambiarCantidad(1)" id="btn-sumar">
+                          <i class="bi bi-plus-lg"></i>
+                        </button>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- Disponibilidad -->
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <span class="badge bg-success bg-opacity-10 text-success border border-success" id="disp-info">Cargando...</span>
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="d-flex align-items-center gap-2">
-                      <span class="seat-dot bg-success"></span>
-                      <span class="small">Disponible</span>
+                <!-- PASO 3: Mapa de asientos + Selector de horario -->
+                <div class="card shadow-sm border-0 mb-3" style="border-radius: 16px;">
+                  <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                      <span class="step-circle">3</span>
+                      <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Selecciona tus asientos</h5>
                     </div>
-                    <div class="d-flex align-items-center gap-2">
-                      <span class="seat-dot bg-danger"></span>
-                      <span class="small">Ocupado</span>
+
+                    <!-- Resumen del viaje actual -->
+                    <div class="card border-0 shadow-sm mb-3" style="border-radius: 12px; background: linear-gradient(135deg, #0d1b3e 0%, #1a2d6b 100%);">
+                      <div class="card-body p-3 text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                          <div>
+                            <div class="fw-bold" id="resumen-ruta">—</div>
+                            <div class="d-flex gap-3 small text-white-50 mt-1">
+                              <span><i class="bi bi-calendar me-1"></i><span id="resumen-fecha">—</span></span>
+                              <span><i class="bi bi-clock me-1"></i><span id="resumen-hora">—</span></span>
+                            </div>
+                          </div>
+                          <div class="text-end">
+                            <div class="small text-white-50">S/ 12.00</div>
+                            <div class="small">por pasajero</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Mapa de asientos (JS lo llena) -->
+                    <div id="seat-map"></div>
+
+                    <div class="alert alert-warning mt-2 mb-0 d-none py-2 small" id="seat-warning">
+                      <i class="bi bi-hand-index-thumb me-1"></i>Selecciona todos los asientos para continuar.
+                    </div>
+
+                    <hr class="my-3" />
+
+                    <!-- Selector de horario (dentro del mapa) -->
+                    <h6 class="fw-bold mb-2 small" style="color: #0d1b3e;"><i class="bi bi-clock me-1"></i>Elige horario</h6>
+                    <p class="text-muted small mb-2">Cada botón muestra los asientos libres disponibles.</p>
+                    <div id="time-selector" class="d-flex gap-2 flex-wrap"></div>
+                    <div id="found-badge" class="mt-2 small d-none">
+                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i><span id="found-count">0</span> viaje(s) encontrados</span>
                     </div>
                   </div>
                 </div>
 
-                <div class="alert alert-warning d-none" id="disp-warning" role="alert"></div>
+                <!-- PASO 4: Datos de pasajeros -->
+                <div class="card shadow-sm border-0 mb-3" style="border-radius: 16px;">
+                  <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                      <span class="step-circle">4</span>
+                      <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Datos de cada pasajero</h5>
+                    </div>
 
-                <div class="row g-3">
-                  <div class="col-lg-6">
-                    <div class="card shadow-sm">
-                      <div class="card-body">
-                        <div class="text-muted small fw-semibold mb-2">
-                          <i class="bi bi-grid-3x3-gap-fill me-1"></i>Mapa de asientos
-                        </div>
+                    <input type="hidden" id="viajeId" name="viajeId" />
 
-                        <div id="seat-map" class="seat-map"></div>
+                    <div id="pasajerosContainer">
+                      <div class="text-muted small text-center py-3">
+                        <i class="bi bi-hand-index-thumb me-1"></i>Elige asientos en el mapa para registrar cada pasajero
+                      </div>
+                    </div>
 
-                        <div
-                          class="alert alert-warning mt-3 mb-0 d-none"
-                          id="seat-warning"
-                        >
-                          <i class="bi bi-hand-index-thumb me-1"></i>Selecciona los asientos para continuar.
+                    <div id="compra-alert" class="mt-2"></div>
+
+                    <div class="d-grid gap-2 mt-3">
+                      <button class="btn btn-amarillo fw-bold btn-lg" id="btn-confirmar-compra" disabled>
+                        <i class="bi bi-credit-card me-2"></i>Confirmar compra
+                      </button>
+                    </div>
+
+                    <div id="boleto-area" class="mt-3 d-none">
+                      <div class="card border-success bg-success bg-opacity-10" style="border-radius: 12px;">
+                        <div class="card-body text-center p-3">
+                          <i class="bi bi-check-circle-fill text-success fs-1 mb-2"></i>
+                          <h6 class="fw-bold text-success mb-1">¡Compra exitosa!</h6>
+                          <div class="text-muted small">Redirigiendo a tu historial...</div>
                         </div>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  <div class="col-lg-6">
-                    <div class="card shadow-sm">
-                      <div class="card-body">
-                        <h6 class="fw-bold text-primario mb-0">
-                          <i class="bi bi-pencil-square me-1 text-amarillo"></i>Datos de pasajeros
-                        </h6>
-                        <p class="text-muted small mb-3">
-                          Completa los datos de cada pasajero y confirma la compra.
-                        </p>
+              </div><!-- /resultados-area -->
 
-                        <form id="compraForm" class="row g-3">
-                          <input type="hidden" id="viajeId" name="viajeId" />
-                          <input type="hidden" id="precioSeleccionado" name="precio" value="" />
-                          <input type="hidden" id="asientosSeleccionadosCsv" name="asientosSeleccionados" />
+            </div><!-- /col-lg-8 -->
 
-                          <!-- N° de pasajes selector -->
-                          <div class="col-12">
-                            <div class="d-flex align-items-center justify-content-between bg-light rounded-3 p-3 mb-2">
-                              <div>
-                                <span class="fw-semibold">N° de pasajes</span>                                  <span class="text-muted small ms-2" id="precio-unitario-label">— c/u</span>
-                              </div>
-                              <div class="d-flex align-items-center gap-2">
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="pasajesUI.cambiarCantidad(-1)" id="btn-restar">
-                                  <i class="bi bi-dash-lg"></i>
-                                </button>
-                                <span class="fs-5 fw-bold text-primario mx-2" id="cantidadDisplay" style="min-width: 32px; text-align: center;">1</span>
-                                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="pasajesUI.cambiarCantidad(1)" id="btn-sumar">
-                                  <i class="bi bi-plus-lg"></i>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
+            <!-- COLUMNA DERECHA: Panel de resumen sticky -->
+            <div class="col-lg-4">
+              <div class="card shadow-sm border-0" style="border-radius: 16px; position: sticky; top: 1rem;">
+                <div class="card-body p-4">
+                  <h6 class="fw-bold mb-3" style="color: #0d1b3e;">
+                    <i class="bi bi-receipt me-2" style="color: #f5a623;"></i>Resumen de compra
+                  </h6>
 
-                          <div class="col-12" id="pasajerosContainer"></div>
+                  <!-- Ruta -->
+                  <div class="mb-3">
+                    <div class="text-muted small text-uppercase fw-semibold">Ruta</div>
+                    <div class="fw-bold" id="panel-ruta" style="color: #0d1b3e;">—</div>
+                  </div>
 
-                          <div class="col-12">
-                            <div
-                              class="d-flex align-items-center justify-content-between"
-                            >
-                              <span class="text-muted small fw-semibold">Total</span>
-                              <strong id="precioResumen" class="fs-5 text-primario">—</strong>
-                            </div>
-                            <div
-                              class="text-muted small mt-1"
-                              id="precioDetalle"
-                            ></div>
-                          </div>
+                  <hr class="my-2" />
 
-                          <div class="col-12">
-                            <button
-                              type="submit"
-                              class="btn btn-amarillo fw-bold w-100 btn-lg"
-                            >
-                              <i class="bi bi-credit-card me-2"></i>Confirmar
-                              compra
-                            </button>
-                          </div>
-                        </form>
-
-                        <div id="compra-alert" class="mt-3"></div>
-
-                        <div id="boleto-area" class="mt-4 d-none">
-                          <div class="card border-success bg-success bg-opacity-10" style="border-radius: 16px;">
-                            <div class="card-body text-center p-4">
-                              <i class="bi bi-check-circle-fill text-success display-5 mb-2"></i>
-                              <h6 class="fw-bold text-success mb-1">
-                                <i class="bi bi-ticket me-1"></i>Boleto(s) generado(s)
-                              </h6>
-                              <div class="text-muted small mb-3">
-                                Tus códigos están listos. Guárdalos para consultar el estado de tu viaje.
-                              </div>
-                              <div id="boletosLista" class="mt-2"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                  <!-- Fecha y hora -->
+                  <div class="row g-2 mb-3">
+                    <div class="col-6">
+                      <div class="text-muted small text-uppercase fw-semibold">Fecha</div>
+                      <div class="fw-semibold small" id="panel-fecha">—</div>
                     </div>
+                    <div class="col-6">
+                      <div class="text-muted small text-uppercase fw-semibold">Hora</div>
+                      <div class="fw-semibold small" id="panel-hora">—</div>
+                    </div>
+                  </div>
+
+                  <hr class="my-2" />
+
+                  <!-- Asientos seleccionados -->
+                  <div class="mb-3">
+                    <div class="text-muted small text-uppercase fw-semibold">Asientos</div>
+                    <div id="panel-asientos" class="mt-1">
+                      <span class="text-muted small">Ninguno</span>
+                    </div>
+                  </div>
+
+                  <hr class="my-2" />
+
+                  <!-- Cantidad -->
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="text-muted small">Pasajeros</span>
+                    <span class="fw-semibold small" id="panel-cantidad">—</span>
+                  </div>
+
+                  <!-- Precio detalle -->
+                  <div class="text-muted small mb-2" id="panel-detalle-precio">—</div>
+
+                  <hr class="my-2" />
+
+                  <!-- Total -->
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold" style="color: #0d1b3e;">Total</span>
+                    <span class="fw-bold fs-5" id="panel-total" style="color: #0d1b3e;">—</span>
+                  </div>
+
+                  <hr class="my-2" />
+
+                  <div class="text-muted small">
+                    <i class="bi bi-clock-history me-1"></i>Duración estimada: <strong>2h 30min</strong>
+                  </div>
+                  <div class="text-muted small mt-1">
+                    <i class="bi bi-bus-front me-1"></i>Minivan 15 asientos
+                  </div>
+
+                  <div class="mt-3 p-2 rounded" style="background: #f5a62315;">
+                    <p class="small mb-0" style="color: #0d1b3e;">
+                      <i class="bi bi-shield-check me-1" style="color: #f5a623;"></i>
+                      Precio fijo de <strong>S/ 12.00</strong> por pasajero.
+                      La disponibilidad se confirma al reservar.
+                    </p>
                   </div>
                 </div>
               </div>
-            </div>
+            </div><!-- /col-lg-4 -->
 
-            <div class="mt-4 text-center text-muted small">
-              <i class="bi bi-shield-check me-1"></i>
-              La disponibilidad de asientos se confirma al reservar. Precio fijo de S/ 12.00 por pasajero.
-            </div>
-          </div>
+          </div><!-- /row -->
         </div>
 
         <!-- TAB: MIS VIAJES -->
@@ -354,10 +353,13 @@
                 <span><i class="bi bi-clock me-1"></i><span id="modal-hora">—</span></span>
               </div>
             </div>
-            <hr />
             <div class="d-flex justify-content-between mb-2">
               <span class="text-muted">Precio unitario</span>
               <span id="modal-precio-unitario" class="fw-semibold">—</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Asientos</span>
+              <span id="modal-asientos" class="fw-semibold">—</span>
             </div>
             <div class="d-flex justify-content-between mb-2">
               <span class="text-muted">Cantidad de pasajes</span>
@@ -385,7 +387,7 @@
     <div th:replace="~{layout :: scripts}"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
-    <script src="/js/pasajes/cliente-buscar.js"></script>
+    <script src="/js/pasajes/cliente-buscar.js?v=4"></script>
     <script>
       // Tab switching logic
       document.querySelectorAll(".btn-tab").forEach((btn) => {
@@ -403,21 +405,8 @@
         });
       });
 
-      // Métodos específicos del contexto de tabs (no sobreescribe los mejorados)
-      Object.assign(pasajesUI, {
-        volverResultados() {
-          document.getElementById("paso-seleccion").classList.add("d-none");
-          document.getElementById("resultados").classList.remove("d-none");
-        },
-        verDetallesViaje(codigoBoleto) {
-          document.querySelector('.btn-tab[data-tab="estado-viaje"]').click();
-          document.getElementById("estado-boleto-codigo").value = codigoBoleto;
-          this.consultarEstadoViaje();
-        }
-      });
-
       document.addEventListener("DOMContentLoaded", () => {
-        if (document.querySelector('.btn-tab[data-tab="mis-viajes"]').classList.contains('active')) {
+        if (document.querySelector('.btn-tab[data-tab="mis-viajes"]')?.classList.contains('active')) {
           pasajesUI.cargarMisViajes();
         }
       });
@@ -441,46 +430,175 @@
         background: #1b2a5e;
         color: white;
       }
-      .seat-map {
-        display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        gap: 8px;
-        padding: 10px;
-        background: rgba(13, 27, 76, 0.03);
-        border-radius: 14px;
-        border: 1px dashed rgba(13, 27, 76, 0.18);
-        min-height: 140px;
+      /* ===== MINIVAN SEAT MAP ===== */
+      :root {
+        --color-disponible: #2ecc71;
+        --color-ocupado: #e74c3c;
+        --color-azul: #0d1b3e;
+        --color-amarillo: #f5a623;
+        --color-fondo: #eef0f4;
       }
 
-      .seat {
-        height: 32px;
-        border-radius: 10px;
-        cursor: pointer;
+      .minivan-front {
+        text-align: center;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--color-azul);
+        opacity: 0.5;
+        margin-bottom: 4px;
+        padding: 4px;
+        border-bottom: 2px solid var(--color-amarillo);
+      }
+
+      .minivan-grid {
+        background: rgba(13, 27, 62, 0.03);
+        border-radius: 14px;
+        border: 1px dashed rgba(13, 27, 62, 0.18);
+        padding: 8px;
         display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .minivan-seats-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 16px 1fr;
+        gap: 6px;
+        align-items: center;
+      }
+
+      .minivan-seat {
+        height: 40px;
+        border-radius: 10px 10px 4px 4px;
+        display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         font-weight: 700;
-        font-size: 12px;
+        font-size: 11px;
         color: #fff;
         user-select: none;
-        transition: transform 0.12s ease;
+        transition: all 0.15s ease;
+        cursor: pointer;
+        position: relative;
+        min-width: 0;
+        border: 2px solid transparent;
       }
 
-      .seat:active {
-        transform: scale(0.98);
+      .minivan-seat:hover:not(.occupied):not(.driver-seat) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
       }
 
-      .seat.available {
-        background: #198754;
+      .minivan-seat:active:not(.occupied):not(.driver-seat) {
+        transform: scale(0.96);
       }
-      .seat.occupied {
-        background: #dc3545;
+
+      .minivan-seat .seat-label {
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      .minivan-seat .passenger-badge {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        background: var(--color-azul);
+        color: #fff;
+        font-size: 8px;
+        font-weight: 700;
+        padding: 1px 5px;
+        border-radius: 8px;
+        line-height: 1.4;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      }
+
+      .minivan-seat.available {
+        background: var(--color-disponible);
+        border-color: #27ae60;
+      }
+
+      .minivan-seat.neutral {
+        background: #e9ecef;
+        border-color: #dee2e6;
+        cursor: default;
+        color: #6c757d;
+      }
+
+      .minivan-seat.occupied {
+        background: #adb5bd;
+        border-color: #8e9297;
         cursor: not-allowed;
+        opacity: 0.85;
+        color: #fff;
       }
-      .seat.selected {
-        background: #f4b400;
-        color: #1a1a1a;
-        box-shadow: 0 0 0 3px rgba(244, 180, 0, 0.35);
+
+      .minivan-seat.selected-first {
+        background: #f5a623 !important;
+        color: #fff !important;
+      }
+
+      .minivan-seat.selected-other {
+        background: #fce4a8 !important;
+        border-color: #f5a623;
+        color: #8b6914 !important;
+      }
+
+      .minivan-seat.selected {
+        border-color: #fff !important;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0,0,0,0.15) !important;
+      }
+
+      .minivan-seat.driver-seat {
+        background: #2c3e50;
+        border-color: #1a252f;
+        cursor: default;
+        grid-column: span 2;
+        flex-direction: row;
+        gap: 4px;
+        font-size: 10px;
+      }
+
+      .minivan-seat.empty-cell {
+        visibility: hidden;
+      }
+
+      .minivan-seats-row.row-5 {
+        grid-template-columns: 1fr 1fr 1fr 0;
+      }
+      .minivan-seats-row.row-6 {
+        grid-template-columns: 1fr 1fr 16px 0;
+      }
+
+      .minivan-aisle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(13, 27, 62, 0.12);
+        font-size: 14px;
+        height: 40px;
+      }
+
+      .minivan-aisle i {
+        transform: rotate(90deg);
+      }
+
+      .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        flex-shrink: 0;
+      }
+
+      .seat-badge {
+        font-weight: 600;
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 6px;
       }
 
       .seat-dot {
@@ -488,6 +606,24 @@
         height: 14px;
         border-radius: 50%;
         display: inline-block;
+      }
+
+      /* Passenger card styles */
+      .pasajero-card {
+        background: #fff;
+        border: 1px solid #e2e6ea !important;
+        transition: all 0.2s ease;
+      }
+      .pasajero-card:hover {
+        border-color: var(--color-amarillo) !important;
+        box-shadow: 0 2px 8px rgba(245, 166, 35, 0.1);
+      }
+
+      .form-label-xs {
+        font-size: 11px;
+        font-weight: 600;
+        color: #6c757d;
+        margin-bottom: 2px;
       }
 
       /* Timeline */
@@ -544,6 +680,60 @@
       .btn-outline-primario:hover {
         background: #1b2a5e;
         color: white;
+      }
+
+      /* Step circles */
+      .step-circle {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: #0d1b3e;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
+      /* Time selector buttons */
+      .time-btn {
+        border: 2px solid #dee2e6;
+        background: #fff;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 700;
+        font-size: 14px;
+        color: #0d1b3e;
+        transition: all 0.2s ease;
+        text-align: center;
+        min-width: 120px;
+        flex: 1;
+      }
+      .time-btn:hover:not(.disabled) {
+        border-color: #f5a623;
+        background: #fff8e7;
+      }
+      .time-btn.active {
+        border-color: #f5a623;
+        background: #f5a623;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(245, 166, 35, 0.3);
+      }
+      .time-btn.active .time-avail {
+        color: rgba(255,255,255,0.85);
+      }
+      .time-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .time-avail {
+        display: block;
+        font-size: 11px;
+        font-weight: 400;
+        color: #6c757d;
+        margin-top: 2px;
       }
     </style>
   </body>

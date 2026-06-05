@@ -101,6 +101,27 @@ public class PasajesApiController {
     }
 
 
+    @GetMapping("/disponibilidad-horaria")
+    public ResponseEntity<List<Map<String, Object>>> disponibilidadHoraria(
+            @RequestParam String origen,
+            @RequestParam String destino,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+        List<Viaje> viajes = viajeRepository.findByOrigenAndDestinoAndFecha(origen, destino, fecha);
+        java.util.List<Map<String, Object>> result = new java.util.ArrayList<>();
+        for (Viaje v : viajes) {
+            List<Integer> ocupados = reservaService.asientosOcupados(v);
+            java.util.Map<String, Object> item = new java.util.LinkedHashMap<>();
+            item.put("hora", v.getHoraSalida());
+            item.put("viajeId", v.getId());
+            item.put("totalAsientos", v.getTotalAsientos());
+            item.put("ocupados", ocupados.size());
+            item.put("disponibles", v.getTotalAsientos() - ocupados.size());
+            item.put("tipoBus", v.getTipoBus());
+            result.add(item);
+        }
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/mis")
     public ResponseEntity<?> mis(Authentication authentication) {
         String email = authentication != null ? authentication.getName() : null;
