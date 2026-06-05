@@ -1,4 +1,4 @@
-package proyecto.nuevaases.controllers;
+package proyecto.nuevaases.controllers.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequestMapping("/api/encomiendas")
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
-public class EncomiendaController {
+public class EncomiendaApiController {
 
     private final IEncomiendaService encomiendaService;
     private final IUsuarioService usuarioService;
@@ -89,5 +89,19 @@ public class EncomiendaController {
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
         encomiendaService.eliminar(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<?> cambiarEstado(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        EncomiendaDTO enc = encomiendaService.buscarPorId(id);
+        enc.setEstado(body.get("estado"));
+        return ResponseEntity.ok(encomiendaService.guardar(enc));
+    }
+
+    @PatchMapping("/{id}/precio")
+    public ResponseEntity<?> asignarPrecio(@PathVariable Long id, @RequestBody Map<String, Double> body) {
+        EncomiendaDTO enc = encomiendaService.buscarPorId(id);
+        enc.setPrecio(body.get("precio"));
+        return ResponseEntity.ok(encomiendaService.guardar(enc));
     }
 }

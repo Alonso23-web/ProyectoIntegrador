@@ -38,7 +38,7 @@ http
                                                                 "/", "/index.html", "/inicio", "/nosotros",
                                                                 "/registro", "/css/**", "/js/**",
                                                                 "/images/**", "/img/**", "/node_modules/**",
-                                                                "/webjars/**", "/api/**", "/alquiler/**")
+                                                                "/webjars/**",  "/alquiler/**")
                                                 .permitAll()
                                                 .requestMatchers("/h2-console/**").permitAll()
                                                 .anyRequest().authenticated())
