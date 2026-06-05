@@ -21,7 +21,10 @@
     <section class="py-5">
       <div class="container">
         <div class="position-relative mb-4">
-          <ul class="nav nav-pills gap-2 d-flex justify-content-center" id="encTabs">
+          <ul
+            class="nav nav-pills gap-2 d-flex justify-content-center"
+            id="encTabs"
+          >
             <li class="nav-item">
               <button class="nav-link active btn-tab" data-tab="mis-registros">
                 <i class="bi bi-boxes me-1"></i> Mis envíos
@@ -38,9 +41,9 @@
               </button>
             </li>
             <li class="nav-item">
-              <button class="nav-link btn-tab" data-tab="rastrear">
+              <a class="nav-link btn-tab" href="http://localhost:8081/rastrear">
                 <i class="bi bi-upc-scan me-1"></i> Rastrear encomienda
-              </button>
+              </a>
             </li>
           </ul>
         </div>
@@ -84,6 +87,8 @@
                     id="reg-remitente"
                     class="form-control"
                     placeholder="Nombre completo"
+                    oninput="this.value = this.value.replace(/\d/g, '')"
+                    title="No ingrese números en el nombre"
                   />
                 </div>
                 <div class="col-md-6">
@@ -92,7 +97,14 @@
                     type="text"
                     id="reg-dni-rem"
                     class="form-control"
+                    inputmode="numeric"
+                    pattern="\d{8}"
+                    maxlength="8"
                     placeholder="12345678"
+                    oninput="
+                      this.value = this.value.replace(/\D/g, '').slice(0, 8)
+                    "
+                    title="Ingrese 8 dígitos numéricos"
                   />
                 </div>
                 <div class="col-md-6">
@@ -102,6 +114,8 @@
                     id="reg-destinatario"
                     class="form-control"
                     placeholder="Nombre completo"
+                    oninput="this.value = this.value.replace(/\d/g, '')"
+                    title="No ingrese números en el nombre"
                   />
                 </div>
                 <div class="col-md-6">
@@ -110,7 +124,14 @@
                     type="text"
                     id="reg-dni-dest"
                     class="form-control"
+                    inputmode="numeric"
+                    pattern="\d{8}"
+                    maxlength="8"
                     placeholder="87654321"
+                    oninput="
+                      this.value = this.value.replace(/\D/g, '').slice(0, 8)
+                    "
+                    title="Ingrese 8 dígitos numéricos"
                   />
                 </div>
                 <div class="col-md-6">
@@ -129,17 +150,7 @@
                     <option>Pacasmayo</option>
                   </select>
                 </div>
-                <div class="col-md-4">
-                  <label class="form-label fw-semibold">Peso (kg)</label>
-                  <input
-                    type="number"
-                    id="reg-peso"
-                    class="form-control"
-                    placeholder="1.5"
-                    min="0.1"
-                    step="0.1"
-                  />
-                </div>
+
                 <div class="col-md-4">
                   <label class="form-label fw-semibold">Descripción</label>
                   <input
@@ -251,7 +262,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -300,7 +310,7 @@
       }
     </style>
 
-    <script th:inline="javascript">
+    <script>
       const API = "/api/encomiendas";
 
       document.querySelectorAll(".btn-tab").forEach((btn) => {
@@ -346,6 +356,11 @@
                     <td>S/ ${Number(e.precio).toFixed(2)}</td>
                     <td><span class="estado-badge estado-${e.estado}">${e.estado.replace("_", " ")}</span></td>
                     <td>${e.fechaEnvio || "-"}</td>
+                    <td>
+                      <a href="/encomiendas/editar/${e.id}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil"></i> Editar
+                      </a>
+                    </td>
                 </tr>
             `,
             )
@@ -357,7 +372,7 @@
                             <tr>
                                 <th>Código</th><th>Ruta</th><th>Remitente</th>
                                 <th>Destinatario</th><th>Peso</th><th>Precio</th>
-                                <th>Estado</th><th>Fecha</th>
+                                <th>Estado</th><th>Fecha</th><th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>${filas}</tbody>
@@ -376,51 +391,91 @@
       // Función unificada para mostrar alertas
       function alerta(id, tipo, html) {
         const el = document.getElementById(id);
-        if (el) el.innerHTML = `<div class="alert alert-${tipo} mt-2">${html}</div>`;
+        if (el)
+          el.innerHTML = `<div class="alert alert-${tipo} mt-2">${html}</div>`;
       }
 
       function obtenerTarifaBase(origen, destino) {
-        const ruta = (origen.toLowerCase() + '-' + destino.toLowerCase()).normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-        if (ruta === 'trujillo-chepen' || ruta === 'chepen-trujillo') return 5.00;
-        if (ruta === 'trujillo-pacasmayo' || ruta === 'pacasmayo-trujillo') return 4.50;
-        if (ruta === 'chepen-pacasmayo' || ruta === 'pacasmayo-chepen') return 3.50;
-        return 5.00;
+        const ruta = (origen.toLowerCase() + "-" + destino.toLowerCase())
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+        if (ruta === "trujillo-chepen" || ruta === "chepen-trujillo")
+          return 5.0;
+        if (ruta === "trujillo-pacasmayo" || ruta === "pacasmayo-trujillo")
+          return 4.5;
+        if (ruta === "chepen-pacasmayo" || ruta === "pacasmayo-chepen")
+          return 3.5;
+        return 5.0;
       }
 
       function calcularPrecio(origen, destino, peso) {
         const tarifaBase = obtenerTarifaBase(origen, destino);
-        const cargoPeso = peso > 1 ? (peso - 1) * 1.50 : 0;
+        const cargoPeso = peso > 1 ? (peso - 1) * 1.5 : 0;
         const total = tarifaBase + cargoPeso;
         return Math.round(total * 100) / 100;
       }
 
-      function calcular() {
-        const peso = parseFloat(document.getElementById("calc-peso").value) || 0;
+      async function calcular() {
+        const peso =
+          parseFloat(document.getElementById("calc-peso").value) || 0;
         const origen = document.getElementById("calc-origen").value;
         const destino = document.getElementById("calc-destino").value;
-        
-        if(peso <= 0) {
+
+        if (peso <= 0) {
           document.getElementById("calc-result").innerHTML = "";
           return;
         }
 
         if (origen === destino) {
-          alerta("calc-result", "warning", "El origen y destino no pueden ser iguales.");
+          alerta(
+            "calc-result",
+            "warning",
+            "El origen y destino no pueden ser iguales.",
+          );
           return;
         }
 
-        // Fórmula exacta del backend
-        const total = calcularPrecio(origen, destino, peso);
-        
+        const tarifaBase = obtenerTarifaBase(origen, destino);
+        const pesoNormalIncluido = 10.0;
+        const cargoExtra =
+          peso > pesoNormalIncluido ? (peso - pesoNormalIncluido) * 1.5 : 0;
+        const precioConPesoNormal = tarifaBase + 1.5;
+
+        let total;
+        try {
+          const response = await fetch(
+            `/api/encomiendas/precio?origen=${encodeURIComponent(origen)}&destino=${encodeURIComponent(destino)}&peso=${encodeURIComponent(peso)}`,
+          );
+          if (!response.ok) {
+            throw new Error("Error al calcular el precio en el servidor");
+          }
+          const data = await response.json();
+          total = parseFloat(data.precio);
+          if (Number.isNaN(total)) {
+            throw new Error("Precio inválido devuelto por el servidor");
+          }
+        } catch (error) {
+          alerta(
+            "calc-result",
+            "danger",
+            `No se pudo obtener el precio desde el servidor. ${error.message}`,
+          );
+          return;
+        }
+
         const detalle = `
           <div class="small text-start mb-2">
             <div class="d-flex justify-content-between">
-              <span>Tarifa base (${origen} → ${destino})</span>
-              <span>S/ ${obtenerTarifaBase(origen, destino).toFixed(2)}</span>
+              <span>Precio por ruta (${origen} → ${destino})</span>
+              <span>S/ ${tarifaBase.toFixed(2)}</span>
             </div>
             <div class="d-flex justify-content-between">
-              <span>Cargo por peso extra${peso > 1 ? ' (' + (peso - 1).toFixed(1) + ' kg × S/ 1.50)' : ''}</span>
-              <span>S/ ${(peso > 1 ? (peso - 1) * 1.50 : 0).toFixed(2)}</span>
+              <span>Cargo por peso normal (hasta ${pesoNormalIncluido.toFixed(1)} kg)</span>
+              <span>S/ ${precioConPesoNormal.toFixed(2)}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>Cargo por peso extra${peso > pesoNormalIncluido ? " (" + (peso - pesoNormalIncluido).toFixed(1) + " kg × S/ 1.50)" : ""}</span>
+              <span>S/ ${cargoExtra.toFixed(2)}</span>
             </div>
             <hr class="my-1">
             <div class="d-flex justify-content-between fw-bold fs-5 text-primario">
@@ -430,7 +485,10 @@
           </div>
         `;
 
-        alerta("calc-result", "info", `
+        alerta(
+          "calc-result",
+          "info",
+          `
             <div class="text-center">
                 ${detalle}
                 <div class="alert alert-warning py-2 mb-0 small">
@@ -438,31 +496,70 @@
                     El costo es referencial y será validado en oficina.
                 </div>
             </div>
-        `);
+        `,
+        );
       }
-
-      // Agregar listener para cálculo en tiempo real
-      document.getElementById("calc-peso").addEventListener("input", calcular);
-      document.getElementById("calc-origen").addEventListener("change", calcular);
-      document.getElementById("calc-destino").addEventListener("change", calcular);
 
       // Lógica para registrar encomienda
       async function registrar() {
         const remitente = document.getElementById("reg-remitente").value.trim();
-        const dniRemitente = document.getElementById("reg-dni-rem").value.trim();
-        const destinatario = document.getElementById("reg-destinatario").value.trim();
-        const dniDestinatario = document.getElementById("reg-dni-dest").value.trim();
+        const dniRemitente = document
+          .getElementById("reg-dni-rem")
+          .value.trim();
+        const destinatario = document
+          .getElementById("reg-destinatario")
+          .value.trim();
+        const dniDestinatario = document
+          .getElementById("reg-dni-dest")
+          .value.trim();
         const origen = document.getElementById("reg-origen").value;
         const destino = document.getElementById("reg-destino").value;
-        const peso = parseFloat(document.getElementById("reg-peso").value);
-        const descripcion = document.getElementById("reg-descripcion").value.trim();
-        const telefonoContacto = document.getElementById("reg-telefono").value.trim();
+        const descripcion = document
+          .getElementById("reg-descripcion")
+          .value.trim();
+        const telefonoContacto = document
+          .getElementById("reg-telefono")
+          .value.trim();
 
-        if (!remitente || !dniRemitente || !destinatario || !dniDestinatario || !origen || !destino || isNaN(peso) || peso <= 0 || !descripcion) {
-          return alerta("reg-result", "warning", "Por favor, completa todos los campos obligatorios y asegúrate de que el peso sea válido.");
+        const dniRegex = /^\d{8}$/;
+        if (
+          !remitente ||
+          !dniRemitente ||
+          !destinatario ||
+          !dniDestinatario ||
+          !origen ||
+          !destino ||
+          !descripcion
+        ) {
+          return alerta(
+            "reg-result",
+            "warning",
+            "Por favor, completa todos los campos obligatorios.",
+          );
         }
 
-        alerta("reg-result", "info", '<div class="spinner-border spinner-border-sm me-2"></div> Registrando encomienda...');
+        if (!dniRegex.test(dniRemitente) || !dniRegex.test(dniDestinatario)) {
+          return alerta(
+            "reg-result",
+            "warning",
+            "Los DNI deben ser numéricos y de exactamente 8 dígitos.",
+          );
+        }
+
+        const nombreRegex = /\d/;
+        if (nombreRegex.test(remitente) || nombreRegex.test(destinatario)) {
+          return alerta(
+            "reg-result",
+            "warning",
+            "Los nombres no deben contener números.",
+          );
+        }
+
+        alerta(
+          "reg-result",
+          "info",
+          '<div class="spinner-border spinner-border-sm me-2"></div> Registrando encomienda...',
+        );
 
         const body = {
           remitente: remitente,
@@ -471,9 +568,8 @@
           dniDestinatario: dniDestinatario,
           origen: origen,
           destino: destino,
-          peso: peso,
           descripcion: descripcion,
-          observaciones: telefonoContacto
+          observaciones: telefonoContacto,
         };
 
         try {
@@ -503,15 +599,14 @@
           document.getElementById("reg-dni-rem").value = "";
           document.getElementById("reg-destinatario").value = "";
           document.getElementById("reg-dni-dest").value = "";
-          document.getElementById("reg-peso").value = "";
+
           document.getElementById("reg-descripcion").value = "";
           document.getElementById("reg-telefono").value = "";
-
         } catch (e) {
           alerta(
             "reg-result",
             "danger",
-            `<i class="bi bi-exclamation-circle me-2"></i>Error al registrar. ${e.message || 'Revisa los datos.'}`,
+            `<i class="bi bi-exclamation-circle me-2"></i>Error al registrar. ${e.message || "Revisa los datos."}`,
           );
         }
       }
@@ -536,12 +631,20 @@
           const d = await r.json();
 
           // Mapeo de estados para el badge
-          let estadoBadgeClass = 'bg-secondary';
+          let estadoBadgeClass = "bg-secondary";
           switch (d.estado) {
-            case 'REGISTRADO': estadoBadgeClass = 'estado-REGISTRADO'; break;
-            case 'EN_TRANSITO': estadoBadgeClass = 'estado-EN_TRANSITO'; break;
-            case 'EN_DESTINO': estadoBadgeClass = 'estado-EN_DESTINO'; break;
-            case 'ENTREGADO': estadoBadgeClass = 'estado-ENTREGADO'; break;
+            case "REGISTRADO":
+              estadoBadgeClass = "estado-REGISTRADO";
+              break;
+            case "EN_TRANSITO":
+              estadoBadgeClass = "estado-EN_TRANSITO";
+              break;
+            case "EN_DESTINO":
+              estadoBadgeClass = "estado-EN_DESTINO";
+              break;
+            case "ENTREGADO":
+              estadoBadgeClass = "estado-ENTREGADO";
+              break;
           }
 
           alerta(
@@ -574,23 +677,59 @@
       // Inicializar la pestaña activa al cargar la página
       document.addEventListener("DOMContentLoaded", () => {
         const urlParams = new URLSearchParams(window.location.search);
-        const activeTab = urlParams.get('tab');
+        const activeTab = urlParams.get("tab");
         if (activeTab) {
-          const targetButton = document.querySelector(`.btn-tab[data-tab="${activeTab}"]`);
+          const targetButton = document.querySelector(
+            `.btn-tab[data-tab="${activeTab}"]`,
+          );
           if (targetButton) {
             targetButton.click();
-            if (activeTab === 'mis-registros') {
+            if (activeTab === "mis-registros") {
               cargarMisRegistros();
-            } else if (activeTab === 'cotizar') {
-              calcular(); // Realizar un cálculo inicial si la pestaña de cotizar está activa
             }
           }
         } else {
           // Si no hay tab en la URL, activar la primera por defecto (Mis Registros)
           document.querySelector('.btn-tab[data-tab="mis-registros"]').click();
         }
+
+        // Manejadores para sanitizar contenido pegado en campos (evita errores por onpaste inline)
+        const regRemitente = document.getElementById("reg-remitente");
+        if (regRemitente) {
+          regRemitente.addEventListener("paste", function (e) {
+            e.preventDefault();
+            const p = (e.clipboardData || window.clipboardData).getData("text");
+            this.value = p.replace(/\d/g, "");
+          });
+        }
+
+        const regDest = document.getElementById("reg-destinatario");
+        if (regDest) {
+          regDest.addEventListener("paste", function (e) {
+            e.preventDefault();
+            const p = (e.clipboardData || window.clipboardData).getData("text");
+            this.value = p.replace(/\d/g, "");
+          });
+        }
+
+        const dniRem = document.getElementById("reg-dni-rem");
+        if (dniRem) {
+          dniRem.addEventListener("paste", function (e) {
+            e.preventDefault();
+            const p = (e.clipboardData || window.clipboardData).getData("text");
+            this.value = p.replace(/\D/g, "").slice(0, 8);
+          });
+        }
+
+        const dniDest = document.getElementById("reg-dni-dest");
+        if (dniDest) {
+          dniDest.addEventListener("paste", function (e) {
+            e.preventDefault();
+            const p = (e.clipboardData || window.clipboardData).getData("text");
+            this.value = p.replace(/\D/g, "").slice(0, 8);
+          });
+        }
       });
     </script>
-
   </body>
 </html>
