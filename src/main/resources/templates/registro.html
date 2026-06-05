@@ -26,7 +26,7 @@
               />
               <h4 class="mb-0 fw-bold">Crear Cuenta</h4>
               <small class="text-white-50"
-                >Regístrate como cliente o conductor</small
+                >Regístrate como cliente o postula como conductor</small
               >
             </div>
             <div class="card-body p-4">
@@ -38,7 +38,7 @@
                 <span th:text="${error}"></span>
               </div>
 
-              <form th:action="@{/registro}" method="post">
+              <form th:action="@{/registro}" method="post" enctype="multipart/form-data">
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Nombre Completo</label>
@@ -160,12 +160,85 @@
                           Conductor
                         </label>
                         <small class="text-muted d-block"
-                          >Alquila vehículos y conduce</small
+                          >Postula para trabajar como conductor</small
                         >
                       </div>
                     </div>
                   </div>
                 </div>
+                <!-- ==================== CAMPOS DE CONDUCTOR (dinámicos) ==================== -->
+                <div id="conductorFields" style="display: none;">
+                  <hr class="my-4" />
+                  <h5 class="fw-bold text-primario mb-3">
+                    <i class="bi bi-truck-front me-2"></i>Información del Conductor
+                  </h5>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label fw-bold">Número de Licencia</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-light"
+                          ><i class="bi bi-card-text"></i
+                        ></span>
+                        <input
+                          type="text"
+                          name="numeroLicencia"
+                          class="form-control"
+                          placeholder="Ej: LIC-001234"
+                          id="numeroLicencia"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label fw-bold">Años de Experiencia</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-light"
+                          ><i class="bi bi-clock-history"></i
+                        ></span>
+                        <input
+                          type="number"
+                          name="aniosExperiencia"
+                          class="form-control"
+                          placeholder="Ej: 5"
+                          min="0"
+                          max="60"
+                          id="aniosExperiencia"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Tipo de Vehículo</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"
+                        ><i class="bi bi-truck"></i
+                      ></span>
+                      <select name="tipoVehiculo" class="form-select" id="tipoVehiculo">
+                        <option value="">Selecciona un tipo...</option>
+                        <option value="Minivan">Minivan</option>
+                        <option value="Bus">Bus</option>
+                        <option value="Camión">Camión</option>
+                        <option value="Automóvil">Automóvil</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Subida de Documentos</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"
+                        ><i class="bi bi-file-earmark-pdf"></i
+                      ></span>
+                      <input
+                        type="file"
+                        name="documento"
+                        class="form-control"
+                        accept=".pdf,.jpg,.png"
+                        id="documento"
+                      />
+                    </div>
+                    <small class="text-muted">PDF, JPG o PNG (máx. 5MB)</small>
+                  </div>
+                </div>
+
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Contraseña</label>
@@ -201,8 +274,8 @@
                   </div>
                 </div>
                 <div class="d-grid">
-                  <button type="submit" class="btn btn-amarillo fw-bold">
-                    <i class="bi bi-person-plus me-2"></i>Crear Cuenta
+                  <button type="submit" class="btn btn-amarillo fw-bold" id="btnSubmit">
+                    <i class="bi bi-person-plus me-2"></i><span id="btnTexto">Crear Cuenta</span>
                   </button>
                 </div>
               </form>
@@ -222,5 +295,35 @@
 
     <div th:replace="~{layout :: footer}"></div>
     <div th:replace="~{layout :: scripts}"></div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const radios = document.querySelectorAll('input[name="rol"]');
+        const conductorFields = document.getElementById('conductorFields');
+        const btnTexto = document.getElementById('btnTexto');
+
+        function toggleConductorFields() {
+          const selected = document.querySelector('input[name="rol"]:checked');
+          const isConductor = selected && selected.value === 'CONDUCTOR';
+
+          conductorFields.style.display = isConductor ? 'block' : 'none';
+          btnTexto.textContent = isConductor ? 'Enviar postulación' : 'Crear Cuenta';
+
+          // Deshabilitar campos para que no se envíen vacíos al elegir CLIENTE
+          ['numeroLicencia', 'aniosExperiencia', 'tipoVehiculo', 'documento'].forEach(function(id) {
+            var el = document.getElementById(id);
+            el.disabled = !isConductor;
+            el.required = isConductor;
+          });
+        }
+
+        radios.forEach(function(radio) {
+          radio.addEventListener('change', toggleConductorFields);
+        });
+
+        // Ejecutar al cargar por si ya viene seleccionado
+        toggleConductorFields();
+      });
+    </script>
   </body>
 </html>

@@ -12,5 +12,7 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
 
     List<Viaje> findByOrigenAndDestinoAndFecha(String origen, String destino, LocalDate fecha);
 
+    List<Viaje> findByFecha(LocalDate fecha);
+
 }
 

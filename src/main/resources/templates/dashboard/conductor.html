@@ -7,356 +7,301 @@
     <div th:replace="~{layout :: navbar}"></div>
 
     <style>
-      .conductor-dashboard {
+      .cond-dashboard {
         background: #f0f2f5;
         min-height: calc(100vh - 130px);
         padding: 2rem 0;
       }
 
-      /* Tarjeta de bienvenida */
-      .welcome-card {
+      /* Header de bienvenida */
+      .cond-header {
         background: linear-gradient(135deg, #0d1b4c 0%, #1a2d6b 100%);
         border-radius: 24px;
-        padding: 2.5rem;
+        padding: 2rem 2.5rem;
         color: white;
         margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
         position: relative;
         overflow: hidden;
       }
-      .welcome-card::after {
+      .cond-header::after {
         content: "🚛";
         position: absolute;
-        right: 30px;
-        bottom: -10px;
-        font-size: 120px;
-        opacity: 0.1;
+        right: 20px;
+        bottom: -15px;
+        font-size: 100px;
+        opacity: 0.08;
       }
-      .welcome-card h1 {
+      .cond-header h1 {
         font-weight: 800;
-        font-size: 1.8rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.5rem;
+        margin-bottom: 0.3rem;
       }
-      .welcome-card p {
-        opacity: 0.85;
-        font-size: 1.05rem;
+      .cond-header p {
+        opacity: 0.8;
+        font-size: 0.95rem;
         margin-bottom: 0;
-        max-width: 500px;
       }
-      .welcome-card .badge-rol {
+      .cond-header .cond-badge {
         background: rgba(255,255,255,0.15);
         color: white;
-        padding: 0.5rem 1.2rem;
+        padding: 0.4rem 1.2rem;
         border-radius: 50px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        display: inline-block;
-        margin-top: 0.8rem;
-      }
-
-      /* Sección de acción rápida (Postular / Alquilar) */
-      .accion-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.2rem;
-        margin-bottom: 2.5rem;
-      }
-      .accion-card {
-        background: white;
-        border-radius: 20px;
-        padding: 2rem 1.5rem;
-        text-align: center;
-        text-decoration: none;
-        color: #0d1b4c;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-        border: 2px solid transparent;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0.8rem;
-      }
-      .accion-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 30px rgba(13,27,76,0.15);
-        border-color: #f5a623;
-        color: #0d1b4c;
-        text-decoration: none;
-      }
-      .accion-card .accion-icono {
-        width: 80px;
-        height: 80px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.4rem;
-      }
-      .accion-card .accion-nombre {
-        font-weight: 700;
-        font-size: 1.15rem;
-      }
-      .accion-card .accion-desc {
         font-size: 0.85rem;
-        color: #6c757d;
-        margin: 0;
-        max-width: 240px;
-      }
-      .accion-card .btn-accion {
-        background: #f5a623;
-        color: #1a1a1a;
-        font-weight: 700;
-        border: none;
-        padding: 0.6rem 1.8rem;
-        border-radius: 50px;
-        transition: all 0.3s ease;
-        font-size: 0.9rem;
-        margin-top: 0.3rem;
-      }
-      .accion-card .btn-accion:hover {
-        background: #e89800;
-        transform: scale(1.05);
-      }
-
-      .icono-postular { background: #e8f4fd; color: #0d6efd; }
-      .icono-alquilar { background: #fff3cd; color: #856404; }
-      .icono-vehiculos-conductor { background: #d4edda; color: #155724; }
-      .icono-encomiendas-conductor { background: #f8d7da; color: #721c24; }
-      .icono-rastrear-conductor { background: #e2d9f3; color: #563d7c; }
-
-      /* Grid de módulos */
-      .modulos-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2.5rem;
-      }
-      .modulo-card {
-        background: white;
-        border-radius: 18px;
-        padding: 1.5rem 1rem;
-        text-align: center;
-        text-decoration: none;
-        color: #0d1b4c;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-        border: 2px solid transparent;
-        cursor: pointer;
-        display: flex;
-        flex-direction: column;
+        font-weight: 600;
+        display: inline-flex;
         align-items: center;
         gap: 0.5rem;
       }
-      .modulo-card:hover {
-        transform: translateY(-5px);
+
+      /* Cards de resumen */
+      .resumen-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      @media (max-width: 768px) {
+        .resumen-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .resumen-card {
+        background: white;
+        border-radius: 18px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+      }
+      .resumen-card:hover {
+        transform: translateY(-4px);
         box-shadow: 0 10px 25px rgba(13,27,76,0.12);
         border-color: #f5a623;
-        color: #0d1b4c;
-        text-decoration: none;
       }
-      .modulo-card .mod-icono {
-        width: 60px;
-        height: 60px;
+      .resumen-card .res-icon {
+        width: 56px;
+        height: 56px;
         border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 1.6rem;
+        margin: 0 auto 0.8rem;
       }
-      .modulo-card .mod-nombre {
-        font-weight: 700;
-        font-size: 0.9rem;
-      }
-      .modulo-card .mod-desc {
-        font-size: 0.75rem;
-        color: #6c757d;
-        margin: 0;
-      }
-
-      .mod-icono-vehiculos { background: #e8f4fd; color: #0d6efd; }
-      .mod-icono-encomiendas { background: #fff3cd; color: #856404; }
-      .mod-icono-rastrear { background: #d4edda; color: #155724; }
-      .mod-icono-perfil { background: #f8d7da; color: #721c24; }
-
-      /* Estadísticas */
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-      }
-      .stat-card {
-        background: white;
-        border-radius: 18px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-        text-align: center;
-        transition: transform 0.2s ease;
-      }
-      .stat-card:hover {
-        transform: translateY(-3px);
-      }
-      .stat-card .stat-number {
-        font-size: 2.2rem;
+      .resumen-card .res-num {
+        font-size: 2rem;
         font-weight: 800;
         color: #0d1b4c;
         line-height: 1.2;
       }
-      .stat-card .stat-label {
+      .resumen-card .res-label {
         font-size: 0.8rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         font-weight: 600;
         color: #6c757d;
-        margin-top: 0.3rem;
+        margin-top: 0.2rem;
       }
-      .stat-card .stat-icon {
-        font-size: 1.6rem;
-        margin-bottom: 0.3rem;
-        display: block;
+      .res-icon-viajes { background: #e8f4fd; color: #0d6efd; }
+      .res-icon-pasajeros { background: #d4edda; color: #155724; }
+      .res-icon-encomiendas { background: #fff3cd; color: #856404; }
+
+      /* Sección de viajes */
+      .section-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        color: #6c757d;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
 
-      /* Información del conductor */
-      .info-card {
+      .viaje-card {
         background: white;
-        border-radius: 20px;
+        border-radius: 18px;
         padding: 1.5rem;
         box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-        display: flex;
-        align-items: center;
-        gap: 1.2rem;
-        flex-wrap: wrap;
+        margin-bottom: 1rem;
+        border-left: 4px solid #f5a623;
+        transition: all 0.3s ease;
       }
-      .info-card .avatar-conductor {
-        width: 64px;
-        height: 64px;
-        border-radius: 50%;
-        background: linear-gradient(135deg, #0d1b4c, #1a2d6b);
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        flex-shrink: 0;
+      .viaje-card:hover {
+        box-shadow: 0 8px 25px rgba(13,27,76,0.1);
       }
-      .info-card .info-detalle {
-        flex: 1;
-        min-width: 180px;
-      }
-      .info-card .info-detalle .info-nombre {
+      .viaje-card .viaje-ruta {
         font-weight: 700;
-        font-size: 1.05rem;
+        font-size: 1.1rem;
         color: #0d1b4c;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
-      .info-card .info-detalle .info-rol {
-        font-size: 0.85rem;
-        color: #6c757d;
+      .viaje-card .viaje-ruta .arrow {
+        color: #f5a623;
       }
-      .info-card .info-estado {
-        background: #d4edda;
-        color: #155724;
-        padding: 0.4rem 1.2rem;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 0.85rem;
-        display: inline-flex;
+      .viaje-card .viaje-detalles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin-top: 0.8rem;
+        padding-top: 0.8rem;
+        border-top: 1px solid #f0f2f5;
+      }
+      .viaje-card .viaje-detalle-item {
+        display: flex;
         align-items: center;
         gap: 0.4rem;
+        font-size: 0.88rem;
+        color: #495057;
+      }
+      .viaje-card .viaje-detalle-item i {
+        color: #f5a623;
+        font-size: 1rem;
+      }
+      .viaje-card .viaje-acciones {
+        margin-top: 1rem;
+        padding-top: 0.8rem;
+        border-top: 1px solid #f0f2f5;
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+      }
+
+      .alertas-section {
+        margin-bottom: 2rem;
       }
     </style>
 
-    <section class="conductor-dashboard">
+    <section class="cond-dashboard">
       <div class="container">
 
-        <!-- Tarjeta de bienvenida -->
-        <div class="welcome-card">
-          <h1>🚛 ¡Bienvenido, <span th:text="${nombreUsuario}"></span>!</h1>
-          <p>Panel del conductor. Aquí puedes ver los vehículos disponibles, gestionar encomiendas, postular a trabajos y solicitar vehículos para tus rutas.</p>
-          <span class="badge-rol">🧑‍✈️ Conductor</span>
-        </div>
-
-        <!-- ACCIONES PRINCIPALES: Postular y Alquilar -->
-        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
-          <i class="bi bi-lightning-fill me-2"></i>Acciones rápidas
-        </h5>
-        <div class="accion-grid">
-          <a href="/alquiler" class="accion-card">
-            <div class="accion-icono icono-postular"><i class="bi bi-briefcase-fill"></i></div>
-            <span class="accion-nombre">💼 Postular a trabajo</span>
-            <p class="accion-desc">Revisa los vehículos disponibles y solicita asignación para tus rutas como conductor.</p>
-            <span class="btn-accion">Ver oportunidades</span>
-          </a>
-          <a href="/alquiler" class="accion-card">
-            <div class="accion-icono icono-alquilar"><i class="bi bi-car-front-fill"></i></div>
-            <span class="accion-nombre">🚗 Alquilar vehículo</span>
-            <p class="accion-desc">Solicita un vehículo de la flota para tus rutas y trabajos asignados.</p>
-            <span class="btn-accion">Ver flota disponible</span>
-          </a>
-        </div>
-
-        <!-- MÓDULOS DEL SISTEMA -->
-        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
-          <i class="bi bi-grid-3x3-gap-fill me-2"></i>Módulos del sistema
-        </h5>
-        <div class="modulos-grid">
-          <a href="/vehiculos" class="modulo-card">
-            <div class="mod-icono mod-icono-vehiculos"><i class="bi bi-truck"></i></div>
-            <span class="mod-nombre">Vehículos</span>
-            <span class="mod-desc">Ver flota disponible</span>
-          </a>
-          <a href="/encomiendas" class="modulo-card">
-            <div class="mod-icono mod-icono-encomiendas"><i class="bi bi-box-seam"></i></div>
-            <span class="mod-nombre">Encomiendas</span>
-            <span class="mod-desc">Gestionar envíos</span>
-          </a>
-          <a href="/rastrear" class="modulo-card">
-            <div class="mod-icono mod-icono-rastrear"><i class="bi bi-search"></i></div>
-            <span class="mod-nombre">Rastrear</span>
-            <span class="mod-desc">Localizar envío</span>
-          </a>
-          <a href="/perfil" class="modulo-card">
-            <div class="mod-icono mod-icono-perfil"><i class="bi bi-person-circle"></i></div>
-            <span class="mod-nombre">Mi Perfil</span>
-            <span class="mod-desc">Ver mis datos</span>
-          </a>
-        </div>
-
-        <!-- ESTADÍSTICAS -->
-        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
-          <i class="bi bi-bar-chart-fill me-2"></i>Resumen del sistema
-        </h5>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <span class="stat-icon">🚛</span>
-            <div class="stat-number" th:text="${totalVehiculos}">0</div>
-            <div class="stat-label">Vehículos en flota</div>
-          </div>
-          <div class="stat-card">
-            <span class="stat-icon">🎫</span>
-            <div class="stat-number" th:text="${totalPasajes}">0</div>
-            <div class="stat-label">Pasajes vendidos</div>
-          </div>
-          <div class="stat-card">
-            <span class="stat-icon">📦</span>
-            <div class="stat-number" th:text="${totalEncomiendas}">0</div>
-            <div class="stat-label">Encomiendas</div>
+        <!-- HEADER DE BIENVENIDA -->
+        <div class="cond-header">
+          <div>
+            <h1>🚛 ¡Buenos días, <span th:text="${nombreCompleto}"></span>!</h1>
+            <p>Panel del conductor — Revisa tu jornada de hoy y gestiona tus actividades.</p>
+            <span class="cond-badge mt-2">
+              <i class="bi bi-person-check-fill"></i> Conductor activo
+            </span>
           </div>
         </div>
 
-        <!-- INFORMACIÓN DEL CONDUCTOR -->
-        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
-          <i class="bi bi-person-badge-fill me-2"></i>Mi información
+        <!-- RESUMEN: 3 cards pequeñas en grid -->
+        <h5 class="section-label">
+          <i class="bi bi-bar-chart-fill"></i> Resumen
         </h5>
-        <div class="info-card">
-          <div class="avatar-conductor">
-            <i class="bi bi-person-fill"></i>
+        <div class="resumen-grid">
+          <div class="resumen-card">
+            <div class="res-icon res-icon-viajes"><i class="bi bi-bus-front"></i></div>
+            <div class="res-num" th:text="${totalViajes}">0</div>
+            <div class="res-label">Total de viajes</div>
           </div>
-          <div class="info-detalle">
-            <div class="info-nombre" th:text="${nombreUsuario}">conductor@email.com</div>
-            <div class="info-rol">🧑‍✈️ Conductor de flota — Nueva Ases Express</div>
+          <div class="resumen-card">
+            <div class="res-icon res-icon-pasajeros"><i class="bi bi-people"></i></div>
+            <div class="res-num" th:text="${totalPasajeros}">0</div>
+            <div class="res-label">Pasajeros transportados</div>
           </div>
-          <div class="info-estado">
-            <i class="bi bi-check-circle-fill"></i> Activo
+          <div class="resumen-card">
+            <div class="res-icon res-icon-encomiendas"><i class="bi bi-box-seam"></i></div>
+            <div class="res-num" th:text="${totalEncomiendas}">0</div>
+            <div class="res-label">Encomiendas entregadas</div>
+          </div>
+        </div>
+
+        <!-- ALERTAS -->
+        <h5 class="section-label">
+          <i class="bi bi-exclamation-triangle-fill text-warning"></i> Alertas
+        </h5>
+        <div class="alertas-section">
+          <div class="alert alert-warning d-flex align-items-center" role="alert" th:if="${hayViajeProximo}">
+            <i class="bi bi-clock-fill me-3 fs-4"></i>
+            <div>
+              <strong>¡Atención!</strong> Tienes un viaje en 30 minutos. Prepárate para iniciar tu ruta.
+            </div>
+          </div>
+          <div class="alert alert-info d-flex align-items-center" role="alert" th:if="${faltanPasajeros}">
+            <i class="bi bi-people-fill me-3 fs-4"></i>
+            <div>
+              <strong>Faltan pasajeros por abordar</strong> — Revisa los viajes pendientes y confirma el abordaje.
+            </div>
+          </div>
+          <div class="alert alert-success d-flex align-items-center" role="alert" th:if="${!viajesConPasajeros.empty}">
+            <i class="bi bi-check-circle-fill me-3 fs-4"></i>
+            <div>
+              <strong>Jornada activa</strong> — Tienes <span th:text="${#lists.size(viajesConPasajeros)}"></span> viaje(s) programado(s) para hoy.
+            </div>
+          </div>
+          <div class="alert alert-secondary d-flex align-items-center" role="alert" th:if="${viajesConPasajeros.empty}">
+            <i class="bi bi-calendar-check me-3 fs-4"></i>
+            <div>
+              <strong>Sin viajes hoy</strong> — No tienes viajes programados para esta fecha. Disfruta tu día libre.
+            </div>
+          </div>
+        </div>
+
+        <!-- MI JORNADA DE HOY -->
+        <h5 class="section-label">
+          <i class="bi bi-calendar-day"></i> Mi jornada de hoy
+        </h5>
+
+        <div th:if="${viajesConPasajeros.empty}" class="text-center py-5">
+          <i class="bi bi-calendar-check text-muted" style="font-size: 3rem;"></i>
+          <p class="text-muted mt-3 mb-0">No hay viajes programados para hoy.</p>
+        </div>
+
+        <div th:each="item : ${viajesConPasajeros}" th:object="${item}">
+          <div class="viaje-card">
+            <div class="viaje-ruta">
+              <i class="bi bi-geo-alt-fill text-primario"></i>
+              <span th:text="${item.viaje.origen}">Origen</span>
+              <span class="arrow"><i class="bi bi-arrow-right"></i></span>
+              <i class="bi bi-geo-alt-fill text-success"></i>
+              <span th:text="${item.viaje.destino}">Destino</span>
+            </div>
+            <div class="viaje-detalles">
+              <span class="viaje-detalle-item">
+                <i class="bi bi-clock"></i>
+                <span th:text="${item.viaje.horaSalida}">08:00</span>
+              </span>
+              <span class="viaje-detalle-item">
+                <i class="bi bi-people"></i>
+                <span th:text="${item.pasajerosCount}">0</span> pasajeros
+              </span>
+              <span class="viaje-detalle-item">
+                <i class="bi bi-box-seam"></i>
+                <span th:text="${item.encomiendasCount}">0</span> encomiendas
+              </span>
+              <span class="viaje-detalle-item">
+                <i class="bi bi-bus-front"></i>
+                <span th:text="${item.viaje.tipoBus}">MINIVAN</span>
+              </span>
+              <span class="viaje-detalle-item">
+                <i class="bi bi-ticket"></i>
+                S/ <span th:text="${#numbers.formatDecimal(item.viaje.precio, 1, 2)}">12.00</span>
+              </span>
+              <span class="viaje-detalle-item ms-auto">
+                <span class="badge bg-success rounded-pill px-3 py-1">
+                  <i class="bi bi-check-circle me-1"></i>Programado
+                </span>
+              </span>
+            </div>
+            <div class="viaje-acciones">
+              <button class="btn btn-amarillo btn-sm fw-bold" onclick="alert('Función de inicio de viaje próximamente.')">
+                <i class="bi bi-play-fill me-1"></i>Iniciar viaje
+              </button>
+              <a th:href="@{/viajes/{id}(id=${item.viaje.id})}" class="btn btn-outline-secondary btn-sm fw-semibold">
+                <i class="bi bi-eye me-1"></i>Ver detalles
+              </a>
+            </div>
           </div>
         </div>
 

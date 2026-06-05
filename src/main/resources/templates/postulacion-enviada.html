@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head('Postulación Enviada - Nueva Ases Express')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <div class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div
+            class="card shadow-lg border-0 text-center"
+            style="border-radius: 24px; overflow: hidden"
+          >
+            <div class="card-body p-5">
+              <div
+                class="mb-4"
+                style="
+                  width: 100px;
+                  height: 100px;
+                  border-radius: 50%;
+                  background: linear-gradient(135deg, #d4edda, #c3e6cb);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin: 0 auto;
+                "
+              >
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 3.5rem;"></i>
+              </div>
+
+              <h3 class="fw-bold text-dark mb-2">¡Postulación enviada correctamente!</h3>
+              <p class="text-muted mb-4" style="font-size: 1.05rem;">
+                Tu solicitud está en revisión. Te notificaremos cuando tu cuenta sea
+                aprobada para que puedas comenzar a trabajar con nosotros.
+              </p>
+
+              <div class="mb-4">
+                <span class="badge bg-warning text-dark fs-6 px-4 py-2 rounded-pill">
+                  <i class="bi bi-clock me-2"></i>Pendiente
+                </span>
+              </div>
+
+              <div
+                class="bg-light rounded-4 p-3 mb-4 text-start"
+                style="font-size: 0.9rem;"
+              >
+                <p class="mb-2 fw-semibold text-dark">
+                  <i class="bi bi-info-circle me-2 text-primario"></i>Próximos pasos:
+                </p>
+                <ol class="text-muted mb-0 ps-3">
+                  <li class="mb-1">Revisaremos tus datos y documentos.</li>
+                  <li class="mb-1">Verificaremos tu licencia y experiencia.</li>
+                  <li>Recibirás un correo con la confirmación de aprobación.</li>
+                </ol>
+              </div>
+
+              <a href="/" class="btn btn-amarillo fw-bold px-5">
+                <i class="bi bi-house-door me-2"></i>Volver al inicio
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>
