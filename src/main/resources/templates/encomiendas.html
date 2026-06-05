@@ -356,6 +356,11 @@
                     <td>S/ ${Number(e.precio).toFixed(2)}</td>
                     <td><span class="estado-badge estado-${e.estado}">${e.estado.replace("_", " ")}</span></td>
                     <td>${e.fechaEnvio || "-"}</td>
+                    <td>
+                      <a href="/encomiendas/editar/${e.id}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-pencil"></i> Editar
+                      </a>
+                    </td>
                 </tr>
             `,
             )
@@ -367,7 +372,7 @@
                             <tr>
                                 <th>Código</th><th>Ruta</th><th>Remitente</th>
                                 <th>Destinatario</th><th>Peso</th><th>Precio</th>
-                                <th>Estado</th><th>Fecha</th>
+                                <th>Estado</th><th>Fecha</th><th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>${filas}</tbody>

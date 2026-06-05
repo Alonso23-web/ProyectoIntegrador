@@ -22,10 +22,17 @@
               >Administra, actualiza estados y asigna precios</small
             >
           </div>
-          <a href="/encomiendas/nuevo" class="btn btn-amarillo fw-bold">
+          <button
+            type="button"
+            class="btn btn-amarillo fw-bold"
+            onclick="
+              alerta('header-alert', 'info', 'Funcionalidad en desarrollo')
+            "
+          >
             <i class="bi bi-plus-circle me-2"></i>Nueva Encomienda
-          </a>
+          </button>
         </div>
+        <div id="header-alert" class="mt-2 w-100"></div>
 
         <!-- Filtros -->
         <div class="card border-0 shadow-sm mb-4 rounded-4">
