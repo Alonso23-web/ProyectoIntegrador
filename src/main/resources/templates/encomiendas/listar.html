@@ -1,335 +1,600 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layout :: head('Gestión de Encomiendas - Nueva Ases Express')}"></head>
-<body>
-<div th:replace="~{layout :: navbar}"></div>
+  <head
+    th:replace="~{layout :: head('Gestión de Encomiendas - Nueva Ases Express')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
 
-<section class="py-4" style="background:#f0f2f5; min-height:calc(100vh - 130px);">
-    <div class="container-fluid px-4">
-
+    <section
+      class="py-4"
+      style="background: #f0f2f5; min-height: calc(100vh - 130px)"
+    >
+      <div class="container-fluid px-4">
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h4 class="fw-bold text-primario mb-0">
-                    <i class="bi bi-boxes me-2 text-amarillo"></i>Gestión de Encomiendas
-                </h4>
-                <small class="text-muted">Administra, actualiza estados y asigna precios</small>
-            </div>
-            <a href="/encomiendas/nuevo" class="btn btn-amarillo fw-bold">
-                <i class="bi bi-plus-circle me-2"></i>Nueva Encomienda
-            </a>
+          <div>
+            <h4 class="fw-bold text-primario mb-0">
+              <i class="bi bi-boxes me-2 text-amarillo"></i>Gestión de
+              Encomiendas
+            </h4>
+            <small class="text-muted"
+              >Administra, actualiza estados y asigna precios</small
+            >
+          </div>
+          <a href="/encomiendas/nuevo" class="btn btn-amarillo fw-bold">
+            <i class="bi bi-plus-circle me-2"></i>Nueva Encomienda
+          </a>
         </div>
 
         <!-- Filtros -->
         <div class="card border-0 shadow-sm mb-4 rounded-4">
-            <div class="card-body p-3">
-                <div class="row g-2 align-items-end">
-                    <div class="col-md-4">
-                        <label class="form-label small fw-semibold text-muted">Buscar</label>
-                        <input type="text" id="filtro-buscar" class="form-control"
-                               placeholder="Código, remitente, destinatario...">
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label small fw-semibold text-muted">Estado</label>
-                        <select id="filtro-estado" class="form-select">
-                            <option value="">Todos los estados</option>
-                            <option value="REGISTRADO">Registrado</option>
-                            <option value="EN_TRANSITO">En tránsito</option>
-                            <option value="EN_DESTINO">En destino</option>
-                            <option value="ENTREGADO">Entregado</option>
-                        </select>
-                    </div>
-                    <div class="col-md-2">
-                        <button class="btn btn-outline-secondary w-100" onclick="limpiarFiltros()">
-                            <i class="bi bi-x-circle me-1"></i>Limpiar
-                        </button>
-                    </div>
-                </div>
+          <div class="card-body p-3">
+            <div class="row g-2 align-items-end">
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold text-muted"
+                  >Buscar</label
+                >
+                <input
+                  type="text"
+                  id="filtro-buscar"
+                  class="form-control"
+                  placeholder="Código, remitente, destinatario..."
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold text-muted"
+                  >Estado</label
+                >
+                <select id="filtro-estado" class="form-select">
+                  <option value="">Todos los estados</option>
+                  <option value="REGISTRADO">Registrado</option>
+                  <option value="EN_TRANSITO">En tránsito</option>
+                  <option value="EN_DESTINO">En destino</option>
+                  <option value="ENTREGADO">Entregado</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <button
+                  class="btn btn-outline-secondary w-100"
+                  onclick="limpiarFiltros()"
+                >
+                  <i class="bi bi-x-circle me-1"></i>Limpiar
+                </button>
+              </div>
             </div>
+          </div>
         </div>
 
         <!-- Tabla -->
         <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0" id="tabla-encomiendas">
-                        <thead style="background:#f8f9fa;">
-                            <tr>
-                                <th class="px-3 py-3 text-muted small fw-bold">CÓDIGO</th>
-                                <th class="py-3 text-muted small fw-bold">REMITENTE</th>
-                                <th class="py-3 text-muted small fw-bold">DESTINATARIO</th>
-                                <th class="py-3 text-muted small fw-bold">RUTA</th>
-                                <th class="py-3 text-muted small fw-bold">PESO</th>
-                                <th class="py-3 text-muted small fw-bold">PRECIO</th>
-                                <th class="py-3 text-muted small fw-bold">FECHA</th>
-                                <th class="py-3 text-muted small fw-bold">ESTADO</th>
-                                <th class="py-3 text-muted small fw-bold" style="min-width:160px;">ACCIONES</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="enc : ${encomiendas}"
-                                th:data-codigo="${enc.codigoRastreo}"
-                                th:data-remitente="${enc.remitente}"
-                                th:data-destinatario="${enc.destinatario}"
-                                th:data-estado="${enc.estado}">
-                                <td class="px-3">
-                                    <code class="fw-semibold text-primario" th:text="${enc.codigoRastreo}"></code>
-                                </td>
-                                <td>
-                                    <div class="fw-semibold" th:text="${enc.remitente}"></div>
-                                    <small class="text-muted" th:text="${enc.dniRemitente}"></small>
-                                </td>
-                                <td>
-                                    <div class="fw-semibold" th:text="${enc.destinatario}"></div>
-                                    <small class="text-muted" th:text="${enc.dniDestinatario}"></small>
-                                </td>
-                                <td>
-                                    <span th:text="${enc.origen}"></span>
-                                    <i class="bi bi-arrow-right mx-1 text-muted"></i>
-                                    <span th:text="${enc.destino}"></span>
-                                </td>
-                                <td th:text="${enc.peso} + ' kg'"></td>
-                                <td>
-                                    <span th:if="${enc.precio > 0}" class="fw-semibold text-success"
-                                          th:text="'S/ ' + ${#numbers.formatDecimal(enc.precio, 1, 2)}"></span>
-                                    <span th:if="${enc.precio == 0}" class="text-warning fw-semibold">
-                                        <i class="bi bi-exclamation-circle me-1"></i>Sin precio
-                                    </span>
-                                </td>
-                                <td th:text="${enc.fechaEnvio}"></td>
-                                <td>
-                                    <span class="badge-estado"
-                                          th:classappend="'badge-' + ${#strings.toLowerCase(enc.estado)}"
-                                          th:text="${enc.estado}"></span>
-                                </td>
-                                <td>
-                                    <div class="d-flex gap-1">
-                                        <!-- Cambiar estado -->
-                                        <button class="btn btn-sm btn-outline-primary"
-                                                th:attr="data-id=${enc.id}, data-estado=${enc.estado}, data-codigo=${enc.codigoRastreo}"
-                                                onclick="abrirModalEstadoBtn(this)">
-                                            <i class="bi bi-arrow-repeat"></i>
-                                        </button>
-                                        <!-- Asignar precio -->
-                                        <button class="btn btn-sm btn-outline-warning"
-                                                th:attr="data-id=${enc.id}, data-precio=${enc.precio}, data-codigo=${enc.codigoRastreo}"
-                                                onclick="abrirModalPrecioBtn(this)">
-                                            <i class="bi bi-currency-dollar"></i>
-                                        </button>
-                                        <!-- Editar -->
-                                        <a th:href="@{/encomiendas/editar/{id}(id=${enc.id})}"
-                                           class="btn btn-sm btn-outline-secondary">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <!-- Eliminar -->
-                                        <button class="btn btn-sm btn-outline-danger"
-                                                th:attr="data-id=${enc.id}, data-codigo=${enc.codigoRastreo}"
-                                                onclick="confirmarEliminarBtn(this)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr th:if="${encomiendas.empty}">
-                                <td colspan="9" class="text-center text-muted py-5">
-                                    <i class="bi bi-inbox display-6 d-block mb-2"></i>
-                                    No hay encomiendas registradas.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table
+                class="table table-hover align-middle mb-0"
+                id="tabla-encomiendas"
+              >
+                <thead style="background: #f8f9fa">
+                  <tr>
+                    <th class="px-3 py-3 text-muted small fw-bold">CÓDIGO</th>
+                    <th class="py-3 text-muted small fw-bold">REMITENTE</th>
+                    <th class="py-3 text-muted small fw-bold">DESTINATARIO</th>
+                    <th class="py-3 text-muted small fw-bold">RUTA</th>
+                    <th class="py-3 text-muted small fw-bold">PESO</th>
+                    <th class="py-3 text-muted small fw-bold">PRECIO</th>
+                    <th class="py-3 text-muted small fw-bold">FECHA REGISTRO</th>
+                    <th class="py-3 text-muted small fw-bold">ESTADO</th>
+                    <th
+                      class="py-3 text-muted small fw-bold"
+                      style="min-width: 160px"
+                    >
+                      ACCIONES
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    th:each="enc : ${encomiendas}"
+                    th:data-codigo="${enc.codigoRastreo}"
+                    th:data-remitente="${enc.remitente}"
+                    th:data-destinatario="${enc.destinatario}"
+                    th:data-estado="${enc.estado}"
+                  >
+                    <td class="px-3">
+                      <code
+                        class="fw-semibold text-primario"
+                        th:text="${enc.codigoRastreo}"
+                      ></code>
+                    </td>
+                    <td>
+                      <div class="fw-semibold" th:text="${enc.remitente}"></div>
+                      <small
+                        class="text-muted"
+                        th:text="${enc.dniRemitente}"
+                      ></small>
+                    </td>
+                    <td>
+                      <div
+                        class="fw-semibold"
+                        th:text="${enc.destinatario}"
+                      ></div>
+                      <small
+                        class="text-muted"
+                        th:text="${enc.dniDestinatario}"
+                      ></small>
+                    </td>
+                    <td>
+                      <span th:text="${enc.origen}"></span>
+                      <i class="bi bi-arrow-right mx-1 text-muted"></i>
+                      <span th:text="${enc.destino}"></span>
+                    </td>
+                    <td th:text="${enc.peso} + ' kg'"></td>
+                    <td>
+                      <span
+                        th:if="${enc.precio > 0}"
+                        class="fw-semibold text-success"
+                        th:text="'S/ ' + ${#numbers.formatDecimal(enc.precio, 1, 2)}"
+                      ></span>
+                      <span
+                        th:if="${enc.precio == 0}"
+                        class="text-warning fw-semibold"
+                      >
+                        <i class="bi bi-exclamation-circle me-1"></i>Sin precio
+                      </span>
+                    </td>
+                    <td th:text="${enc.fechaEnvio}"></td>
+                    <td>
+                      <span
+                        class="badge-estado"
+                        th:classappend="'badge-' + ${#strings.toLowerCase(enc.estado)}"
+                        th:text="${enc.estado}"
+                      ></span>
+                    </td>
+                    <td>
+                      <div class="d-flex gap-1">
+                        <!-- Editar (admin modal) -->
+                        <button
+                          class="btn btn-sm btn-outline-secondary"
+                          th:attr="data-id=${enc.id}, data-codigo=${enc.codigoRastreo}, data-remitente=${enc.remitente}, data-dniremitente=${enc.dniRemitente}, data-destinatario=${enc.destinatario}, data-dnidestinatario=${enc.dniDestinatario}, data-origen=${enc.origen}, data-destino=${enc.destino}, data-peso=${enc.peso}, data-precio=${enc.precio}, data-fecha=${enc.fechaEnvio}, data-estado=${enc.estado}, data-observaciones=${enc.observaciones}"
+                          onclick="abrirModalEditarBtn(this)"
+                          title="Editar (admin)"
+                        >
+                          <i class="bi bi-pencil"></i>
+                        </button>
+                        <!-- Eliminar -->
+                        <button
+                          class="btn btn-sm btn-outline-danger"
+                          th:attr="data-id=${enc.id}, data-codigo=${enc.codigoRastreo}"
+                          onclick="confirmarEliminarBtn(this)"
+                        >
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr th:if="${encomiendas.empty}">
+                    <td colspan="9" class="text-center text-muted py-5">
+                      <i class="bi bi-inbox display-6 d-block mb-2"></i>
+                      No hay encomiendas registradas.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal: Confirmar Eliminar -->
+    <div class="modal fade" id="modalEliminar" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold text-danger">
+              <i class="bi bi-trash me-2"></i>Eliminar Encomienda
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              ¿Estás seguro de eliminar la encomienda
+              <strong id="modal-eliminar-codigo"></strong>?
+            </p>
+            <p class="text-muted small">Esta acción no se puede deshacer.</p>
+          </div>
+          <div class="modal-footer border-0">
+            <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button
+              class="btn btn-danger fw-bold"
+              onclick="confirmarEliminarFinal()"
+            >
+              <i class="bi bi-trash me-1"></i>Eliminar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+
+    <!-- Modal: Editar (Admin) -->
+    <div class="modal fade" id="modalEditarAdmin" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 border-0 shadow">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold text-primario">
+              <i class="bi bi-pencil me-2 text-amarillo"></i>Editar Encomienda
+              (Administración)
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-12">
+                <p class="text-muted small mb-2">
+                  Encomienda: <strong id="modal-editar-codigo"></strong>
+                </p>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Remitente</label>
+                <input
+                  type="text"
+                  id="modal-editar-remitente"
+                  class="form-control"
+                  readonly
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small">DNI Remitente</label>
+                <input
+                  type="text"
+                  id="modal-editar-dniremitente"
+                  class="form-control"
+                  readonly
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Destinatario</label>
+                <input
+                  type="text"
+                  id="modal-editar-destinatario"
+                  class="form-control"
+                  readonly
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small">DNI Destinatario</label>
+                <input
+                  type="text"
+                  id="modal-editar-dnidestinatario"
+                  class="form-control"
+                  readonly
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small">Origen</label>
+                <input
+                  type="text"
+                  id="modal-editar-origen"
+                  class="form-control"
+                  readonly
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small">Destino</label>
+                <input
+                  type="text"
+                  id="modal-editar-destino"
+                  class="form-control"
+                  readonly
+                />
+              </div>
+
+              <div class="col-md-3">
+                <label class="form-label small">Peso (kg)</label>
+                <input
+                  type="number"
+                  id="modal-editar-peso"
+                  class="form-control"
+                  min="0"
+                  step="0.1"
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small">Precio calculado</label>
+                <div class="input-group">
+                  <span class="input-group-text">S/</span>
+                  <input
+                    type="text"
+                    id="modal-editar-precio"
+                    class="form-control"
+                    readonly
+                  />
                 </div>
-            </div>
-        </div>
-    </div>
-</section>
+                <div class="form-check mt-2">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="modal-editar-sobrescribir-precio"
+                  />
+                  <label
+                    class="form-check-label small"
+                    for="modal-editar-sobrescribir-precio"
+                    >Sobrescribir precio manualmente</label
+                  >
+                </div>
+                <input
+                  type="number"
+                  id="modal-editar-precio-manual"
+                  class="form-control mt-2"
+                  placeholder="0.00"
+                  step="0.5"
+                  style="display: none"
+                />
+              </div>
 
-<!-- Modal: Cambiar Estado -->
-<div class="modal fade" id="modalEstado" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold text-primario">
-                    <i class="bi bi-arrow-repeat me-2 text-amarillo"></i>Cambiar Estado
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p class="text-muted small mb-3">Encomienda: <strong id="modal-estado-codigo"></strong></p>
-                <label class="form-label fw-semibold">Nuevo estado</label>
-                <select id="modal-estado-select" class="form-select">
-                    <option value="REGISTRADO">Registrado</option>
-                    <option value="EN_TRANSITO">En tránsito</option>
-                    <option value="EN_DESTINO">En destino</option>
-                    <option value="ENTREGADO">Entregado</option>
+              <div class="col-md-3">
+                <label class="form-label small">Estado</label>
+                <select id="modal-editar-estado" class="form-select">
+                  <option value="REGISTRADO">Registrado</option>
+                  <option value="EN_TRANSITO">En tránsito</option>
+                  <option value="EN_DESTINO">En destino</option>
+                  <option value="ENTREGADO">Entregado</option>
                 </select>
+              </div>
+
+              <div class="col-md-12">
+                <label class="form-label small"
+                  >Observaciones </label
+                >
+                <textarea
+                  id="modal-editar-observaciones"
+                  class="form-control"
+                  rows="2"
+                  readonly
+                ></textarea>
+                
+                 
+                
+              </div>
             </div>
-            <div class="modal-footer border-0">
-                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-amarillo fw-bold" onclick="guardarEstado()">
-                    <i class="bi bi-check-circle me-1"></i>Guardar cambio
-                </button>
-            </div>
+          </div>
+          <div class="modal-footer border-0">
+            <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button class="btn btn-amarillo fw-bold" onclick="guardarEditar()">
+              <i class="bi bi-check-circle me-1"></i>Guardar cambios
+            </button>
+          </div>
         </div>
+      </div>
     </div>
-</div>
 
-<!-- Modal: Asignar Precio -->
-<div class="modal fade" id="modalPrecio" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold text-primario">
-                    <i class="bi bi-currency-dollar me-2 text-amarillo"></i>Asignar Precio
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p class="text-muted small mb-3">Encomienda: <strong id="modal-precio-codigo"></strong></p>
-                <label class="form-label fw-semibold">Precio real (S/)</label>
-                <input type="number" id="modal-precio-input" class="form-control"
-                       placeholder="0.00" min="0" step="0.50">
-                <small class="text-muted mt-1 d-block">Ingresa el precio después del pesaje físico.</small>
-            </div>
-            <div class="modal-footer border-0">
-                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-amarillo fw-bold" onclick="guardarPrecio()">
-                    <i class="bi bi-check-circle me-1"></i>Asignar precio
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+    <style>
+      .badge-estado {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+        font-weight: 600;
+      }
+      .badge-registrado {
+        background: #e2e8f0;
+        color: #475569;
+      }
+      .badge-en_transito {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .badge-en_destino {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .badge-entregado {
+        background: #dcfce7;
+        color: #166534;
+      }
+    </style>
 
-<!-- Modal: Confirmar Eliminar -->
-<div class="modal fade" id="modalEliminar" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 border-0 shadow">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold text-danger">
-                    <i class="bi bi-trash me-2"></i>Eliminar Encomienda
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>¿Estás seguro de eliminar la encomienda <strong id="modal-eliminar-codigo"></strong>?</p>
-                <p class="text-muted small">Esta acción no se puede deshacer.</p>
-            </div>
-            <div class="modal-footer border-0">
-                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-danger fw-bold" onclick="confirmarEliminarFinal()">
-                    <i class="bi bi-trash me-1"></i>Eliminar
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+    <script th:inline="javascript">
+      const API = "/api/encomiendas";
+      let encomiendaIdActual = null;
 
-<div th:replace="~{layout :: footer}"></div>
-<div th:replace="~{layout :: scripts}"></div>
+      document
+        .getElementById("filtro-buscar")
+        .addEventListener("input", filtrar);
+      document
+        .getElementById("filtro-estado")
+        .addEventListener("change", filtrar);
 
-<style>
-    .badge-estado { font-size: 0.7rem; padding: 0.3rem 0.8rem; border-radius: 50px; font-weight: 600; }
-    .badge-registrado  { background: #e2e8f0; color: #475569; }
-    .badge-en_transito { background: #fef3c7; color: #92400e; }
-    .badge-en_destino  { background: #dbeafe; color: #1e40af; }
-    .badge-entregado   { background: #dcfce7; color: #166534; }
-</style>
-
-<script th:inline="javascript">
-    const API = '/api/encomiendas';
-    let encomiendaIdActual = null;
-
-    document.getElementById('filtro-buscar').addEventListener('input', filtrar);
-    document.getElementById('filtro-estado').addEventListener('change', filtrar);
-
-    function filtrar() {
-        const buscar = document.getElementById('filtro-buscar').value.toLowerCase();
-        const estado = document.getElementById('filtro-estado').value.toUpperCase();
-        document.querySelectorAll('#tabla-encomiendas tbody tr[data-codigo]').forEach(tr => {
-            const codigo       = (tr.dataset.codigo || '').toLowerCase();
-            const remitente    = (tr.dataset.remitente || '').toLowerCase();
-            const destinatario = (tr.dataset.destinatario || '').toLowerCase();
-            const trEstado     = (tr.dataset.estado || '').toUpperCase();
-            const coincideBuscar = !buscar || codigo.includes(buscar) || remitente.includes(buscar) || destinatario.includes(buscar);
+      function filtrar() {
+        const buscar = document
+          .getElementById("filtro-buscar")
+          .value.toLowerCase();
+        const estado = document
+          .getElementById("filtro-estado")
+          .value.toUpperCase();
+        document
+          .querySelectorAll("#tabla-encomiendas tbody tr[data-codigo]")
+          .forEach((tr) => {
+            const codigo = (tr.dataset.codigo || "").toLowerCase();
+            const remitente = (tr.dataset.remitente || "").toLowerCase();
+            const destinatario = (tr.dataset.destinatario || "").toLowerCase();
+            const trEstado = (tr.dataset.estado || "").toUpperCase();
+            const coincideBuscar =
+              !buscar ||
+              codigo.includes(buscar) ||
+              remitente.includes(buscar) ||
+              destinatario.includes(buscar);
             const coincideEstado = !estado || trEstado === estado;
-            tr.style.display = coincideBuscar && coincideEstado ? '' : 'none';
-        });
-    }
+            tr.style.display = coincideBuscar && coincideEstado ? "" : "none";
+          });
+      }
 
-    function limpiarFiltros() {
-        document.getElementById('filtro-buscar').value = '';
-        document.getElementById('filtro-estado').value = '';
+      function limpiarFiltros() {
+        document.getElementById("filtro-buscar").value = "";
+        document.getElementById("filtro-estado").value = "";
         filtrar();
-    }
+      }
 
-    // Modal estado
-    function abrirModalEstadoBtn(btn) {
+      // Modal editar (admin)
+      function abrirModalEditarBtn(btn) {
         encomiendaIdActual = btn.dataset.id;
-        document.getElementById('modal-estado-codigo').textContent = btn.dataset.codigo;
-        document.getElementById('modal-estado-select').value = btn.dataset.estado;
-        new bootstrap.Modal(document.getElementById('modalEstado')).show();
-    }
+        document.getElementById("modal-editar-codigo").textContent =
+          btn.dataset.codigo;
+        document.getElementById("modal-editar-remitente").value =
+          btn.dataset.remitente || "";
+        document.getElementById("modal-editar-dniremitente").value =
+          btn.dataset.dniremitente || "";
+        document.getElementById("modal-editar-destinatario").value =
+          btn.dataset.destinatario || "";
+        document.getElementById("modal-editar-dnidestinatario").value =
+          btn.dataset.dnidestinatario || "";
+        document.getElementById("modal-editar-origen").value =
+          btn.dataset.origen || "";
+        document.getElementById("modal-editar-destino").value =
+          btn.dataset.destino || "";
+        document.getElementById("modal-editar-peso").value =
+          btn.dataset.peso && parseFloat(btn.dataset.peso) > 0
+            ? btn.dataset.peso
+            : "";
+        document.getElementById("modal-editar-precio").value =
+          btn.dataset.precio && parseFloat(btn.dataset.precio) > 0
+            ? parseFloat(btn.dataset.precio).toFixed(2)
+            : "";
+        document.getElementById("modal-editar-estado").value =
+          btn.dataset.estado || "REGISTRADO";
+        document.getElementById("modal-editar-observaciones").value =
+          btn.dataset.observaciones || "";
+        document.getElementById("modal-editar-sobrescribir-precio").checked =
+          false;
+        document.getElementById("modal-editar-precio-manual").style.display =
+          "none";
+        new bootstrap.Modal(document.getElementById("modalEditarAdmin")).show();
 
-    async function guardarEstado() {
-        const estado = document.getElementById('modal-estado-select').value;
+        // recalcular cuando cambie peso
+        const pesoInput = document.getElementById("modal-editar-peso");
+        pesoInput.removeEventListener("input", calcularPrecioParaModal);
+        pesoInput.addEventListener("input", calcularPrecioParaModal);
+        document
+          .getElementById("modal-editar-sobrescribir-precio")
+          .addEventListener("change", function (e) {
+            const manual = document.getElementById(
+              "modal-editar-precio-manual",
+            );
+            manual.style.display = e.target.checked ? "" : "none";
+          });
+      }
+
+      let precioCalculadoEnModal = null;
+      async function calcularPrecioParaModal() {
+        const origen = document.getElementById("modal-editar-origen").value;
+        const destino = document.getElementById("modal-editar-destino").value;
+        const peso = parseFloat(
+          document.getElementById("modal-editar-peso").value,
+        );
+        if (!origen || !destino || !peso || peso <= 0) {
+          document.getElementById("modal-editar-precio").value = "";
+          precioCalculadoEnModal = null;
+          return;
+        }
         try {
-            const r = await fetch(`${API}/${encomiendaIdActual}/estado`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ estado })
+          const resp = await fetch(
+            `${API}/precio?origen=${encodeURIComponent(origen)}&destino=${encodeURIComponent(destino)}&peso=${peso}`,
+          );
+          if (!resp.ok) throw new Error();
+          const data = await resp.json();
+          precioCalculadoEnModal = data.precio;
+          document.getElementById("modal-editar-precio").value =
+            data.precio.toFixed(2);
+        } catch (e) {
+          console.error("Error calculando precio", e);
+        }
+      }
+
+      async function guardarEditar() {
+        const estado = document.getElementById("modal-editar-estado").value;
+        const sobrescribir = document.getElementById(
+          "modal-editar-sobrescribir-precio",
+        ).checked;
+        const precioManual = parseFloat(
+          document.getElementById("modal-editar-precio-manual").value,
+        );
+        const peso = parseFloat(
+          document.getElementById("modal-editar-peso").value,
+        );
+
+        try {
+          // Si admin sobrescribe precio manualmente
+          if (sobrescribir && !isNaN(precioManual) && precioManual >= 0) {
+            const r1 = await fetch(`${API}/${encomiendaIdActual}/precio`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ precio: precioManual }),
             });
-            if (!r.ok) throw new Error();
-            bootstrap.Modal.getInstance(document.getElementById('modalEstado')).hide();
-            location.reload();
-        } catch(e) {
-            alert('Error al cambiar el estado. Intenta de nuevo.');
-        }
-    }
-
-    // Modal precio
-    function abrirModalPrecioBtn(btn) {
-        encomiendaIdActual = btn.dataset.id;
-        const precio = parseFloat(btn.dataset.precio);
-        document.getElementById('modal-precio-codigo').textContent = btn.dataset.codigo;
-        document.getElementById('modal-precio-input').value = precio > 0 ? precio : '';
-        new bootstrap.Modal(document.getElementById('modalPrecio')).show();
-    }
-
-    async function guardarPrecio() {
-        const precio = parseFloat(document.getElementById('modal-precio-input').value);
-        if (!precio || precio <= 0) return alert('Ingresa un precio válido.');
-        try {
-            const r = await fetch(`${API}/${encomiendaIdActual}/precio`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ precio })
+            if (!r1.ok) throw new Error();
+          } else if (!isNaN(peso) && peso > 0) {
+            // asignar peso (esto recalcula precio en backend)
+            const r2 = await fetch(`${API}/${encomiendaIdActual}/peso`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ peso }),
             });
-            if (!r.ok) throw new Error();
-            bootstrap.Modal.getInstance(document.getElementById('modalPrecio')).hide();
-            location.reload();
-        } catch(e) {
-            alert('Error al asignar el precio. Intenta de nuevo.');
-        }
-    }
+            if (!r2.ok) throw new Error();
+          }
 
-    // Modal eliminar
-    function confirmarEliminarBtn(btn) {
+          // actualizar estado siempre
+          const r3 = await fetch(`${API}/${encomiendaIdActual}/estado`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ estado }),
+          });
+          if (!r3.ok) throw new Error();
+
+          bootstrap.Modal.getInstance(
+            document.getElementById("modalEditarAdmin"),
+          ).hide();
+          location.reload();
+        } catch (e) {
+          alert("Error al guardar los cambios. Intenta de nuevo.");
+          console.error(e);
+        }
+      }
+
+      // Modal eliminar
+      function confirmarEliminarBtn(btn) {
         encomiendaIdActual = btn.dataset.id;
-        document.getElementById('modal-eliminar-codigo').textContent = btn.dataset.codigo;
-        new bootstrap.Modal(document.getElementById('modalEliminar')).show();
-    }
+        document.getElementById("modal-eliminar-codigo").textContent =
+          btn.dataset.codigo;
+        new bootstrap.Modal(document.getElementById("modalEliminar")).show();
+      }
 
-    async function confirmarEliminarFinal() {
+      async function confirmarEliminarFinal() {
         try {
-            const r = await fetch(`${API}/${encomiendaIdActual}`, { method: 'DELETE' });
-            if (!r.ok) throw new Error();
-            bootstrap.Modal.getInstance(document.getElementById('modalEliminar')).hide();
-            location.reload();
-        } catch(e) {
-            alert('Error al eliminar. Intenta de nuevo.');
+          const r = await fetch(`${API}/${encomiendaIdActual}`, {
+            method: "DELETE",
+          });
+          if (!r.ok) throw new Error();
+          bootstrap.Modal.getInstance(
+            document.getElementById("modalEliminar"),
+          ).hide();
+          location.reload();
+        } catch (e) {
+          alert("Error al eliminar. Intenta de nuevo.");
         }
-    }
-</script>
-</body>
+      }
+    </script>
+  </body>
 </html>

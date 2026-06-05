@@ -51,10 +51,15 @@ public class EncomiendaApiController {
         encomienda.setCodigoRastreo("NAE-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         encomienda.setFechaEnvio(LocalDate.now());
         encomienda.setEstado("REGISTRADO");
-        encomienda.setPrecio(encomiendaService.calcularPrecio(
-                encomienda.getOrigen(), encomienda.getDestino(), encomienda.getPeso()));
+
+        // Flujo solicitado: el cliente registra sin pesaje.
+        // Guardamos peso/precio en 0; el admin asigna el peso luego.
+        encomienda.setPeso(0);
+        encomienda.setPrecio(0);
+
         return ResponseEntity.ok(encomiendaService.guardar(encomienda));
     }
+
 
     @GetMapping("/precio")
     public ResponseEntity<?> calcularPrecio(
@@ -104,4 +109,19 @@ public class EncomiendaApiController {
         enc.setPrecio(body.get("precio"));
         return ResponseEntity.ok(encomiendaService.guardar(enc));
     }
+
+    // Admin asigna peso y el backend recalcula el precio real.
+    @PatchMapping("/{id}/peso")
+    public ResponseEntity<?> asignarPeso(@PathVariable Long id, @RequestBody Map<String, Double> body) {
+        EncomiendaDTO enc = encomiendaService.buscarPorId(id);
+        Double peso = body.get("peso");
+        if (peso == null || peso <= 0) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Peso inválido"));
+        }
+        enc.setPeso(peso);
+        double precio = encomiendaService.calcularPrecio(enc.getOrigen(), enc.getDestino(), peso);
+        enc.setPrecio(precio);
+        return ResponseEntity.ok(encomiendaService.guardar(enc));
+    }
 }
+
