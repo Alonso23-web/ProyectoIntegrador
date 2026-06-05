@@ -82,7 +82,9 @@
                     <th class="py-3 text-muted small fw-bold">RUTA</th>
                     <th class="py-3 text-muted small fw-bold">PESO</th>
                     <th class="py-3 text-muted small fw-bold">PRECIO</th>
-                    <th class="py-3 text-muted small fw-bold">FECHA REGISTRO</th>
+                    <th class="py-3 text-muted small fw-bold">
+                      FECHA REGISTRO
+                    </th>
                     <th class="py-3 text-muted small fw-bold">ESTADO</th>
                     <th
                       class="py-3 text-muted small fw-bold"
@@ -313,12 +315,27 @@
                 />
               </div>
               <div class="col-md-3">
-                <label class="form-label small">Precio calculado</label>
+                <label class="form-label small">Cargo por peso</label>
                 <div class="input-group">
                   <span class="input-group-text">S/</span>
                   <input
                     type="text"
-                    id="modal-editar-precio"
+                    id="modal-editar-precio-por-peso"
+                    class="form-control"
+                    readonly
+                  />
+                </div>
+                <div class="form-text small text-muted">
+                  Cargo normal (1.50) + Cargo extra si excede 10 kg.
+                </div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small">Precio final</label>
+                <div class="input-group">
+                  <span class="input-group-text">S/</span>
+                  <input
+                    type="text"
+                    id="modal-editar-precio-final"
                     class="form-control"
                     readonly
                   />
@@ -334,6 +351,9 @@
                     for="modal-editar-sobrescribir-precio"
                     >Sobrescribir precio manualmente</label
                   >
+                </div>
+                <div class="form-text small text-muted">
+                  Tarifa ruta + Cargo por peso.
                 </div>
                 <input
                   type="number"
@@ -356,18 +376,13 @@
               </div>
 
               <div class="col-md-12">
-                <label class="form-label small"
-                  >Observaciones </label
-                >
+                <label class="form-label small">Observaciones </label>
                 <textarea
                   id="modal-editar-observaciones"
                   class="form-control"
                   rows="2"
                   readonly
                 ></textarea>
-                
-                 
-                
               </div>
             </div>
           </div>
@@ -408,7 +423,7 @@
       }
     </style>
 
-    <script th:inline="javascript">
+    <script>
       const API = "/api/encomiendas";
       let encomiendaIdActual = null;
 
@@ -470,7 +485,8 @@
           btn.dataset.peso && parseFloat(btn.dataset.peso) > 0
             ? btn.dataset.peso
             : "";
-        document.getElementById("modal-editar-precio").value =
+        document.getElementById("modal-editar-precio-por-peso").value = "";
+        document.getElementById("modal-editar-precio-final").value =
           btn.dataset.precio && parseFloat(btn.dataset.precio) > 0
             ? parseFloat(btn.dataset.precio).toFixed(2)
             : "";
@@ -488,39 +504,133 @@
         const pesoInput = document.getElementById("modal-editar-peso");
         pesoInput.removeEventListener("input", calcularPrecioParaModal);
         pesoInput.addEventListener("input", calcularPrecioParaModal);
-        document
-          .getElementById("modal-editar-sobrescribir-precio")
-          .addEventListener("change", function (e) {
-            const manual = document.getElementById(
-              "modal-editar-precio-manual",
-            );
-            manual.style.display = e.target.checked ? "" : "none";
-          });
+        const checkboxPrecio = document.getElementById(
+          "modal-editar-sobrescribir-precio",
+        );
+        checkboxPrecio.removeEventListener("change", togglePrecioManual);
+        checkboxPrecio.addEventListener("change", togglePrecioManual);
+        const precioManualInput = document.getElementById(
+          "modal-editar-precio-manual",
+        );
+        precioManualInput.removeEventListener(
+          "input",
+          actualizarPrecioFinalManual,
+        );
+        precioManualInput.addEventListener(
+          "input",
+          actualizarPrecioFinalManual,
+        );
+        if (pesoInput.value) {
+          calcularPrecioParaModal({ soloMostrar: true });
+        }
       }
 
       let precioCalculadoEnModal = null;
-      async function calcularPrecioParaModal() {
+
+      function togglePrecioManual(e) {
+        const manual = document.getElementById("modal-editar-precio-manual");
+        manual.style.display = e.target.checked ? "" : "none";
+        if (!e.target.checked) {
+          const precioPesado = document.getElementById(
+            "modal-editar-precio-por-peso",
+          ).value;
+          document.getElementById("modal-editar-precio-final").value =
+            precioPesado;
+        }
+      }
+
+      function actualizarPrecioFinalManual() {
+        const precioManual = parseFloat(
+          document.getElementById("modal-editar-precio-manual").value,
+        );
+        if (!isNaN(precioManual) && precioManual >= 0) {
+          document.getElementById("modal-editar-precio-final").value =
+            precioManual.toFixed(2);
+        }
+      }
+
+      function obtenerTarifaBase(origen, destino) {
+        const ruta = `${origen.toLowerCase()}-${destino.toLowerCase()}`;
+        switch (ruta) {
+          case "trujillo-chepén":
+          case "chepén-trujillo":
+            return 5.0;
+          case "trujillo-pacasmayo":
+          case "pacasmayo-trujillo":
+            return 4.5;
+          case "chepén-pacasmayo":
+          case "pacasmayo-chepén":
+            return 3.5;
+          default:
+            return 5.0;
+        }
+      }
+
+      async function calcularPrecioParaModal({ soloMostrar = false } = {}) {
         const origen = document.getElementById("modal-editar-origen").value;
         const destino = document.getElementById("modal-editar-destino").value;
-        const peso = parseFloat(
-          document.getElementById("modal-editar-peso").value,
-        );
+        const pesoStr = document.getElementById("modal-editar-peso").value;
+        const peso = parseFloat(pesoStr);
+        console.log("calcularPrecioParaModal", {
+          origen,
+          destino,
+          pesoStr,
+          peso,
+          soloMostrar,
+        });
         if (!origen || !destino || !peso || peso <= 0) {
-          document.getElementById("modal-editar-precio").value = "";
+          document.getElementById("modal-editar-precio-por-peso").value = "";
+          document.getElementById("modal-editar-precio-final").value = "";
           precioCalculadoEnModal = null;
           return;
         }
         try {
+          // Obtener el precio total desde el backend con la lógica correcta
           const resp = await fetch(
-            `${API}/precio?origen=${encodeURIComponent(origen)}&destino=${encodeURIComponent(destino)}&peso=${peso}`,
+            `${API}/precio?origen=${encodeURIComponent(origen)}&destino=${encodeURIComponent(destino)}&peso=${encodeURIComponent(peso)}`,
           );
-          if (!resp.ok) throw new Error();
+          console.log("respPrecio", resp.status);
+          if (!resp.ok) {
+            throw new Error("Error al calcular el precio");
+          }
           const data = await resp.json();
-          precioCalculadoEnModal = data.precio;
-          document.getElementById("modal-editar-precio").value =
-            data.precio.toFixed(2);
+          console.log("dataPrecio", data);
+          const precioTotal = Number(data.precio);
+
+          // Desglose de precios siguiendo la lógica del cliente
+          const tarifaBase = obtenerTarifaBase(origen, destino);
+          const cargoNormal = 1.5; // Cargo fijo por peso normal hasta 10 kg
+          const pesoNormalIncluido = 10.0;
+          const precioConPesoNormal = tarifaBase + cargoNormal; // 6.50 para Trujillo-Chepén
+          const cargoExtra =
+            peso > pesoNormalIncluido ? (peso - pesoNormalIncluido) * 1.5 : 0;
+
+          // "Precio por peso" = precio con peso normal (6.50) + cargo extra si excede
+          const cargoPorPeso = precioConPesoNormal + cargoExtra;
+          document.getElementById("modal-editar-precio-por-peso").value = isNaN(
+            cargoPorPeso,
+          )
+            ? ""
+            : cargoPorPeso.toFixed(2);
+
+          // "Precio final" = tarifa base + cargo por peso
+          const precioFinal = tarifaBase + cargoPorPeso;
+          precioCalculadoEnModal = precioFinal;
+
+          if (!soloMostrar) {
+            const sobrescribir = document.getElementById(
+              "modal-editar-sobrescribir-precio",
+            ).checked;
+            if (!sobrescribir) {
+              document.getElementById("modal-editar-precio-final").value =
+                isNaN(precioFinal) ? "" : precioFinal.toFixed(2);
+            }
+          }
         } catch (e) {
           console.error("Error calculando precio", e);
+          document.getElementById("modal-editar-precio-por-peso").value = "";
+          if (!soloMostrar)
+            document.getElementById("modal-editar-precio-final").value = "";
         }
       }
 
@@ -532,27 +642,35 @@
         const precioManual = parseFloat(
           document.getElementById("modal-editar-precio-manual").value,
         );
+        const precioFinal = parseFloat(
+          document.getElementById("modal-editar-precio-final").value,
+        );
         const peso = parseFloat(
           document.getElementById("modal-editar-peso").value,
         );
 
         try {
-          // Si admin sobrescribe precio manualmente
-          if (sobrescribir && !isNaN(precioManual) && precioManual >= 0) {
-            const r1 = await fetch(`${API}/${encomiendaIdActual}/precio`, {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ precio: precioManual }),
-            });
-            if (!r1.ok) throw new Error();
-          } else if (!isNaN(peso) && peso > 0) {
-            // asignar peso (esto recalcula precio en backend)
+          if (!isNaN(peso) && peso > 0) {
             const r2 = await fetch(`${API}/${encomiendaIdActual}/peso`, {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ peso }),
             });
             if (!r2.ok) throw new Error();
+          }
+
+          // Guardar el precio final (ya sea calculado o manual)
+          let precioAGuardar = precioFinal;
+          if (sobrescribir && !isNaN(precioManual) && precioManual >= 0) {
+            precioAGuardar = precioManual;
+          }
+          if (!isNaN(precioAGuardar) && precioAGuardar >= 0) {
+            const r1 = await fetch(`${API}/${encomiendaIdActual}/precio`, {
+              method: "PATCH",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ precio: precioAGuardar }),
+            });
+            if (!r1.ok) throw new Error();
           }
 
           // actualizar estado siempre

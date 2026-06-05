@@ -410,7 +410,7 @@
         return Math.round(total * 100) / 100;
       }
 
-      function calcular() {
+      async function calcular() {
         const peso =
           parseFloat(document.getElementById("calc-peso").value) || 0;
         const origen = document.getElementById("calc-origen").value;
@@ -430,18 +430,47 @@
           return;
         }
 
-        // Fórmula exacta del backend
-        const total = calcularPrecio(origen, destino, peso);
+        const tarifaBase = obtenerTarifaBase(origen, destino);
+        const pesoNormalIncluido = 10.0;
+        const cargoExtra =
+          peso > pesoNormalIncluido ? (peso - pesoNormalIncluido) * 1.5 : 0;
+        const precioConPesoNormal = tarifaBase + 1.5;
+
+        let total;
+        try {
+          const response = await fetch(
+            `/api/encomiendas/precio?origen=${encodeURIComponent(origen)}&destino=${encodeURIComponent(destino)}&peso=${encodeURIComponent(peso)}`,
+          );
+          if (!response.ok) {
+            throw new Error("Error al calcular el precio en el servidor");
+          }
+          const data = await response.json();
+          total = parseFloat(data.precio);
+          if (Number.isNaN(total)) {
+            throw new Error("Precio inválido devuelto por el servidor");
+          }
+        } catch (error) {
+          alerta(
+            "calc-result",
+            "danger",
+            `No se pudo obtener el precio desde el servidor. ${error.message}`,
+          );
+          return;
+        }
 
         const detalle = `
           <div class="small text-start mb-2">
             <div class="d-flex justify-content-between">
-              <span>Tarifa base (${origen} → ${destino})</span>
-              <span>S/ ${obtenerTarifaBase(origen, destino).toFixed(2)}</span>
+              <span>Precio por ruta (${origen} → ${destino})</span>
+              <span>S/ ${tarifaBase.toFixed(2)}</span>
             </div>
             <div class="d-flex justify-content-between">
-              <span>Cargo por peso extra${peso > 1 ? " (" + (peso - 1).toFixed(1) + " kg × S/ 1.50)" : ""}</span>
-              <span>S/ ${(peso > 1 ? (peso - 1) * 1.5 : 0).toFixed(2)}</span>
+              <span>Cargo por peso normal (hasta ${pesoNormalIncluido.toFixed(1)} kg)</span>
+              <span>S/ ${precioConPesoNormal.toFixed(2)}</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span>Cargo por peso extra${peso > pesoNormalIncluido ? " (" + (peso - pesoNormalIncluido).toFixed(1) + " kg × S/ 1.50)" : ""}</span>
+              <span>S/ ${cargoExtra.toFixed(2)}</span>
             </div>
             <hr class="my-1">
             <div class="d-flex justify-content-between fw-bold fs-5 text-primario">
@@ -465,15 +494,6 @@
         `,
         );
       }
-
-      // Agregar listener para cálculo en tiempo real
-      document.getElementById("calc-peso").addEventListener("input", calcular);
-      document
-        .getElementById("calc-origen")
-        .addEventListener("change", calcular);
-      document
-        .getElementById("calc-destino")
-        .addEventListener("change", calcular);
 
       // Lógica para registrar encomienda
       async function registrar() {
@@ -661,8 +681,6 @@
             targetButton.click();
             if (activeTab === "mis-registros") {
               cargarMisRegistros();
-            } else if (activeTab === "calcular") {
-              calcular(); // Realizar un cálculo inicial si la pestaña de calcular está activa
             }
           }
         } else {

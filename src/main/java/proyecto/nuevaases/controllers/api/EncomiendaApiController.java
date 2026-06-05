@@ -53,13 +53,13 @@ public class EncomiendaApiController {
         encomienda.setEstado("REGISTRADO");
 
         // Flujo solicitado: el cliente registra sin pesaje.
-        // Guardamos peso/precio en 0; el admin asigna el peso luego.
+        // Guardamos peso/precio en 0; el admin asigna el peso y puede ajustar el precio
+        // final.
         encomienda.setPeso(0);
         encomienda.setPrecio(0);
 
         return ResponseEntity.ok(encomiendaService.guardar(encomienda));
     }
-
 
     @GetMapping("/precio")
     public ResponseEntity<?> calcularPrecio(
@@ -72,6 +72,14 @@ public class EncomiendaApiController {
                 "destino", destino,
                 "peso", peso,
                 "precio", precio));
+    }
+
+    @GetMapping("/precio-por-peso")
+    public ResponseEntity<?> calcularPrecioPorPeso(@RequestParam double peso) {
+        double precio = encomiendaService.calcularPrecioPorPeso(peso);
+        return ResponseEntity.ok(Map.of(
+                "peso", peso,
+                "precioPorPeso", precio));
     }
 
     @GetMapping("/historial")
@@ -124,4 +132,3 @@ public class EncomiendaApiController {
         return ResponseEntity.ok(encomiendaService.guardar(enc));
     }
 }
-
