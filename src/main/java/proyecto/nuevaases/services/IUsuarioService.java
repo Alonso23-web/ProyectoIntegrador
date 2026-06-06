@@ -12,4 +12,15 @@ public interface IUsuarioService {
     void eliminar(Long id);
     boolean existeEmail(String email);
     boolean existeDni(String dni);
+
+    // ==================== Conductor management ====================
+    List<UsuarioDTO> listarConductoresPendientes();
+    List<UsuarioDTO> listarConductores();
+    long contarConductoresActivos();
+    void aprobarConductor(Long id);
+    void rechazarConductor(Long id);
+
+    // ==================== User management (admin) ====================
+    List<UsuarioDTO> listarTodosUsuarios();
+    UsuarioDTO cambiarEstadoActivo(Long id, boolean activo);
 }

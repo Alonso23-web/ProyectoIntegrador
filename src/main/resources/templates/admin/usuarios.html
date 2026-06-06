@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head('Gestión de Usuarios - Nueva Ases Express')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <section
+      class="py-4"
+      style="background: #f0f2f5; min-height: calc(100vh - 130px)"
+    >
+      <div class="container-fluid px-4">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h4 class="fw-bold text-primario mb-0">
+              <i class="bi bi-people me-2 text-amarillo"></i>Gestión de Usuarios
+            </h4>
+            <small class="text-muted">Administra clientes, conductores y administradores del sistema</small>
+          </div>
+        </div>
+
+        <!-- Flash messages -->
+        <div th:if="${mensajeExito}" class="alert alert-success d-flex align-items-center rounded-4 py-2 px-3 mb-3" style="border: none;">
+          <i class="bi bi-check-circle-fill me-2"></i><span th:text="${mensajeExito}"></span>
+        </div>
+        <div th:if="${mensajeError}" class="alert alert-danger d-flex align-items-center rounded-4 py-2 px-3 mb-3" style="border: none;">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${mensajeError}"></span>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card border-0 shadow-sm mb-4 rounded-4">
+          <div class="card-body p-3">
+            <div class="row g-2 align-items-end">
+              <div class="col-md-5">
+                <label class="form-label small fw-semibold text-muted">Buscar</label>
+                <input
+                  type="text"
+                  id="filtro-buscar"
+                  class="form-control"
+                  placeholder="Nombre, correo electrónico..."
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold text-muted">Rol</label>
+                <select id="filtro-rol" class="form-select">
+                  <option value="">Todos los roles</option>
+                  <option value="CLIENTE">Cliente</option>
+                  <option value="CONDUCTOR">Conductor</option>
+                  <option value="ADMINISTRADOR">Administrador</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted">Estado</label>
+                <select id="filtro-estado" class="form-select">
+                  <option value="">Todos</option>
+                  <option value="activo">Activo</option>
+                  <option value="inactivo">Bloqueado</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <button class="btn btn-outline-secondary w-100" onclick="limpiarFiltros()">
+                  <i class="bi bi-x-circle me-1"></i>Limpiar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0" id="tabla-usuarios">
+                <thead style="background: #f8f9fa">
+                  <tr>
+                    <th class="px-3 py-3 text-muted small fw-bold">NOMBRE</th>
+                    <th class="py-3 text-muted small fw-bold">CORREO</th>
+                    <th class="py-3 text-muted small fw-bold">DNI</th>
+                    <th class="py-3 text-muted small fw-bold">TELÉFONO</th>
+                    <th class="py-3 text-muted small fw-bold">ROL</th>
+                    <th class="py-3 text-muted small fw-bold">ESTADO</th>
+                    <th class="py-3 text-muted small fw-bold">REGISTRO</th>
+                    <th class="py-3 text-muted small fw-bold" style="min-width: 140px">ACCIONES</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    th:each="u : ${usuarios}"
+                    th:data-nombre="${u.nombreCompleto}"
+                    th:data-email="${u.email}"
+                    th:data-rol="${u.rol}"
+                    th:data-activo="${u.activo}"
+                  >
+                    <td class="px-3">
+                      <div class="fw-semibold" th:text="${u.nombreCompleto}">—</div>
+                    </td>
+                    <td>
+                      <span class="small" th:text="${u.email}">—</span>
+                    </td>
+                    <td th:text="${u.dni}">—</td>
+                    <td th:text="${u.telefono}">—</td>
+                    <td>
+                      <span th:if="${u.rol == 'ADMINISTRADOR'}" class="badge bg-primario text-white px-3 py-1 rounded-pill fw-semibold">
+                        <i class="bi bi-shield-lock me-1"></i>Admin
+                      </span>
+                      <span th:if="${u.rol == 'CLIENTE'}" class="badge px-3 py-1 rounded-pill fw-semibold" style="background:#e8f0fe;color:#1967d2;">
+                        <i class="bi bi-person me-1"></i>Cliente
+                      </span>
+                      <span th:if="${u.rol == 'CONDUCTOR'}" class="badge px-3 py-1 rounded-pill fw-semibold" style="background:#fef7e0;color:#e37400;">
+                        <i class="bi bi-truck-front me-1"></i>Conductor
+                      </span>
+                    </td>
+                    <td>
+                      <!-- Conductor pendiente (prioridad) -->
+                      <span th:if="${u.rol == 'CONDUCTOR' and u.estadoPostulacion == 'PENDIENTE'}" class="badge badge-estado badge-pendiente px-3 py-1">
+                        <span class="status-dot pending"></span> Pendiente
+                      </span>
+                      <span th:if="${u.rol == 'CONDUCTOR' and u.estadoPostulacion == 'RECHAZADO'}" class="badge badge-estado badge-rechazado px-3 py-1">
+                        <span class="status-dot inactive"></span> Rechazado
+                      </span>
+                      <span th:if="${u.activo and !(u.rol == 'CONDUCTOR' and u.estadoPostulacion == 'PENDIENTE') and !(u.rol == 'CONDUCTOR' and u.estadoPostulacion == 'RECHAZADO')}" class="badge badge-estado badge-aprobado px-3 py-1">
+                        <span class="status-dot active"></span> Activo
+                      </span>
+                      <span th:if="${!u.activo and !(u.rol == 'CONDUCTOR' and u.estadoPostulacion == 'PENDIENTE') and !(u.rol == 'CONDUCTOR' and u.estadoPostulacion == 'RECHAZADO')}" class="badge badge-estado badge-rechazado px-3 py-1">
+                        <span class="status-dot inactive"></span> Bloqueado
+                      </span>
+                    </td>
+                    <td class="small text-muted" th:text="${u.fechaRegistro != null ? #temporals.format(u.fechaRegistro, 'dd/MM/yyyy') : '—'}">—</td>
+                    <td>
+                      <div class="d-flex gap-1">
+                        <!-- Ver detalle -->
+                        <button class="btn btn-sm btn-outline-secondary" title="Ver detalle"
+                                th:attr="data-id=${u.id},data-nombre=${u.nombreCompleto},data-email=${u.email},
+                                  data-dni=${u.dni},data-telefono=${u.telefono},data-rol=${u.rol},
+                                  data-activo=${u.activo},data-fecharegistro=${u.fechaRegistro},
+                                  data-licencia=${u.numeroLicencia},data-exp=${u.aniosExperiencia},
+                                  data-tipo=${u.tipoVehiculo},data-postulacion=${u.estadoPostulacion}"
+                                onclick="verDetalle(this)">
+                          <i class="bi bi-eye"></i>
+                        </button>
+
+                        <!-- Cambiar estado (Activar/Bloquear) -->
+                        <form th:if="${u.rol != 'ADMINISTRADOR'}" th:action="@{'/admin/usuarios/estado/' + ${u.id}}" method="post" style="display:inline">
+                          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                          <input type="hidden" name="activo" th:value="${!u.activo}" />
+                          <button type="submit" class="btn btn-sm"
+                                  th:classappend="${u.activo} ? 'btn-outline-warning' : 'btn-outline-success'"
+                                  th:title="${u.activo} ? 'Bloquear usuario' : 'Activar usuario'"
+                                  onclick="return confirm('¿${u.activo ? 'Bloquear' : 'Activar'} a ${u.nombreCompleto}?')">
+                            <i class="bi" th:classappend="${u.activo} ? 'bi-lock' : 'bi-unlock'"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr th:if="${#lists.size(usuarios) == 0}">
+                    <td colspan="8" class="text-center text-muted py-5">
+                      <i class="bi bi-inbox display-6 d-block mb-2"></i>
+                      No hay usuarios registrados.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal: Detalle de Usuario -->
+    <div class="modal fade" id="modalDetalleUsuario" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold text-primario">
+              <i class="bi bi-person-circle me-2 text-amarillo"></i>Detalle del Usuario
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="text-center mb-3">
+              <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light" style="width:80px;height:80px;font-size:2.5rem;">
+                <i class="bi bi-person-fill text-primario"></i>
+              </div>
+              <h5 class="fw-bold mt-2 mb-0" id="det-nombre">—</h5>
+              <span class="badge mt-1" id="det-rol-badge">—</span>
+            </div>
+            <table class="table table-borderless mb-0" style="font-size:0.9rem;">
+              <tr>
+                <td class="text-muted fw-semibold ps-0" style="width:35%;">Correo</td>
+                <td class="pe-0" id="det-email">—</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-semibold ps-0">DNI</td>
+                <td class="pe-0" id="det-dni">—</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-semibold ps-0">Teléfono</td>
+                <td class="pe-0" id="det-telefono">—</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-semibold ps-0">Rol</td>
+                <td class="pe-0" id="det-rol">—</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-semibold ps-0">Estado</td>
+                <td class="pe-0" id="det-estado">—</td>
+              </tr>
+              <tr>
+                <td class="text-muted fw-semibold ps-0">Registro</td>
+                <td class="pe-0" id="det-fecha">—</td>
+              </tr>
+              <tr id="det-licencia-row" style="display:none;">
+                <td class="text-muted fw-semibold ps-0">Licencia</td>
+                <td class="pe-0" id="det-licencia">—</td>
+              </tr>
+              <tr id="det-experiencia-row" style="display:none;">
+                <td class="text-muted fw-semibold ps-0">Experiencia</td>
+                <td class="pe-0" id="det-experiencia">—</td>
+              </tr>
+              <tr id="det-vehiculo-row" style="display:none;">
+                <td class="text-muted fw-semibold ps-0">Tipo vehículo</td>
+                <td class="pe-0" id="det-vehiculo">—</td>
+              </tr>
+              <tr id="det-postulacion-row" style="display:none;">
+                <td class="text-muted fw-semibold ps-0">Postulación</td>
+                <td class="pe-0" id="det-postulacion">—</td>
+              </tr>
+            </table>
+          </div>
+          <div class="modal-footer border-0">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+
+    <style>
+      .badge-estado { font-size: 0.7rem; padding: 0.3rem 0.8rem; border-radius: 50px; font-weight: 600; }
+      .badge-aprobado { background: #e6f4ea; color: #1e8e3e; }
+      .badge-pendiente { background: #fef7e0; color: #e37400; }
+      .badge-rechazado { background: #fce8e6; color: #d93025; }
+      .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 0.4rem; }
+      .status-dot.active { background: #1e8e3e; }
+      .status-dot.pending { background: #e37400; }
+      .status-dot.inactive { background: #94a3b8; }
+    </style>
+
+    <script>
+      document.getElementById("filtro-buscar").addEventListener("input", filtrar);
+      document.getElementById("filtro-rol").addEventListener("change", filtrar);
+      document.getElementById("filtro-estado").addEventListener("change", filtrar);
+
+      function filtrar() {
+        const buscar = document.getElementById("filtro-buscar").value.toLowerCase();
+        const rol = document.getElementById("filtro-rol").value;
+        const estado = document.getElementById("filtro-estado").value;
+
+        document.querySelectorAll("#tabla-usuarios tbody tr[data-nombre]").forEach(tr => {
+          const nombre = (tr.dataset.nombre || "").toLowerCase();
+          const email = (tr.dataset.email || "").toLowerCase();
+          const trRol = (tr.dataset.rol || "").toUpperCase();
+          const trActivo = tr.dataset.activo === "true";
+
+          const coincideBuscar = !buscar || nombre.includes(buscar) || email.includes(buscar);
+          const coincideRol = !rol || trRol === rol;
+          const coincideEstado = !estado ||
+            (estado === "activo" && trActivo) ||
+            (estado === "inactivo" && !trActivo);
+
+          tr.style.display = (coincideBuscar && coincideRol && coincideEstado) ? "" : "none";
+        });
+      }
+
+      function limpiarFiltros() {
+        document.getElementById("filtro-buscar").value = "";
+        document.getElementById("filtro-rol").value = "";
+        document.getElementById("filtro-estado").value = "";
+        filtrar();
+      }
+
+      function verDetalle(btn) {
+        const d = btn.dataset;
+        document.getElementById("det-nombre").textContent = d.nombre || "—";
+        document.getElementById("det-email").textContent = d.email || "—";
+        document.getElementById("det-dni").textContent = d.dni || "—";
+        document.getElementById("det-telefono").textContent = d.telefono || "—";
+        document.getElementById("det-rol").textContent = d.rol || "—";
+        document.getElementById("det-fecha").textContent = d.fecharegistro || "—";
+
+        // Estado
+        const esActivo = d.activo === "true";
+        const esPendiente = d.postulacion === "PENDIENTE";
+        const esRechazado = d.postulacion === "RECHAZADO";
+        let estadoText = esActivo ? "Activo" : "Bloqueado";
+        if (d.rol === "CONDUCTOR" && esPendiente) estadoText = "Pendiente";
+        if (d.rol === "CONDUCTOR" && esRechazado) estadoText = "Rechazado";
+        document.getElementById("det-estado").textContent = estadoText;
+
+        // Rol badge
+        const badge = document.getElementById("det-rol-badge");
+        if (d.rol === "ADMINISTRADOR") { badge.textContent = "🔒 Admin"; badge.className = "badge bg-primario text-white px-3 py-1 rounded-pill"; }
+        else if (d.rol === "CLIENTE") { badge.textContent = "👤 Cliente"; badge.className = "badge px-3 py-1 rounded-pill"; badge.style = "background:#e8f0fe;color:#1967d2;"; }
+        else { badge.textContent = "🚛 Conductor"; badge.className = "badge px-3 py-1 rounded-pill"; badge.style = "background:#fef7e0;color:#e37400;"; }
+
+        // Campos de conductor
+        const esConductor = d.rol === "CONDUCTOR";
+        document.getElementById("det-licencia-row").style.display = esConductor ? "" : "none";
+        document.getElementById("det-experiencia-row").style.display = esConductor ? "" : "none";
+        document.getElementById("det-vehiculo-row").style.display = esConductor ? "" : "none";
+        document.getElementById("det-postulacion-row").style.display = esConductor ? "" : "none";
+        if (esConductor) {
+          document.getElementById("det-licencia").textContent = d.licencia || "—";
+          document.getElementById("det-experiencia").textContent = d.exp ? d.exp + " años" : "—";
+          document.getElementById("det-vehiculo").textContent = d.tipo || "—";
+          document.getElementById("det-postulacion").textContent = d.postulacion || "—";
+        }
+
+        new bootstrap.Modal(document.getElementById("modalDetalleUsuario")).show();
+      }
+    </script>
+  </body>
+</html>

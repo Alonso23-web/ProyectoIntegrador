@@ -7,334 +7,844 @@
     <div th:replace="~{layout :: navbar}"></div>
 
     <style>
-      .admin-dashboard {
-        background: #f0f2f5;
+      :root {
+        --adm-blue: #0d1b3e;
+        --adm-gold: #f5a623;
+        --adm-gold-hover: #e89800;
+        --adm-bg: #f0f2f5;
+        --adm-card-shadow: 0 4px 20px rgba(13,27,62,0.08);
+        --adm-radius: 20px;
+      }
+
+      .adm-dashboard {
+        background: var(--adm-bg);
         min-height: calc(100vh - 130px);
         padding: 2rem 0;
       }
-      /* Tarjeta de bienvenida */
-      .welcome-card {
-        background: linear-gradient(135deg, #0d1b4c 0%, #1a2d6b 100%);
-        border-radius: 24px;
-        padding: 2.5rem;
+
+      /* ========== ALERTAS FLASH ========== */
+      .adm-alert {
+        border-radius: 16px;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      /* ========== WELCOME CARD ========== */
+      .adm-welcome {
+        background: linear-gradient(135deg, #0d1b3e 0%, #1a2d6b 100%);
+        border-radius: var(--adm-radius);
+        padding: 2.5rem 3rem;
         color: white;
         margin-bottom: 2rem;
         position: relative;
         overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
       }
-      .welcome-card::after {
-        content: "🔧";
+      .adm-welcome::after {
+        content: "⚙️";
         position: absolute;
         right: 30px;
-        bottom: -10px;
-        font-size: 120px;
-        opacity: 0.1;
+        bottom: -15px;
+        font-size: 130px;
+        opacity: 0.08;
       }
-      .welcome-card h1 {
+      .adm-welcome h1 {
         font-weight: 800;
-        font-size: 1.8rem;
-        margin-bottom: 0.5rem;
+        font-size: 1.7rem;
+        margin-bottom: 0.3rem;
       }
-      .welcome-card p {
+      .adm-welcome p {
         opacity: 0.85;
-        font-size: 1.05rem;
+        font-size: 1rem;
         margin-bottom: 0;
-        max-width: 500px;
+        max-width: 480px;
       }
-      .welcome-card .badge-rol {
-        background: rgba(255,255,255,0.15);
+      .adm-welcome-badge {
+        background: rgba(255,255,255,0.12);
         color: white;
-        padding: 0.5rem 1.2rem;
+        padding: 0.5rem 1.4rem;
         border-radius: 50px;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         font-weight: 600;
-        display: inline-block;
-        margin-top: 0.8rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+      .adm-welcome-right {
+        text-align: right;
+      }
+      .adm-welcome-fecha {
+        font-size: 0.85rem;
+        opacity: 0.7;
+        display: block;
+        margin-bottom: 0.3rem;
       }
 
-      /* Grid de módulos - tarjetas grandes tipo botón */
-      .modulos-grid {
+      /* ========== STATS CARDS ========== */
+      .adm-stats {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 1.2rem;
         margin-bottom: 2.5rem;
       }
-      .modulo-card {
+      .adm-stat {
         background: white;
-        border-radius: 20px;
-        padding: 1.8rem 1.2rem;
-        text-align: center;
-        text-decoration: none;
-        color: #0d1b4c;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-        border: 2px solid transparent;
-        cursor: pointer;
+        border-radius: var(--adm-radius);
+        padding: 1.5rem 1.8rem;
+        box-shadow: var(--adm-card-shadow);
         display: flex;
-        flex-direction: column;
         align-items: center;
-        gap: 0.6rem;
+        gap: 1.2rem;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        border-left: 4px solid var(--adm-blue);
       }
-      .modulo-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 30px rgba(13,27,76,0.15);
-        border-color: #f5a623;
-        color: #0d1b4c;
-        text-decoration: none;
+      .adm-stat:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 30px rgba(13,27,62,0.12);
       }
-      .modulo-card .modulo-icono {
-        width: 70px;
-        height: 70px;
-        border-radius: 18px;
+      .adm-stat-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 2rem;
-        margin-bottom: 0.3rem;
+        font-size: 1.6rem;
+        flex-shrink: 0;
       }
-      .modulo-card .modulo-nombre {
+      .adm-stat-icon.blue { background: #e8f0fe; color: #1967d2; }
+      .adm-stat-icon.green { background: #e6f4ea; color: #1e8e3e; }
+      .adm-stat-icon.orange { background: #fef7e0; color: #e37400; }
+      .adm-stat-icon.purple { background: #f3e8fd; color: #7c3aed; }
+      .adm-stat-info { flex: 1; }
+      .adm-stat-num {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--adm-blue);
+        line-height: 1.1;
+      }
+      .adm-stat-label {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        font-weight: 600;
+        color: #64748b;
+        margin-top: 0.15rem;
+      }
+      .adm-stat-sub {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        margin-top: 0.1rem;
+      }
+
+      /* ========== SECTION TITLE ========== */
+      .adm-section-title {
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
         font-weight: 700;
-        font-size: 1rem;
-        letter-spacing: 0.3px;
+        color: #64748b;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       }
-      .modulo-card .modulo-desc {
-        font-size: 0.8rem;
-        color: #6c757d;
+      .adm-section-title i {
+        font-size: 1rem;
+      }
+
+      /* ========== MODULES GRID ========== */
+      .adm-modules {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+      }
+      .adm-module {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        text-decoration: none;
+        color: var(--adm-blue);
+        transition: all 0.3s ease;
+        box-shadow: var(--adm-card-shadow);
+        border: 2px solid transparent;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .adm-module:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(13,27,62,0.13);
+        border-color: var(--adm-gold);
+        color: var(--adm-blue);
+        text-decoration: none;
+      }
+      .adm-module .adm-mod-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        margin-bottom: 0.2rem;
+      }
+      .adm-module .adm-mod-name {
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.2px;
+      }
+      .adm-module .adm-mod-desc {
+        font-size: 0.7rem;
+        color: #94a3b8;
         margin: 0;
       }
 
-      /* Colores de iconos por módulo */
-      .icono-dashboard { background: #e8f4fd; color: #0d6efd; }
-      .icono-vehiculos { background: #fff3cd; color: #856404; }
-      .icono-pasajes  { background: #d4edda; color: #155724; }
-      .icono-encomiendas { background: #f8d7da; color: #721c24; }
-      .icono-rastrear { background: #e2d9f3; color: #563d7c; }
-      .icono-usuarios { background: #cce5ff; color: #004085; }
-      .icono-reportes { background: #d1ecf1; color: #0c5460; }
-      .icono-viajes   { background: #fce4ec; color: #880e4f; }
+      .mod-icon-dashboard { background: #e8f0fe; color: #1967d2; }
+      .mod-icon-pasajes   { background: #e6f4ea; color: #1e8e3e; }
+      .mod-icon-conductores { background: #fef7e0; color: #e37400; }
+      .mod-icon-encomiendas { background: #fce8e6; color: #d93025; }
+      .mod-icon-viajes    { background: #f3e8fd; color: #7c3aed; }
+      .mod-icon-vehiculos { background: #e0f2fe; color: #0284c7; }
+      .mod-icon-usuarios  { background: #f0fdf4; color: #16a34a; }
+      .mod-icon-reportes  { background: #fff1f2; color: #e11d48; }
 
-      /* Tarjetas de estadísticas */
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      /* ========== PENDING CONDUCTORS ========== */
+      .adm-pending-section {
+        background: white;
+        border-radius: var(--adm-radius);
+        padding: 1.8rem;
+        box-shadow: var(--adm-card-shadow);
+        margin-bottom: 2.5rem;
+        border-left: 4px solid var(--adm-gold);
+      }
+      .adm-pending-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
         gap: 1rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
       }
-      .stat-card {
-        background: white;
-        border-radius: 18px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-        text-align: center;
-        transition: transform 0.2s ease;
+      .adm-pending-header h5 {
+        font-weight: 700;
+        color: var(--adm-blue);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
       }
-      .stat-card:hover {
-        transform: translateY(-3px);
-      }
-      .stat-card .stat-number {
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: #0d1b4c;
-        line-height: 1.2;
-      }
-      .stat-card .stat-label {
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-weight: 600;
-        color: #6c757d;
-        margin-top: 0.3rem;
-      }
-      .stat-card .stat-icon {
-        font-size: 1.8rem;
-        margin-bottom: 0.5rem;
-        display: block;
+      .adm-pending-count {
+        background: #fef7e0;
+        color: #e37400;
+        padding: 0.25rem 1rem;
+        border-radius: 50px;
+        font-size: 0.82rem;
+        font-weight: 700;
       }
 
-      /* Tabla de actividad reciente */
-      .activity-section {
+      .adm-pending-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1rem;
+      }
+      .adm-pending-card {
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 1.2rem 1.5rem;
+        transition: all 0.25s ease;
+        background: #fafbfc;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .adm-pending-card:hover {
+        border-color: var(--adm-gold);
         background: white;
-        border-radius: 20px;
-        padding: 1.5rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        box-shadow: 0 4px 15px rgba(245,166,35,0.1);
       }
-      .activity-section h5 {
+      .adm-pending-card .pc-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+      .adm-pending-card .pc-name {
         font-weight: 700;
-        color: #0d1b4c;
-        margin-bottom: 1rem;
+        font-size: 1.05rem;
+        color: var(--adm-blue);
       }
-      .activity-section .table th {
-        font-size: 0.75rem;
+      .adm-pending-card .pc-email {
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
+      .adm-pending-card .pc-badge {
+        background: #fef7e0;
+        color: #e37400;
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 0.2rem 0.7rem;
+        border-radius: 50px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #6c757d;
-        border-bottom: 2px solid #f0f2f5;
-        padding: 0.7rem 0.5rem;
+        letter-spacing: 0.3px;
       }
-      .activity-section .table td {
-        padding: 0.7rem 0.5rem;
-        vertical-align: middle;
-        font-size: 0.9rem;
+      .adm-pending-card .pc-details {
+        display: flex;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+        color: #475569;
       }
-      .activity-section .badge-estado {
-        font-size: 0.7rem;
-        padding: 0.3rem 0.8rem;
+      .adm-pending-card .pc-details span {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+      }
+      .adm-pending-card .pc-details i {
+        color: var(--adm-gold);
+        width: 16px;
+        text-align: center;
+      }
+      .adm-pending-card .pc-actions {
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        margin-top: 0.25rem;
+      }
+      .adm-pending-card .pc-actions .btn-pc {
+        border: none;
+        padding: 0.45rem 1.2rem;
         border-radius: 50px;
         font-weight: 600;
+        font-size: 0.8rem;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
       }
-      .badge-reservado { background: #fff3cd; color: #856404; }
-      .badge-pagado { background: #d4edda; color: #155724; }
-      .badge-cancelado { background: #f8d7da; color: #721c24; }
-      .badge-finalizado { background: #cce5ff; color: #004085; }
-      .badge-registrado { background: #e2e8f0; color: #475569; }
-      .badge-en_transito { background: #fef3c7; color: #92400e; }
-      .badge-en_destino { background: #dbeafe; color: #1e40af; }
-      .badge-entregado { background: #dcfce7; color: #166534; }
+      .btn-pc-approve {
+        background: #1e8e3e;
+        color: white;
+      }
+      .btn-pc-approve:hover {
+        background: #157a33;
+        color: white;
+      }
+      .btn-pc-reject {
+        background: #d93025;
+        color: white;
+      }
+      .btn-pc-reject:hover {
+        background: #b3261e;
+        color: white;
+      }
+      .btn-pc-cv {
+        background: #e8f0fe;
+        color: #1967d2;
+      }
+      .btn-pc-cv:hover {
+        background: #d2e3fc;
+        color: #1557b0;
+      }
+
+      .adm-pending-empty {
+        text-align: center;
+        padding: 2rem;
+        color: #94a3b8;
+      }
+      .adm-pending-empty i {
+        font-size: 2.5rem;
+        display: block;
+        margin-bottom: 0.8rem;
+        color: #cbd5e1;
+      }
+
+      /* ========== TABLES SIDE BY SIDE ========== */
+      .adm-tables-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+      @media (max-width: 992px) {
+        .adm-tables-section {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .adm-table-card {
+        background: white;
+        border-radius: var(--adm-radius);
+        padding: 1.5rem;
+        box-shadow: var(--adm-card-shadow);
+      }
+      .adm-table-card h5 {
+        font-weight: 700;
+        color: var(--adm-blue);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+      }
+      .adm-table-card .table {
+        margin-bottom: 0;
+      }
+      .adm-table-card .table th {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        color: #94a3b8;
+        font-weight: 700;
+        border-bottom: 2px solid #f1f5f9;
+        padding: 0.6rem 0.5rem;
+      }
+      .adm-table-card .table td {
+        padding: 0.65rem 0.5rem;
+        vertical-align: middle;
+        font-size: 0.85rem;
+      }
+      .adm-table-card .table tbody tr:hover {
+        background: #f8fafc;
+      }
+      .adm-table-card .table-link {
+        color: var(--adm-blue);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.8rem;
+      }
+      .adm-table-card .table-link:hover {
+        color: var(--adm-gold);
+        text-decoration: underline;
+      }
+
+      /* ========== BADGES ========== */
+      .badge-estado {
+        font-size: 0.65rem;
+        padding: 0.25rem 0.7rem;
+        border-radius: 50px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .badge-reservado { background: #fef7e0; color: #e37400; }
+      .badge-pagado { background: #e6f4ea; color: #1e8e3e; }
+      .badge-cancelado { background: #fce8e6; color: #d93025; }
+      .badge-finalizado { background: #e8f0fe; color: #1967d2; }
+      .badge-registrado { background: #f1f5f9; color: #475569; }
+      .badge-en_transito { background: #fef7e0; color: #e37400; }
+      .badge-en_destino { background: #e8f0fe; color: #1967d2; }
+      .badge-entregado { background: #e6f4ea; color: #1e8e3e; }
+
+      .badge-aprobado { background: #e6f4ea; color: #1e8e3e; }
+      .badge-pendiente { background: #fef7e0; color: #e37400; }
+      .badge-rechazado { background: #fce8e6; color: #d93025; }
+
+      /* ========== STATUS DOT ========== */
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .status-dot.active { background: #1e8e3e; }
+      .status-dot.pending { background: #e37400; }
+      .status-dot.inactive { background: #94a3b8; }
     </style>
 
-    <section class="admin-dashboard">
+    <section class="adm-dashboard">
       <div class="container">
 
-        <!-- Tarjeta de bienvenida -->
-        <div class="welcome-card">
-          <h1>👋 ¡Bienvenido, <span th:text="${nombreUsuario}"></span>!</h1>
-          <p>Panel de control del sistema. Gestiona vehículos, pasajes, encomiendas y más desde un solo lugar.</p>
-          <span class="badge-rol">🔒 Administrador</span>
+        <!-- ============================================================ -->
+        <!-- FLASH MESSAGES                                                -->
+        <!-- ============================================================ -->
+        <div th:if="${mensajeExito}" class="adm-alert alert alert-success">
+          <i class="bi bi-check-circle-fill fs-5"></i>
+          <span th:text="${mensajeExito}"></span>
+        </div>
+        <div th:if="${mensajeError}" class="adm-alert alert alert-danger">
+          <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+          <span th:text="${mensajeError}"></span>
         </div>
 
-        <!-- MÓDULOS: Botones grandes y visuales -->
-        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
-          <i class="bi bi-grid-3x3-gap-fill me-2"></i>Módulos del sistema
-        </h5>
-        <div class="modulos-grid">
-          <a href="/dashboard" class="modulo-card">
-            <div class="modulo-icono icono-dashboard"><i class="bi bi-speedometer2"></i></div>
-            <span class="modulo-nombre">Dashboard</span>
-            <span class="modulo-desc">Panel principal</span>
-          </a>
-          <a href="/vehiculos" class="modulo-card">
-            <div class="modulo-icono icono-vehiculos"><i class="bi bi-truck"></i></div>
-            <span class="modulo-nombre">Vehículos</span>
-            <span class="modulo-desc">Gestionar flota</span>
-          </a>
-          <a href="/pasajes" class="modulo-card">
-            <div class="modulo-icono icono-pasajes"><i class="bi bi-ticket-perforated"></i></div>
-            <span class="modulo-nombre">Pasajes</span>
-            <span class="modulo-desc">Venta de pasajes</span>
-          </a>
-          <a href="/viajes" class="modulo-card">
-            <div class="modulo-icono icono-viajes"><i class="bi bi-signpost-2"></i></div>
-            <span class="modulo-nombre">Viajes</span>
-            <span class="modulo-desc">Crear / editar viajes</span>
-          </a>
-          <a href="/encomiendas/listar" class="modulo-card">
-            <div class="modulo-icono icono-encomiendas"><i class="bi bi-box-seam"></i></div>
-            <span class="modulo-nombre">Encomiendas</span>
-            <span class="modulo-desc">Gestionar envíos</span>
-          </a>
-          <a href="/rastrear" class="modulo-card">
-            <div class="modulo-icono icono-rastrear"><i class="bi bi-search"></i></div>
-            <span class="modulo-nombre">Rastrear</span>
-            <span class="modulo-desc">Localizar envío</span>
-          </a>
-        </div>
-
-        <!-- ESTADÍSTICAS RÁPIDAS -->
-        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
-          <i class="bi bi-bar-chart-fill me-2"></i>Resumen del negocio
-        </h5>
-        <div class="stats-grid">
-          <div class="stat-card">
-            <span class="stat-icon">🎫</span>
-            <div class="stat-number" th:text="${totalPasajes}">0</div>
-            <div class="stat-label">Pasajes vendidos</div>
+        <!-- ============================================================ -->
+        <!-- WELCOME CARD                                                  -->
+        <!-- ============================================================ -->
+        <div class="adm-welcome">
+          <div>
+            <h1>👋 ¡Bienvenido, <span th:text="${nombreAdmin != null ? nombreAdmin : nombreUsuario}"></span>!</h1>
+            <p>Panel de control del sistema. Gestiona pasajes, encomiendas, conductores y más desde un solo lugar.</p>
+            <span class="adm-welcome-badge mt-2">
+              <i class="bi bi-shield-lock-fill"></i> Administrador del sistema
+            </span>
           </div>
-          <div class="stat-card">
-            <span class="stat-icon">📦</span>
-            <div class="stat-number" th:text="${totalEncomiendas}">0</div>
-            <div class="stat-label">Encomiendas</div>
+          <div class="adm-welcome-right">
+            <span class="adm-welcome-fecha"><i class="bi bi-calendar3 me-1"></i><span th:text="${fechaHoy}"></span></span>
+            <span class="adm-welcome-badge">
+              <i class="bi bi-clock me-1"></i> Panel de control
+            </span>
           </div>
         </div>
 
-        <!-- ACTIVIDAD RECIENTE -->
-        <div class="row g-4">
-          <div class="col-lg-6">
-            <div class="activity-section">
-              <h5><i class="bi bi-ticket-detailed me-2 text-amarillo"></i>Últimos pasajes</h5>
-              <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                  <thead>
-                    <tr>
-                      <th>Pasajero</th>
-                      <th>Ruta</th>
-                      <th>Fecha</th>
-                      <th>Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr th:each="pasaje : ${ultimosPasajes}">
-                      <td class="fw-semibold" th:text="${pasaje.nombrePasajero}">—</td>
-                      <td>
-                        <span th:text="${pasaje.viaje.origen}"></span>
-                        <i class="bi bi-arrow-right mx-1 text-muted"></i>
-                        <span th:text="${pasaje.viaje.destino}"></span>
-                      </td>
-                      <td th:text="${pasaje.viaje.fecha}">—</td>
-                      <td>
-                        <span class="badge-estado"
-                              th:classappend="'badge-' + ${#strings.toLowerCase(pasaje.estado)}"
-                              th:text="${pasaje.estado}">—</span>
-                      </td>
-                    </tr>
-                    <tr th:if="${ultimosPasajes.empty}">
-                      <td colspan="4" class="text-center text-muted py-4">
-                        <i class="bi bi-inbox me-2"></i>No hay pasajes recientes.
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+        <!-- ============================================================ -->
+        <!-- STATS ROW                                                     -->
+        <!-- ============================================================ -->
+        <h5 class="adm-section-title">
+          <i class="bi bi-bar-chart-fill text-amarillo"></i> Resumen del día
+        </h5>
+        <div class="adm-stats">
+          <div class="adm-stat">
+            <div class="adm-stat-icon blue"><i class="bi bi-ticket-perforated"></i></div>
+            <div class="adm-stat-info">
+              <div class="adm-stat-num" th:text="${pasajesDelDia}">0</div>
+              <div class="adm-stat-label">Pasajes vendidos hoy</div>
+              <div class="adm-stat-sub">Trujillo ↔ Chepén</div>
+            </div>
+          </div>
+          <div class="adm-stat">
+            <div class="adm-stat-icon green"><i class="bi bi-cash-coin"></i></div>
+            <div class="adm-stat-info">
+              <div class="adm-stat-num">S/ <span th:text="${#numbers.formatDecimal(ingresosDelDia, 1, 2)}">0.00</span></div>
+              <div class="adm-stat-label">Ingresos del día</div>
+              <div class="adm-stat-sub">S/ 12.00 por pasaje</div>
+            </div>
+          </div>
+          <div class="adm-stat">
+            <div class="adm-stat-icon orange"><i class="bi bi-box-seam"></i></div>
+            <div class="adm-stat-info">
+              <div class="adm-stat-num" th:text="${encomiendasActivas}">0</div>
+              <div class="adm-stat-label">Encomiendas activas</div>
+              <div class="adm-stat-sub">En tránsito / pendientes</div>
+            </div>
+          </div>
+          <div class="adm-stat">
+            <div class="adm-stat-icon purple"><i class="bi bi-people"></i></div>
+            <div class="adm-stat-info">
+              <div class="adm-stat-num" th:text="${conductoresActivos}">0</div>
+              <div class="adm-stat-label">Conductores activos</div>
+              <div class="adm-stat-sub">Aprobados en el sistema</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- MODULES GRID                                                  -->
+        <!-- ============================================================ -->
+        <h5 class="adm-section-title">
+          <i class="bi bi-grid-3x3-gap-fill text-amarillo"></i> Módulos del sistema
+        </h5>
+        <div class="adm-modules">
+          <a href="/dashboard" class="adm-module">
+            <div class="adm-mod-icon mod-icon-dashboard"><i class="bi bi-speedometer2"></i></div>
+            <span class="adm-mod-name">Dashboard</span>
+            <span class="adm-mod-desc">Panel principal</span>
+          </a>
+          <a href="/pasajes" class="adm-module">
+            <div class="adm-mod-icon mod-icon-pasajes"><i class="bi bi-ticket-perforated"></i></div>
+            <span class="adm-mod-name">Pasajes</span>
+            <span class="adm-mod-desc">Gestionar ventas</span>
+          </a>
+          <a href="/dashboard#conductores" class="adm-module">
+            <div class="adm-mod-icon mod-icon-conductores"><i class="bi bi-person-badge"></i></div>
+            <span class="adm-mod-name">Conductores</span>
+            <span class="adm-mod-desc">Aprobar postulaciones</span>
+          </a>
+          <a href="/encomiendas/listar" class="adm-module">
+            <div class="adm-mod-icon mod-icon-encomiendas"><i class="bi bi-box-seam"></i></div>
+            <span class="adm-mod-name">Encomiendas</span>
+            <span class="adm-mod-desc">Gestionar envíos</span>
+          </a>
+          <a href="/viajes" class="adm-module">
+            <div class="adm-mod-icon mod-icon-viajes"><i class="bi bi-signpost-2"></i></div>
+            <span class="adm-mod-name">Viajes</span>
+            <span class="adm-mod-desc">Programar rutas</span>
+          </a>
+          <a href="/vehiculos" class="adm-module">
+            <div class="adm-mod-icon mod-icon-vehiculos"><i class="bi bi-truck"></i></div>
+            <span class="adm-mod-name">Vehículos</span>
+            <span class="adm-mod-desc">Gestionar flota</span>
+          </a>
+          <a href="/admin/usuarios" class="adm-module">
+            <div class="adm-mod-icon mod-icon-usuarios"><i class="bi bi-people"></i></div>
+            <span class="adm-mod-name">Usuarios</span>
+            <span class="adm-mod-desc">Administrar cuentas</span>
+          </a>
+          <a href="/admin/reportes" class="adm-module">
+            <div class="adm-mod-icon mod-icon-reportes"><i class="bi bi-file-earmark-bar-graph"></i></div>
+            <span class="adm-mod-name">Reportes</span>
+            <span class="adm-mod-desc">Estadísticas</span>
+          </a>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- PENDING CONDUCTOR APPLICATIONS                                -->
+        <!-- ============================================================ -->
+        <div id="conductores" class="adm-pending-section">
+          <div class="adm-pending-header">
+            <h5>
+              <i class="bi bi-person-check text-amarillo fs-4"></i>
+              Postulaciones de conductores pendientes
+              <span class="adm-pending-count" th:text="${#lists.size(conductoresPendientes)}">0</span>
+            </h5>
+            <small class="text-muted">
+              <i class="bi bi-info-circle me-1"></i>Revisa los documentos y decide si aceptas o rechazas
+            </small>
+          </div>
+
+          <div th:if="${#lists.size(conductoresPendientes) > 0}" class="adm-pending-grid">
+            <div th:each="cond : ${conductoresPendientes}" class="adm-pending-card">
+              <div class="pc-header">
+                <div>
+                  <div class="pc-name">
+                    <i class="bi bi-person-circle me-1 text-amarillo"></i>
+                    <span th:text="${cond.nombreCompleto}">—</span>
+                  </div>
+                  <div class="pc-email">
+                    <i class="bi bi-envelope me-1"></i><span th:text="${cond.email}">—</span>
+                  </div>
+                </div>
+                <span class="pc-badge"><i class="bi bi-clock me-1"></i>Pendiente</span>
+              </div>
+              <div class="pc-details">
+                <span><i class="bi bi-card-text"></i> Licencia: <strong th:text="${cond.numeroLicencia}">—</strong></span>
+                <span><i class="bi bi-clock-history"></i> <strong th:text="${cond.aniosExperiencia}">0</strong> años exp.</span>
+                <span th:if="${cond.tipoVehiculo}"><i class="bi bi-truck"></i> <strong th:text="${cond.tipoVehiculo}">—</strong></span>
+              </div>
+              <div class="pc-actions">
+                <!-- Ver CV / Documento -->
+                <a th:if="${cond.documentoUrl != null and !cond.documentoUrl.isEmpty()}"
+                   th:href="@{'/uploads/' + ${cond.documentoUrl}}"
+                   target="_blank"
+                   class="btn-pc btn-pc-cv">
+                  <i class="bi bi-file-earmark-text"></i> Ver CV
+                </a>
+                <span th:if="${cond.documentoUrl == null or cond.documentoUrl.isEmpty()}" class="text-muted small" style="padding:0.45rem 0;">
+                  <i class="bi bi-file-earmark-x me-1"></i>Sin documento adjunto
+                </span>
+
+                <!-- Aceptar -->
+                <form th:action="@{'/admin/conductores/aprobar/' + ${cond.id}}" method="post" style="display:inline">
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                  <button type="submit" class="btn-pc btn-pc-approve" onclick="return confirm('¿Aprobar a ' + '${cond.nombreCompleto}' + ' como conductor? Podrá iniciar sesión inmediatamente.')">
+                    <i class="bi bi-check-lg"></i> Aceptar
+                  </button>
+                </form>
+
+                <!-- Rechazar -->
+                <form th:action="@{'/admin/conductores/rechazar/' + ${cond.id}}" method="post" style="display:inline">
+                  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                  <button type="submit" class="btn-pc btn-pc-reject" onclick="return confirm('¿Rechazar la postulación de ' + '${cond.nombreCompleto}' + '? No podrá acceder al sistema.')">
+                    <i class="bi bi-x-lg"></i> Rechazar
+                  </button>
+                </form>
               </div>
             </div>
           </div>
 
-          <div class="col-lg-6">
-            <div class="activity-section">
-              <h5><i class="bi bi-boxes me-2 text-amarillo"></i>Últimas encomiendas</h5>
-              <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                  <thead>
-                    <tr>
-                      <th>Código</th>
-                      <th>Remitente</th>
-                      <th>Destino</th>
-                      <th>Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr th:each="enc : ${ultimasEncomiendas}">
-                      <td><code class="fw-semibold" th:text="${enc.codigoRastreo}">—</code></td>
-                      <td th:text="${enc.remitente}">—</td>
-                      <td th:text="${enc.destino}">—</td>
-                      <td>
-                        <span class="badge-estado"
-                              th:classappend="'badge-' + ${#strings.toLowerCase(enc.estado)}"
-                              th:text="${enc.estado}">—</span>
-                      </td>
-                    </tr>
-                    <tr th:if="${ultimasEncomiendas.empty}">
-                      <td colspan="4" class="text-center text-muted py-4">
-                        <i class="bi bi-inbox me-2"></i>No hay encomiendas recientes.
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+          <div th:if="${#lists.size(conductoresPendientes) == 0}" class="adm-pending-empty">
+            <i class="bi bi-check2-circle"></i>
+            <p class="fw-semibold mb-1">No hay postulaciones pendientes</p>
+            <p class="small mb-0">Todos los conductores han sido revisados.</p>
+          </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- TABLES: ÚLTIMOS PASAJES + CONDUCTORES                        -->
+        <!-- ============================================================ -->
+        <h5 class="adm-section-title">
+          <i class="bi bi-table text-amarillo"></i> Actividad reciente
+        </h5>
+        <div class="adm-tables-section">
+
+          <!-- LEFT: Últimos pasajes comprados -->
+          <div class="adm-table-card">
+            <h5>
+              <i class="bi bi-ticket-detailed text-amarillo"></i> Últimos pasajes comprados
+              <small class="text-muted fw-normal ms-auto fs-7">Hoy</small>
+            </h5>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Pasajero</th>
+                    <th>Ruta</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="pasaje : ${ultimosPasajes}">
+                    <td class="fw-semibold" th:text="${pasaje.nombrePasajero}">—</td>
+                    <td>
+                      <span th:text="${pasaje.viaje.origen}">Trujillo</span>
+                      <i class="bi bi-arrow-right mx-1 text-muted" style="font-size:0.7rem;"></i>
+                      <span th:text="${pasaje.viaje.destino}">Chepén</span>
+                    </td>
+                    <td class="text-muted small" th:text="${pasaje.viaje.fecha}">—</td>
+                    <td>
+                      <span class="badge-estado"
+                            th:classappend="'badge-' + ${#strings.toLowerCase(pasaje.estado)}"
+                            th:text="${pasaje.estado}">—</span>
+                    </td>
+                  </tr>
+                  <tr th:if="${#lists.size(ultimosPasajes) == 0}">
+                    <td colspan="4" class="text-center text-muted py-4">
+                      <i class="bi bi-inbox me-2"></i>No hay pasajes vendidos hoy.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
+            <div class="mt-2 text-end">
+              <a href="/pasajes" class="table-link">
+                Ver todos los pasajes <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- RIGHT: Conductores registrados -->
+          <div class="adm-table-card">
+            <h5>
+              <i class="bi bi-people text-amarillo"></i> Conductores registrados
+              <small class="text-muted fw-normal ms-auto fs-7">
+                <span th:text="${#lists.size(conductores)}"></span> registrados
+              </small>
+            </h5>
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Licencia</th>
+                    <th>Estado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="cond : ${conductores}">
+                    <td class="fw-semibold" th:text="${cond.nombreCompleto}">—</td>
+                    <td class="text-muted small" th:text="${cond.numeroLicencia != null ? cond.numeroLicencia : '—'}">—</td>
+                    <td>
+                      <span th:if="${cond.estadoPostulacion == 'APROBADO'}" class="badge-estado badge-aprobado">
+                        <span class="status-dot active"></span>Aprobado
+                      </span>
+                      <span th:if="${cond.estadoPostulacion == 'PENDIENTE'}" class="badge-estado badge-pendiente">
+                        <span class="status-dot pending"></span>Pendiente
+                      </span>
+                      <span th:if="${cond.estadoPostulacion == 'RECHAZADO'}" class="badge-estado badge-rechazado">
+                        <span class="status-dot inactive"></span>Rechazado
+                      </span>
+                    </td>
+                    <td class="text-end">
+                      <a href="#" class="table-link" onclick="alert('Detalle del conductor: próximamente.'); return false;">
+                        <i class="bi bi-eye me-1"></i>Ver
+                      </a>
+                    </td>
+                  </tr>
+                  <tr th:if="${#lists.size(conductores) == 0}">
+                    <td colspan="4" class="text-center text-muted py-4">
+                      <i class="bi bi-inbox me-2"></i>No hay conductores registrados.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="mt-2 text-end">
+              <a href="/dashboard#conductores" class="table-link">
+                Gestionar postulaciones <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ÚLTIMAS ENCOMIENDAS (opcional, debajo)                       -->
+        <!-- ============================================================ -->
+        <div class="adm-table-card" style="margin-bottom: 2rem;">
+          <h5>
+            <i class="bi bi-boxes text-amarillo"></i> Últimas encomiendas registradas
+            <small class="text-muted fw-normal ms-auto fs-7">
+              <span th:text="${totalEncomiendas}">0</span> total
+            </small>
+          </h5>
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Remitente</th>
+                  <th>Destinatario</th>
+                  <th>Ruta</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="enc : ${ultimasEncomiendas}">
+                  <td><code class="fw-semibold text-primario" th:text="${enc.codigoRastreo}">—</code></td>
+                  <td th:text="${enc.remitente}">—</td>
+                  <td th:text="${enc.destinatario}">—</td>
+                  <td class="small">
+                    <span th:text="${enc.origen}"></span>
+                    <i class="bi bi-arrow-right mx-1 text-muted" style="font-size:0.7rem;"></i>
+                    <span th:text="${enc.destino}"></span>
+                  </td>
+                  <td>
+                    <span class="badge-estado"
+                          th:classappend="'badge-' + ${#strings.toLowerCase(enc.estado)}"
+                          th:text="${enc.estado}">—</span>
+                  </td>
+                  <td class="small text-muted" th:text="${enc.fechaEnvio}">—</td>
+                  <td class="text-end">
+                    <a href="/encomiendas/listar" class="table-link">
+                      <i class="bi bi-eye me-1"></i>
+                    </a>
+                  </td>
+                </tr>
+                <tr th:if="${#lists.size(ultimasEncomiendas) == 0}">
+                  <td colspan="7" class="text-center text-muted py-4">
+                    <i class="bi bi-inbox me-2"></i>No hay encomiendas registradas.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mt-2 text-end">
+            <a href="/encomiendas/listar" class="table-link">
+              Ver todas las encomiendas <i class="bi bi-arrow-right ms-1"></i>
+            </a>
           </div>
         </div>
 
       </div>
     </section>
     <div th:replace="~{layout :: scripts}"></div>
+    <script>
+      // Auto-ocultar alertas flash después de 5 segundos
+      document.addEventListener('DOMContentLoaded', function() {
+        var alerts = document.querySelectorAll('.adm-alert');
+        alerts.forEach(function(alert) {
+          setTimeout(function() {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(function() { alert.style.display = 'none'; }, 500);
+          }, 5000);
+        });
+      });
+    </script>
   </body>
 </html>

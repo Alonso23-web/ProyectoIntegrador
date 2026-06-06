@@ -5,12 +5,16 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import proyecto.nuevaases.models.Viaje;
 import proyecto.nuevaases.repositories.EncomiendaRepository;
 import proyecto.nuevaases.repositories.ReservaRepository;
 import proyecto.nuevaases.repositories.UsuarioRepository;
 import proyecto.nuevaases.repositories.VehiculoRepository;
 import proyecto.nuevaases.repositories.ViajeRepository;
+import proyecto.nuevaases.services.IUsuarioService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,6 +31,7 @@ public class DashboardController {
     private final EncomiendaRepository encomiendaRepository;
     private final VehiculoRepository vehiculoRepository;
     private final ViajeRepository viajeRepository;
+    private final IUsuarioService usuarioService;
 
     @GetMapping("/dashboard")
     @Transactional(readOnly = true)
@@ -43,10 +48,37 @@ public class DashboardController {
         model.addAttribute("rolUsuario", rol);
 
         if (rol.equals("ADMINISTRADOR")) {
+            // ==================== ESTADÍSTICAS DEL DÍA ====================
+            LocalDate hoy = LocalDate.now();
+            long pasajesDelDia = reservaRepository.countByViajeFecha(hoy);
+            double ingresosDelDia = reservaRepository.sumPrecioByViajeFecha(hoy);
+            long encomiendasActivas = encomiendaRepository.countByEstadoNot("ENTREGADO");
+            long conductoresActivos = usuarioService.contarConductoresActivos();
+
+            model.addAttribute("pasajesDelDia", pasajesDelDia);
+            model.addAttribute("ingresosDelDia", ingresosDelDia);
+            model.addAttribute("encomiendasActivas", encomiendasActivas);
+            model.addAttribute("conductoresActivos", conductoresActivos);
+
+            // ==================== CONDUCTORES PENDIENTES ====================
+            model.addAttribute("conductoresPendientes", usuarioService.listarConductoresPendientes());
+
+            // ==================== CONDUCTORES (todos) ====================
+            model.addAttribute("conductores", usuarioService.listarConductores());
+
+            // ==================== TABLAS RECIENTES ====================
             model.addAttribute("totalPasajes", reservaRepository.count());
             model.addAttribute("totalEncomiendas", encomiendaRepository.count());
-            model.addAttribute("ultimosPasajes", reservaRepository.findTop5ByOrderByIdDesc());
+            model.addAttribute("ultimosPasajes", reservaRepository.findByViajeFechaOrderByIdDesc(hoy));
             model.addAttribute("ultimasEncomiendas", encomiendaRepository.findTop5ByOrderByFechaEnvioDesc());
+
+            // Nombre del admin desde la BD
+            usuarioOpt.ifPresent(u -> model.addAttribute("nombreAdmin", u.getNombreCompleto()));
+
+            // Fecha formateada en español
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", new java.util.Locale("es", "PE"));
+            model.addAttribute("fechaHoy", hoy.format(formatter));
+
             return "dashboard/admin";
         }
 
@@ -103,6 +135,30 @@ public class DashboardController {
         }
 
         return "dashboard/cliente";
+    }
+
+    // ==================== APROBACIÓN DE CONDUCTORES ====================
+
+    @PostMapping("/admin/conductores/aprobar/{id}")
+    public String aprobarConductor(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            usuarioService.aprobarConductor(id);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Conductor aprobado correctamente. Ya puede iniciar sesión.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al aprobar conductor: " + e.getMessage());
+        }
+        return "redirect:/dashboard";
+    }
+
+    @PostMapping("/admin/conductores/rechazar/{id}")
+    public String rechazarConductor(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            usuarioService.rechazarConductor(id);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Conductor rechazado.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al rechazar conductor: " + e.getMessage());
+        }
+        return "redirect:/dashboard";
     }
 
     // Clase interna para pasar datos de viaje con pasajeros a la vista

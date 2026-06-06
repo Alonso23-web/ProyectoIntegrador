@@ -1,6 +1,7 @@
 package proyecto.nuevaases.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import proyecto.nuevaases.models.Encomienda;
 
 import java.util.List;
@@ -27,4 +28,11 @@ public interface EncomiendaRepository extends JpaRepository<Encomienda, Long> {
         List<Encomienda> findByCreadoPorEmail(String creadoPorEmail);
 
         List<Encomienda> findTop5ByOrderByFechaEnvioDesc();
+
+        long countByEstadoNot(String estado);
+
+        List<Encomienda> findByEstado(String estado);
+
+        @Query("SELECT e.estado as estado, COUNT(e) as total FROM Encomienda e GROUP BY e.estado")
+        List<Object[]> countGroupByEstado();
 }

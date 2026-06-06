@@ -23,8 +23,24 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     Optional<Reserva> findByCodigoBoleto(String codigoBoleto);
 
-    List<Reserva> findByUsuarioEmailOrderByIdDesc(String usuarioEmail);
+    List<Reserva> findByUsuarioEmailOrderByIdDesc(String usuarioEmail);    List<Reserva> findTop5ByOrderByIdDesc();
 
-    List<Reserva> findTop5ByOrderByIdDesc();
+    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.viaje.fecha = :fecha")
+    long countByViajeFecha(@Param("fecha") LocalDate fecha);
 
+    @Query("SELECT COALESCE(SUM(r.precio), 0) FROM Reserva r WHERE r.viaje.fecha = :fecha")
+    double sumPrecioByViajeFecha(@Param("fecha") LocalDate fecha);
+
+    @Query("SELECT r FROM Reserva r WHERE r.viaje.fecha = :fecha ORDER BY r.id DESC")
+    List<Reserva> findByViajeFechaOrderByIdDesc(@Param("fecha") LocalDate fecha);
+
+    @Query("SELECT COALESCE(SUM(r.precio), 0) FROM Reserva r")
+    double sumAllPrecio();
+
+    @Query("SELECT r.viaje.fecha as fecha, COUNT(r) as total, SUM(r.precio) as totalPrecio " +
+           "FROM Reserva r GROUP BY r.viaje.fecha ORDER BY r.viaje.fecha DESC")
+    List<Object[]> countAndSumByFecha();
+
+    @Query("SELECT COUNT(DISTINCT r.viaje.fecha) FROM Reserva r")
+    long countDistinctViajeFecha();
 }
