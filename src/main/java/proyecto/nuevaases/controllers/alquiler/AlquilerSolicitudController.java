@@ -29,30 +29,29 @@ public class AlquilerSolicitudController {
             @RequestParam(required = false) String ubicacion,
             Model model
     ) {
-        // Simulación simple: filtramos por tipo/capacidad si existen campos, si no, mostramos flota.
-        // Nota: evitamos Map.of() con valores null en este handler.
+        // Filtrar vehículos disponibles con capacidad >= personas ingresadas
         List<Vehiculo> all = vehiculoRepository.findAll();
         List<Vehiculo> filtered = new ArrayList<>();
 
         for (Vehiculo v : all) {
-            boolean ok = true;
-            if (tipo != null && !tipo.isBlank()) {
-                String tipoVeh = safeStr(v.getTipo());
-                ok = ok && (tipoVeh.isEmpty() || tipoVeh.toLowerCase(Locale.ROOT).contains(tipo.toLowerCase(Locale.ROOT)));
-            }
-            if (personas != null) {
-                // Si Vehiculo tiene capacidad numérica use getCapacidad; si no, no filtramos.
-                Integer cap = safeInt(v.getCapacidad());
-                if (cap != null) {
-                    ok = ok && cap >= personas;
-                }
-            }
-            // Solo mostrar disponibles
-            if (ok) {
-                ok = v.getEstado() != null && v.getEstado().equalsIgnoreCase("DISPONIBLE");
+            // Solo vehículos con estado DISPONIBLE
+            if (v.getEstado() == null || !v.getEstado().equalsIgnoreCase("DISPONIBLE")) {
+                continue;
             }
 
-            // Ubicación y fechas: en este mock se omite la lógica real.
+            boolean ok = true;
+
+            // Filtrar por tipo (búsqueda parcial, insensible a mayúsculas)
+            if (tipo != null && !tipo.isBlank()) {
+                String tipoVeh = safeStr(v.getTipo());
+                ok = ok && tipoVeh.toLowerCase(Locale.ROOT).contains(tipo.toLowerCase(Locale.ROOT));
+            }
+
+            // Filtrar por capacidad: mostrar vehículos con capacidad >= personas solicitadas
+            if (personas != null && personas > 0) {
+                ok = ok && v.getCapacidad() >= personas;
+            }
+
             if (ok) filtered.add(v);
         }
 
