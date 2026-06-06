@@ -14,4 +14,11 @@ public class UsuarioDTO {
     private String telefono;
     private String rol;
     private boolean activo;
+
+    // Campos de conductor
+    private String numeroLicencia;
+    private Integer aniosExperiencia;
+    private String tipoVehiculo;
+    private String estadoPostulacion;
+    private String documentoUrl;
 }

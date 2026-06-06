@@ -67,6 +67,11 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 .telefono(entity.getTelefono())
                 .rol(entity.getRol())
                 .activo(entity.isActivo())
+                .numeroLicencia(entity.getNumeroLicencia())
+                .aniosExperiencia(entity.getAniosExperiencia())
+                .tipoVehiculo(entity.getTipoVehiculo())
+                .estadoPostulacion(entity.getEstadoPostulacion())
+                .documentoUrl(entity.getDocumentoUrl())
                 .build();
     }
 
@@ -80,6 +85,11 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 .telefono(dto.getTelefono())
                 .rol(dto.getRol())
                 .activo(dto.isActivo())
+                .numeroLicencia(dto.getNumeroLicencia())
+                .aniosExperiencia(dto.getAniosExperiencia())
+                .tipoVehiculo(dto.getTipoVehiculo())
+                .estadoPostulacion(dto.getEstadoPostulacion())
+                .documentoUrl(dto.getDocumentoUrl())
                 .build();
     }
 }

@@ -34,5 +34,19 @@ public class Usuario {
     private String rol; // CLIENTE, ADMINISTRADOR, CONDUCTOR
 
     private boolean activo = true;
+
+    // ==================== CAMPOS DE CONDUCTOR ====================
+
+    private String numeroLicencia;
+
+    private Integer aniosExperiencia;
+
+    private String tipoVehiculo; // Minivan, Bus, Camión, Automóvil
+
+    @Column(nullable = false)
+    @Builder.Default
+    private String estadoPostulacion = "PENDIENTE"; // PENDIENTE, APROBADO, RECHAZADO
+
+    private String documentoUrl;
 }
 

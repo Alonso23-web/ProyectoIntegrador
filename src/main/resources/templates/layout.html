@@ -496,15 +496,9 @@
                     >Comprar pasajes</a
                   >
                 </li>
-                <li>
-                  <a class="dropdown-item" href="/pasajes?tab=mis-viajes"
-                    >Mis viajes</a
-                  >
+                <li><a class="dropdown-item" href="/pasajes/cliente?tab=mis-viajes">Mis viajes</a>
                 </li>
-                <li>
-                  <a class="dropdown-item" href="/pasajes?tab=estado-viaje"
-                    >Estado de viaje</a
-                  >
+                <li><a class="dropdown-item" href="/pasajes/cliente?tab=estado-viaje">Estado de viaje</a>
                 </li>
               </ul>
             </li>
@@ -591,10 +585,7 @@
                     ><i class="bi bi-speedometer2 me-2"></i>Dashboard</a
                   >
                 </li>
-                <li sec:authorize="hasRole('CLIENTE')">
-                  <a class="dropdown-item" href="/pasajes?tab=mis-viajes"
-                    ><i class="bi bi-ticket me-2"></i>Mis reservas</a
-                  >
+                <li sec:authorize="hasRole('CLIENTE')"><a class="dropdown-item" href="/pasajes/cliente?tab=mis-viajes"><i class="bi bi-ticket me-2"></i>Mis reservas</a>
                 </li>
                 <li sec:authorize="hasRole('CLIENTE')">
                   <a class="dropdown-item" href="/encomiendas?tab=mis-registros"
