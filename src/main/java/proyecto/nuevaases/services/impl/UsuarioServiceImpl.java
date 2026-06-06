@@ -51,6 +51,58 @@ public class UsuarioServiceImpl implements IUsuarioService {
     }
 
     @Override
+    public List<UsuarioDTO> listarConductoresPendientes() {
+        return usuarioRepository.findByRolAndEstadoPostulacion("CONDUCTOR", "PENDIENTE")
+                .stream().map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UsuarioDTO> listarConductores() {
+        return usuarioRepository.findByRol("CONDUCTOR")
+                .stream().map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public long contarConductoresActivos() {
+        return usuarioRepository.countByRolAndEstadoPostulacion("CONDUCTOR", "APROBADO");
+    }
+
+    @Override
+    public void aprobarConductor(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Conductor no encontrado con ID: " + id));
+        usuario.setEstadoPostulacion("APROBADO");
+        usuario.setActivo(true);
+        usuarioRepository.save(usuario);
+    }
+
+    @Override
+    public void rechazarConductor(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Conductor no encontrado con ID: " + id));
+        usuario.setEstadoPostulacion("RECHAZADO");
+        usuario.setActivo(false);
+        usuarioRepository.save(usuario);
+    }
+
+    @Override
+    public List<UsuarioDTO> listarTodosUsuarios() {
+        return usuarioRepository.findAll().stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public UsuarioDTO cambiarEstadoActivo(Long id, boolean activo) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
+        usuario.setActivo(activo);
+        return convertToDTO(usuarioRepository.save(usuario));
+    }
+
+    @Override
     public void eliminar(Long id) {
         if (!usuarioRepository.existsById(id)) {
             throw new ResourceNotFoundException("Usuario no encontrado con ID: " + id);
@@ -67,6 +119,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 .telefono(entity.getTelefono())
                 .rol(entity.getRol())
                 .activo(entity.isActivo())
+                .fechaRegistro(entity.getFechaRegistro())
                 .numeroLicencia(entity.getNumeroLicencia())
                 .aniosExperiencia(entity.getAniosExperiencia())
                 .tipoVehiculo(entity.getTipoVehiculo())

@@ -66,6 +66,10 @@ http
                                 if (!usuario.isActivo()) {
                                         throw new UsernameNotFoundException("Usuario inactivo");
                                 }
+                                // Bloquear conductores no aprobados
+                                if ("CONDUCTOR".equals(usuario.getRol()) && !"APROBADO".equals(usuario.getEstadoPostulacion())) {
+                                        throw new UsernameNotFoundException("Conductor no aprobado. Tu postulación está " + usuario.getEstadoPostulacion().toLowerCase());
+                                }
                                 return org.springframework.security.core.userdetails.User.builder()
                                                 .username(usuario.getEmail())
                                                 .password(usuario.getPassword())

@@ -1,70 +1,363 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="~{layout :: head('Pasajes - Nueva Ases Express')}"></head>
+  <head
+    th:replace="~{layout :: head('Gestión de Pasajes - Nueva Ases Express')}"
+  ></head>
   <body>
     <div th:replace="~{layout :: navbar}"></div>
 
-    <div class="container my-4">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primario">
-          Venta de Pasajes Trujillo - Chepén
-        </h2>
-        <a href="/pasajes/cliente" class="btn btn-amarillo fw-bold"
-          ><i class="bi bi-plus-lg me-1"></i>Nuevo Pasaje</a
-        >
-      </div>
+    <section
+      class="py-4"
+      style="background: #f0f2f5; min-height: calc(100vh - 130px)"
+    >
+      <div class="container-fluid px-4">
 
-      <div class="table-responsive">
-        <table class="table table-striped table-hover align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>Pasajero</th>
-              <th>DNI</th>
-              <th>Fecha</th>
-              <th>Hora</th>
-              <th>Asiento</th>
-              <th>Precio</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="p : ${pasajes}">
-              <td th:text="${p.nombrePasajero}"></td>
-              <td th:text="${p.dni}"></td>
-              <td th:text="${p.fechaViaje}"></td>
-              <td th:text="${p.horaViaje}"></td>
-              <td th:text="${p.asiento}"></td>
-              <td>S/ <span th:text="${p.precio}"></span></td>
-              <td>
-                <span
-                  class="badge"
-                  th:classappend="${p.estado == 'PAGADO' ? 'bg-success' : (p.estado == 'RESERVADO' ? 'bg-warning' : 'bg-secondary')}"
-                  th:text="${p.estado}"
-                ></span>
-              </td>
-              <td>
-                <a
-                  th:href="@{'/pasajes/editar/' + ${p.id}}"
-                  class="btn btn-sm btn-outline-primary"
-                  ><i class="bi bi-pencil me-1"></i>Editar</a
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h4 class="fw-bold text-primario mb-0">
+              <i class="bi bi-ticket-perforated me-2 text-amarillo"></i>Gestión de Pasajes
+            </h4>
+            <small class="text-muted"
+              >Administra, filtra y actualiza el estado de los pasajes vendidos</small
+            >
+          </div>
+          <a href="/pasajes/nuevo" class="btn btn-amarillo fw-bold">
+            <i class="bi bi-plus-circle me-2"></i>Nuevo Pasaje
+          </a>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card border-0 shadow-sm mb-4 rounded-4">
+          <div class="card-body p-3">
+            <div class="row g-2 align-items-end">
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold text-muted">Buscar</label>
+                <input
+                  type="text"
+                  id="filtro-buscar"
+                  class="form-control"
+                  placeholder="Pasajero, DNI, email..."
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold text-muted">Estado</label>
+                <select id="filtro-estado" class="form-select">
+                  <option value="">Todos los estados</option>
+                  <option value="RESERVADO">Reservado</option>
+                  <option value="PAGADO">Pagado</option>
+                  <option value="CANCELADO">Cancelado</option>
+                  <option value="FINALIZADO">Finalizado</option>
+                </select>
+              </div>
+              <div class="col-md-2">
+                <label class="form-label small fw-semibold text-muted">Fecha</label>
+                <input type="date" id="filtro-fecha" class="form-control" />
+              </div>
+              <div class="col-md-2">
+                <button
+                  class="btn btn-outline-secondary w-100"
+                  onclick="limpiarFiltros()"
                 >
-                <a
-                  th:href="@{'/pasajes/eliminar/' + ${p.id}}"
-                  class="btn btn-sm btn-outline-danger"
-                  onclick="
-                    return confirm('¿Estás seguro de eliminar este pasaje?');
-                  "
-                  ><i class="bi bi-trash me-1"></i>Eliminar</a
-                >
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                  <i class="bi bi-x-circle me-1"></i>Limpiar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table
+                class="table table-hover align-middle mb-0"
+                id="tabla-pasajes"
+              >
+                <thead style="background: #f8f9fa">
+                  <tr>
+                    <th class="px-3 py-3 text-muted small fw-bold">PASAJERO</th>
+                    <th class="py-3 text-muted small fw-bold">DNI</th>
+                    <th class="py-3 text-muted small fw-bold">RUTA</th>
+                    <th class="py-3 text-muted small fw-bold">FECHA VIAJE</th>
+                    <th class="py-3 text-muted small fw-bold">HORA</th>
+                    <th class="py-3 text-muted small fw-bold">ASIENTO</th>
+                    <th class="py-3 text-muted small fw-bold">PRECIO</th>
+                    <th class="py-3 text-muted small fw-bold">ESTADO</th>
+                    <th class="py-3 text-muted small fw-bold" style="min-width: 140px">ACCIONES</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    th:each="p : ${pasajes}"
+                    th:data-pasajero="${p.nombrePasajero}"
+                    th:data-dni="${p.dni}"
+                    th:data-email="${p.creadoPorEmail}"
+                    th:data-estado="${p.estado}"
+                    th:data-fecha="${p.fechaViaje}"
+                  >
+                    <td class="px-3">
+                      <div class="fw-semibold" th:text="${p.nombrePasajero}">—</div>
+                      <small class="text-muted" th:text="${p.creadoPorEmail}">—</small>
+                    </td>
+                    <td th:text="${p.dni}">—</td>
+                    <td>
+                      <span th:text="${p.origen}">Trujillo</span>
+                      <i class="bi bi-arrow-right mx-1 text-muted" style="font-size:0.7rem;"></i>
+                      <span th:text="${p.destino}">Chepén</span>
+                    </td>
+                    <td th:text="${p.fechaViaje}">—</td>
+                    <td th:text="${p.horaViaje}">—</td>
+                    <td>
+                      <span class="badge badge-light-blue px-2 py-1" th:text="'#' + ${p.asiento}">#0</span>
+                    </td>
+                    <td class="fw-semibold text-success">
+                      S/ <span th:text="${#numbers.formatDecimal(p.precio, 1, 2)}">12.00</span>
+                    </td>
+                    <td>
+                      <span
+                        class="badge-estado"
+                        th:classappend="'badge-' + ${#strings.toLowerCase(p.estado)}"
+                        th:text="${p.estado}"
+                      ></span>
+                    </td>
+                    <td>
+                      <div class="d-flex gap-1">
+                        <!-- Editar (modal) -->
+                        <button
+                          class="btn btn-sm btn-outline-secondary"
+                          th:attr="data-id=${p.id},
+                            data-pasajero=${p.nombrePasajero},
+                            data-dni=${p.dni},
+                            data-origen=${p.origen},
+                            data-destino=${p.destino},
+                            data-fecha=${p.fechaViaje},
+                            data-hora=${p.horaViaje},
+                            data-asiento=${p.asiento},
+                            data-precio=${p.precio},
+                            data-estado=${p.estado},
+                            data-email=${p.creadoPorEmail}"
+                          onclick="abrirModalEditar(this)"
+                          title="Editar"
+                        >
+                          <i class="bi bi-pencil"></i>
+                        </button>
+                        <!-- Cambiar estado rápido -->
+                        <div class="dropdown">
+                          <button
+                            class="btn btn-sm btn-outline-warning dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            title="Cambiar estado"
+                          >
+                            <i class="bi bi-arrow-repeat"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                              <form th:action="@{'/pasajes/estado/' + ${p.id}}" method="post" style="display:inline">
+                                <input type="hidden" name="estado" value="RESERVADO" />
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="dropdown-item small">
+                                  <span class="badge-estado badge-reservado me-2">RESERVADO</span> Marcar
+                                </button>
+                              </form>
+                            </li>
+                            <li>
+                              <form th:action="@{'/pasajes/estado/' + ${p.id}}" method="post" style="display:inline">
+                                <input type="hidden" name="estado" value="PAGADO" />
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="dropdown-item small">
+                                  <span class="badge-estado badge-pagado me-2">PAGADO</span> Marcar
+                                </button>
+                              </form>
+                            </li>
+                            <li>
+                              <form th:action="@{'/pasajes/estado/' + ${p.id}}" method="post" style="display:inline">
+                                <input type="hidden" name="estado" value="CANCELADO" />
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="dropdown-item small">
+                                  <span class="badge-estado badge-cancelado me-2">CANCELADO</span> Marcar
+                                </button>
+                              </form>
+                            </li>
+                            <li>
+                              <form th:action="@{'/pasajes/estado/' + ${p.id}}" method="post" style="display:inline">
+                                <input type="hidden" name="estado" value="FINALIZADO" />
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit" class="dropdown-item small">
+                                  <span class="badge-estado badge-finalizado me-2">FINALIZADO</span> Marcar
+                                </button>
+                              </form>
+                            </li>
+                          </ul>
+                        </div>
+                        <!-- Eliminar -->
+                        <a
+                          th:href="@{'/pasajes/eliminar/' + ${p.id}}"
+                          class="btn btn-sm btn-outline-danger"
+                          onclick="return confirm('¿Eliminar este pasaje?')"
+                        >
+                          <i class="bi bi-trash"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr th:if="${#lists.size(pasajes) == 0}">
+                    <td colspan="9" class="text-center text-muted py-5">
+                      <i class="bi bi-inbox display-6 d-block mb-2"></i>
+                      No hay pasajes registrados.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal: Editar Pasaje -->
+    <div class="modal fade" id="modalEditarPasaje" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold text-primario">
+              <i class="bi bi-pencil me-2 text-amarillo"></i>Editar Pasaje
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <form th:action="@{/pasajes/guardar}" method="post">
+            <div class="modal-body">
+              <input type="hidden" name="id" id="modal-id" />
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Pasajero</label>
+                  <input type="text" name="nombrePasajero" id="modal-pasajero" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">DNI</label>
+                  <input type="text" name="dni" id="modal-dni" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Origen</label>
+                  <input type="text" name="origen" id="modal-origen" class="form-control" readonly />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Destino</label>
+                  <input type="text" name="destino" id="modal-destino" class="form-control" readonly />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold">Fecha viaje</label>
+                  <input type="date" name="fechaViaje" id="modal-fecha" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold">Hora</label>
+                  <input type="text" name="horaViaje" id="modal-hora" class="form-control" placeholder="08:00" />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label small fw-semibold">Asiento</label>
+                  <input type="number" name="asiento" id="modal-asiento" class="form-control" min="1" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Precio (S/)</label>
+                  <input type="number" name="precio" id="modal-precio" class="form-control" step="0.50" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Estado</label>
+                  <select name="estado" id="modal-estado" class="form-select">
+                    <option value="RESERVADO">Reservado</option>
+                    <option value="PAGADO">Pagado</option>
+                    <option value="CANCELADO">Cancelado</option>
+                    <option value="FINALIZADO">Finalizado</option>
+                  </select>
+                </div>
+                <input type="hidden" name="creadoPorEmail" id="modal-email" />
+              </div>
+            </div>
+            <div class="modal-footer border-0">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-amarillo fw-bold">
+                <i class="bi bi-check-circle me-1"></i>Guardar cambios
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
 
     <div th:replace="~{layout :: footer}"></div>
     <div th:replace="~{layout :: scripts}"></div>
+
+    <style>
+      .badge-estado {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+        font-weight: 600;
+      }
+      .badge-reservado { background: #fef7e0; color: #e37400; }
+      .badge-pagado { background: #e6f4ea; color: #1e8e3e; }
+      .badge-cancelado { background: #fce8e6; color: #d93025; }
+      .badge-finalizado { background: #e8f0fe; color: #1967d2; }
+      .badge-light-blue {
+        background: rgba(13,27,62,0.08);
+        color: #0d1b3e;
+        font-weight: 700;
+      }
+    </style>
+
+    <script>
+      document.getElementById("filtro-buscar").addEventListener("input", filtrar);
+      document.getElementById("filtro-estado").addEventListener("change", filtrar);
+      document.getElementById("filtro-fecha").addEventListener("change", filtrar);
+
+      function filtrar() {
+        const buscar = document.getElementById("filtro-buscar").value.toLowerCase();
+        const estado = document.getElementById("filtro-estado").value.toUpperCase();
+        const fecha = document.getElementById("filtro-fecha").value;
+
+        document.querySelectorAll("#tabla-pasajes tbody tr[data-pasajero]").forEach(tr => {
+          const pasajero = (tr.dataset.pasajero || "").toLowerCase();
+          const dni = (tr.dataset.dni || "").toLowerCase();
+          const email = (tr.dataset.email || "").toLowerCase();
+          const trEstado = (tr.dataset.estado || "").toUpperCase();
+          const trFecha = tr.dataset.fecha || "";
+
+          const coincideBuscar = !buscar ||
+            pasajero.includes(buscar) ||
+            dni.includes(buscar) ||
+            email.includes(buscar);
+
+          const coincideEstado = !estado || trEstado === estado;
+          const coincideFecha = !fecha || trFecha === fecha;
+
+          tr.style.display = (coincideBuscar && coincideEstado && coincideFecha) ? "" : "none";
+        });
+      }
+
+      function limpiarFiltros() {
+        document.getElementById("filtro-buscar").value = "";
+        document.getElementById("filtro-estado").value = "";
+        document.getElementById("filtro-fecha").value = "";
+        filtrar();
+      }
+
+      function abrirModalEditar(btn) {
+        document.getElementById("modal-id").value = btn.dataset.id;
+        document.getElementById("modal-pasajero").value = btn.dataset.pasajero || "";
+        document.getElementById("modal-dni").value = btn.dataset.dni || "";
+        document.getElementById("modal-origen").value = btn.dataset.origen || "Trujillo";
+        document.getElementById("modal-destino").value = btn.dataset.destino || "Chepén";
+        document.getElementById("modal-fecha").value = btn.dataset.fecha || "";
+        document.getElementById("modal-hora").value = btn.dataset.hora || "";
+        document.getElementById("modal-asiento").value = btn.dataset.asiento || "";
+        document.getElementById("modal-precio").value = btn.dataset.precio || "12.00";
+        document.getElementById("modal-estado").value = btn.dataset.estado || "RESERVADO";
+        document.getElementById("modal-email").value = btn.dataset.email || "";
+
+        new bootstrap.Modal(document.getElementById("modalEditarPasaje")).show();
+      }
+    </script>
   </body>
 </html>

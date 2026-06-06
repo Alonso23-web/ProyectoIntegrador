@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import proyecto.nuevaases.dto.PasajeDTO;
 import proyecto.nuevaases.dto.UsuarioDTO;
 import proyecto.nuevaases.services.IPasajeService;
@@ -63,6 +64,19 @@ public class PasajeController {
             pasaje.setDestino("Chepén");
         }
         pasajeService.guardar(pasaje);
+        return "redirect:/pasajes";
+    }
+
+    @PostMapping("/estado/{id}")
+    public String cambiarEstado(@PathVariable Long id, @RequestParam String estado, RedirectAttributes redirectAttributes) {
+        try {
+            PasajeDTO pasaje = pasajeService.buscarPorId(id);
+            pasaje.setEstado(estado);
+            pasajeService.guardar(pasaje);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Estado actualizado a " + estado);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al actualizar estado: " + e.getMessage());
+        }
         return "redirect:/pasajes";
     }
 

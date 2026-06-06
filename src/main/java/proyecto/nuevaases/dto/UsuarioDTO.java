@@ -1,6 +1,7 @@
 package proyecto.nuevaases.dto;
 
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -14,6 +15,7 @@ public class UsuarioDTO {
     private String telefono;
     private String rol;
     private boolean activo;
+    private LocalDateTime fechaRegistro;
 
     // Campos de conductor
     private String numeroLicencia;

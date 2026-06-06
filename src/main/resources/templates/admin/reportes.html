@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head('Reportes - Nueva Ases Express')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <section
+      class="py-4"
+      style="background: #f0f2f5; min-height: calc(100vh - 130px)"
+    >
+      <div class="container-fluid px-4">
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h4 class="fw-bold text-primario mb-0">
+              <i class="bi bi-file-earmark-bar-graph me-2 text-amarillo"></i>Reportes del Negocio
+            </h4>
+            <small class="text-muted">Estadísticas reales de pasajes, ingresos y encomiendas</small>
+          </div>
+        </div>
+
+        <style>
+          .rp-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(13,27,62,0.08);
+            margin-bottom: 2rem;
+          }
+          .rp-stat {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem 1.8rem;
+            box-shadow: 0 4px 20px rgba(13,27,62,0.08);
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            transition: transform 0.25s ease;
+            border-left: 4px solid #0d1b3e;
+          }
+          .rp-stat:hover { transform: translateY(-4px); }
+          .rp-stat-icon {
+            width: 56px; height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            flex-shrink: 0;
+          }
+          .rp-stat-icon.blue { background: #e8f0fe; color: #1967d2; }
+          .rp-stat-icon.green { background: #e6f4ea; color: #1e8e3e; }
+          .rp-stat-icon.orange { background: #fef7e0; color: #e37400; }
+          .rp-stat-icon.purple { background: #f3e8fd; color: #7c3aed; }
+          .rp-stat-num { font-size: 2rem; font-weight: 800; color: #0d1b3e; line-height: 1.1; }
+          .rp-stat-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600; color: #64748b; margin-top: 0.15rem; }
+          .rp-section-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+          }
+          .table th {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #94a3b8;
+            font-weight: 700;
+            border-bottom: 2px solid #f1f5f9;
+          }
+          .table td { vertical-align: middle; font-size: 0.88rem; }
+        </style>
+
+        <!-- ==================== MÉTRICAS CLAVE ==================== -->
+        <h5 class="rp-section-title">
+          <i class="bi bi-bar-chart-fill text-amarillo"></i> Métricas clave
+        </h5>
+        <div class="row g-3 mb-4">
+          <div class="col-md-3">
+            <div class="rp-stat">
+              <div class="rp-stat-icon green"><i class="bi bi-cash-stack"></i></div>
+              <div>
+                <div class="rp-stat-num">S/ <span th:text="${#numbers.formatDecimal(ingresosHistoricos, 1, 2)}">0.00</span></div>
+                <div class="rp-stat-label">Ingresos históricos</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="rp-stat">
+              <div class="rp-stat-icon blue"><i class="bi bi-ticket-perforated"></i></div>
+              <div>
+                <div class="rp-stat-num" th:text="${totalPasajes}">0</div>
+                <div class="rp-stat-label">Pasajes vendidos</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="rp-stat">
+              <div class="rp-stat-icon orange"><i class="bi bi-box-seam"></i></div>
+              <div>
+                <div class="rp-stat-num" th:text="${totalEncomiendas}">0</div>
+                <div class="rp-stat-label">Encomiendas procesadas</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="rp-stat">
+              <div class="rp-stat-icon purple"><i class="bi bi-graph-up-arrow"></i></div>
+              <div>
+                <div class="rp-stat-num" th:text="${promedioDiario}">0</div>
+                <div class="rp-stat-label">Promedio diario pasajes</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== PASAJES POR FECHA ==================== -->
+        <h5 class="rp-section-title">
+          <i class="bi bi-calendar-week text-amarillo"></i> Pasajes vendidos por fecha
+        </h5>
+        <div class="rp-card">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Pasajes vendidos</th>
+                  <th>Total recaudado</th>
+                  <th>Promedio por pasaje</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="row : ${pasajesPorFecha}">
+                  <td class="fw-semibold" th:text="${row[0]}">—</td>
+                  <td>
+                    <span class="badge badge-light-blue rounded-pill px-3 py-1 fw-bold" th:text="${row[1]}">0</span>
+                  </td>
+                  <td class="fw-semibold text-success">
+                    S/ <span th:text="${#numbers.formatDecimal(row[2] != null ? row[2] : 0, 1, 2)}">0.00</span>
+                  </td>
+                  <td class="text-muted small">
+                    S/ <span th:text="${#numbers.formatDecimal((row[2] != null ? row[2] : 0) / (row[1] != null && row[1] > 0 ? row[1] : 1), 1, 2)}">0.00</span> c/u
+                  </td>
+                </tr>
+                <tr th:if="${#lists.size(pasajesPorFecha) == 0}">
+                  <td colspan="4" class="text-center text-muted py-4">
+                    <i class="bi bi-inbox me-2"></i>No hay datos de pasajes.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ==================== ENCOMIENDAS POR ESTADO ==================== -->
+        <h5 class="rp-section-title">
+          <i class="bi bi-pie-chart text-amarillo"></i> Encomiendas por estado
+        </h5>
+        <div class="rp-card">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Estado</th>
+                  <th>Cantidad</th>
+                  <th>Porcentaje</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="row : ${encomiendasPorEstado}">
+                  <td>
+                    <span class="badge-estado"
+                          th:classappend="'badge-' + ${#strings.toLowerCase(row[0] != null ? row[0] : '')}"
+                          th:text="${row[0]}">—</span>
+                  </td>
+                  <td>
+                    <span class="fw-bold" th:text="${row[1]}">0</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="progress flex-grow-1" style="height:8px;border-radius:4px;max-width:200px;">
+                        <div class="progress-bar" role="progressbar"
+                             th:style="'width:' + (${totalEncomiendas > 0 ? (row[1] * 100 / totalEncomiendas) : 0}) + '%'"
+                             th:classappend="
+                               ${#strings.toLowerCase(row[0] != null ? row[0] : '') == 'entregado' ? 'bg-success' :
+                               #strings.toLowerCase(row[0] != null ? row[0] : '') == 'en_transito' ? 'bg-warning' :
+                               #strings.toLowerCase(row[0] != null ? row[0] : '') == 'en_destino' ? 'bg-info' : 'bg-secondary'}">
+                        </div>
+                      </div>
+                      <span class="small text-muted fw-semibold"
+                            th:text="${totalEncomiendas > 0 ? #numbers.formatDecimal(row[1] * 100 / totalEncomiendas, 1, 1) : 0} + '%'">
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+                <tr th:if="${#lists.size(encomiendasPorEstado) == 0}">
+                  <td colspan="3" class="text-center text-muted py-4">
+                    <i class="bi bi-inbox me-2"></i>No hay encomiendas registradas.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <style>
+      .badge-estado { font-size: 0.7rem; padding: 0.3rem 0.8rem; border-radius: 50px; font-weight: 600; }
+      .badge-registrado { background: #f1f5f9; color: #475569; }
+      .badge-en_transito { background: #fef7e0; color: #e37400; }
+      .badge-en_destino { background: #e8f0fe; color: #1967d2; }
+      .badge-entregado { background: #e6f4ea; color: #1e8e3e; }
+      .badge-light-blue { background: rgba(13,27,62,0.08); color: #0d1b3e; font-weight: 700; }
+    </style>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>

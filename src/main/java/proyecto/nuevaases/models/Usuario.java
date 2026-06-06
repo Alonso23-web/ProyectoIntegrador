@@ -2,6 +2,9 @@ package proyecto.nuevaases.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usuarios")
@@ -34,6 +37,10 @@ public class Usuario {
     private String rol; // CLIENTE, ADMINISTRADOR, CONDUCTOR
 
     private boolean activo = true;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime fechaRegistro;
 
     // ==================== CAMPOS DE CONDUCTOR ====================
 

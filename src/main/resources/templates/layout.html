@@ -452,23 +452,38 @@
               >
             </li>
             <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+              <a class="nav-link" href="/pasajes"
+                ><i class="bi bi-ticket-perforated me-1"></i>Pasajes</a
+              >
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+              <a class="nav-link" href="/dashboard#conductores"
+                ><i class="bi bi-person-badge me-1"></i>Conductores</a
+              >
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+              <a class="nav-link" href="/encomiendas/listar"
+                ><i class="bi bi-box-seam me-1"></i>Encomiendas</a
+              >
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
+              <a class="nav-link" href="/viajes"
+                ><i class="bi bi-signpost-2 me-1"></i>Viajes</a
+              >
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
               <a class="nav-link" href="/vehiculos"
                 ><i class="bi bi-truck me-1"></i>Vehículos</a
               >
             </li>
             <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
-              <a class="nav-link" href="/pasajes"
-                ><i class="bi bi-ticket me-1"></i>Pasajes</a
+              <a class="nav-link" href="/admin/usuarios"
+                ><i class="bi bi-people me-1"></i>Usuarios</a
               >
             </li>
             <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
-              <a class="nav-link" href="/encomiendas"
-                ><i class="bi bi-box me-1"></i>Encomiendas</a
-              >
-            </li>
-            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
-              <a class="nav-link" href="/rastrear"
-                ><i class="bi bi-search me-1"></i>Rastrear</a
+              <a class="nav-link" href="/admin/reportes"
+                ><i class="bi bi-file-earmark-bar-graph me-1"></i>Reportes</a
               >
             </li>
 
