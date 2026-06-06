@@ -141,7 +141,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 .numeroLicencia(dto.getNumeroLicencia())
                 .aniosExperiencia(dto.getAniosExperiencia())
                 .tipoVehiculo(dto.getTipoVehiculo())
-                .estadoPostulacion(dto.getEstadoPostulacion())
+                .estadoPostulacion(dto.getEstadoPostulacion() != null ? dto.getEstadoPostulacion() : "PENDIENTE")
                 .documentoUrl(dto.getDocumentoUrl())
                 .build();
     }
