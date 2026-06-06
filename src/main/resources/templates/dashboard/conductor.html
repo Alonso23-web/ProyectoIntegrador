@@ -7,33 +7,50 @@
     <div th:replace="~{layout :: navbar}"></div>
 
     <style>
+      :root {
+        --cond-blue: #0d1b3e;
+        --cond-gold: #f5a623;
+        --cond-bg: #f0f2f5;
+      }
+
       .cond-dashboard {
-        background: #f0f2f5;
+        background: var(--cond-bg);
         min-height: calc(100vh - 130px);
         padding: 2rem 0;
       }
 
-      /* Header de bienvenida */
+      /* ========== ALERTAS FLASH ========== */
+      .cond-alert {
+        border-radius: 16px;
+        padding: 1rem 1.5rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      /* ========== HEADER ========== */
       .cond-header {
-        background: linear-gradient(135deg, #0d1b4c 0%, #1a2d6b 100%);
+        background: linear-gradient(135deg, #0d1b3e 0%, #1a2d6b 100%);
         border-radius: 24px;
         padding: 2rem 2.5rem;
         color: white;
         margin-bottom: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 1rem;
         position: relative;
         overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
       }
       .cond-header::after {
         content: "🚛";
         position: absolute;
-        right: 20px;
-        bottom: -15px;
-        font-size: 100px;
+        right: 25px;
+        bottom: -12px;
+        font-size: 110px;
         opacity: 0.08;
       }
       .cond-header h1 {
@@ -42,35 +59,116 @@
         margin-bottom: 0.3rem;
       }
       .cond-header p {
-        opacity: 0.8;
+        opacity: 0.85;
         font-size: 0.95rem;
         margin-bottom: 0;
+        max-width: 400px;
       }
       .cond-header .cond-badge {
-        background: rgba(255,255,255,0.15);
+        background: rgba(255,255,255,0.12);
         color: white;
         padding: 0.4rem 1.2rem;
         border-radius: 50px;
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
+        border: 1px solid rgba(255,255,255,0.1);
+        margin-top: 0.5rem;
       }
 
-      /* Cards de resumen */
-      .resumen-grid {
+      /* ========== COUNTDOWN ========== */
+      .cond-countdown {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem 2rem;
+        box-shadow: 0 4px 20px rgba(13,27,62,0.08);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        border-left: 4px solid var(--cond-gold);
+      }
+      .cond-countdown-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .cond-countdown-info .cd-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: #fef7e0;
+        color: #e37400;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+      }
+      .cond-countdown-info .cd-text h6 {
+        font-weight: 700;
+        color: var(--cond-blue);
+        margin-bottom: 0.15rem;
+      }
+      .cond-countdown-info .cd-text small {
+        color: #94a3b8;
+        font-size: 0.82rem;
+      }
+      .cond-countdown-timer {
+        display: flex;
+        gap: 0.8rem;
+        align-items: center;
+      }
+      .cond-countdown-timer .cd-unit {
+        text-align: center;
+      }
+      .cond-countdown-timer .cd-unit .cd-num {
+        background: var(--cond-blue);
+        color: white;
+        font-weight: 800;
+        font-size: 1.8rem;
+        padding: 0.3rem 0.7rem;
+        border-radius: 12px;
+        min-width: 55px;
+        display: inline-block;
+      }
+      .cond-countdown-timer .cd-unit .cd-label {
+        font-size: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #94a3b8;
+        font-weight: 600;
+        display: block;
+        margin-top: 0.2rem;
+      }
+      .cond-countdown-timer .cd-sep {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--cond-gold);
+        margin-top: -0.5rem;
+      }
+      .cond-countdown-sinviaje {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* ========== STATS ========== */
+      .cond-stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: 1rem;
         margin-bottom: 2rem;
       }
       @media (max-width: 768px) {
-        .resumen-grid {
-          grid-template-columns: 1fr;
-        }
+        .cond-stats { grid-template-columns: 1fr; }
       }
-      .resumen-card {
+      .cond-stat {
         background: white;
         border-radius: 18px;
         padding: 1.5rem;
@@ -79,14 +177,13 @@
         transition: all 0.3s ease;
         border: 2px solid transparent;
       }
-      .resumen-card:hover {
+      .cond-stat:hover {
         transform: translateY(-4px);
-        box-shadow: 0 10px 25px rgba(13,27,76,0.12);
-        border-color: #f5a623;
+        box-shadow: 0 10px 25px rgba(13,27,62,0.12);
+        border-color: var(--cond-gold);
       }
-      .resumen-card .res-icon {
-        width: 56px;
-        height: 56px;
+      .cond-stat .cs-icon {
+        width: 56px; height: 56px;
         border-radius: 16px;
         display: flex;
         align-items: center;
@@ -94,61 +191,86 @@
         font-size: 1.6rem;
         margin: 0 auto 0.8rem;
       }
-      .resumen-card .res-num {
+      .cond-stat .cs-num {
         font-size: 2rem;
         font-weight: 800;
-        color: #0d1b4c;
+        color: var(--cond-blue);
         line-height: 1.2;
       }
-      .resumen-card .res-label {
-        font-size: 0.8rem;
+      .cond-stat .cs-label {
+        font-size: 0.78rem;
         text-transform: uppercase;
         letter-spacing: 0.5px;
         font-weight: 600;
         color: #6c757d;
         margin-top: 0.2rem;
       }
-      .res-icon-viajes { background: #e8f4fd; color: #0d6efd; }
-      .res-icon-pasajeros { background: #d4edda; color: #155724; }
-      .res-icon-encomiendas { background: #fff3cd; color: #856404; }
+      .cs-icon-trips { background: #e8f4fd; color: #0d6efd; }
+      .cs-icon-pax { background: #d4edda; color: #155724; }
+      .cs-icon-packages { background: #fff3cd; color: #856404; }
 
-      /* Sección de viajes */
-      .section-label {
-        font-size: 0.85rem;
+      /* ========== SECTION LABEL ========== */
+      .cond-section-title {
+        font-size: 0.82rem;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 0.6px;
         font-weight: 700;
-        color: #6c757d;
+        color: #64748b;
         margin-bottom: 1rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
       }
 
-      .viaje-card {
+      /* ========== TRIP CARDS ========== */
+      .cond-viaje-card {
         background: white;
         border-radius: 18px;
         padding: 1.5rem;
         box-shadow: 0 4px 15px rgba(0,0,0,0.06);
         margin-bottom: 1rem;
-        border-left: 4px solid #f5a623;
+        border-left: 4px solid var(--cond-gold);
         transition: all 0.3s ease;
       }
-      .viaje-card:hover {
-        box-shadow: 0 8px 25px rgba(13,27,76,0.1);
+      .cond-viaje-card:hover {
+        box-shadow: 0 8px 25px rgba(13,27,62,0.1);
       }
-      .viaje-card .viaje-ruta {
+      .cond-viaje-card.en-curso {
+        border-left-color: var(--cond-gold) !important;
+        border: 2px solid var(--cond-gold);
+        box-shadow: 0 4px 20px rgba(245,166,35,0.15);
+      }
+      .cond-viaje-card .vc-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.8rem;
+      }
+      .cond-viaje-card .vc-ruta {
         font-weight: 700;
         font-size: 1.1rem;
-        color: #0d1b4c;
+        color: var(--cond-blue);
         display: flex;
         align-items: center;
         gap: 0.5rem;
       }
-      .viaje-card .viaje-ruta .arrow {
-        color: #f5a623;
+      .cond-viaje-card .vc-ruta .arrow {
+        color: var(--cond-gold);
       }
-      .viaje-card .viaje-detalles {
+      .cond-viaje-card .vc-badge {
+        font-size: 0.65rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .vc-badge-programado { background: #e8f0fe; color: #1967d2; }
+      .vc-badge-en_curso { background: #fef7e0; color: #e37400; }
+      .vc-badge-finalizado { background: #e6f4ea; color: #1e8e3e; }
+
+      .cond-viaje-card .vc-details {
         display: flex;
         flex-wrap: wrap;
         gap: 1.5rem;
@@ -156,151 +278,313 @@
         padding-top: 0.8rem;
         border-top: 1px solid #f0f2f5;
       }
-      .viaje-card .viaje-detalle-item {
+      .cond-viaje-card .vc-detail-item {
         display: flex;
         align-items: center;
         gap: 0.4rem;
         font-size: 0.88rem;
         color: #495057;
       }
-      .viaje-card .viaje-detalle-item i {
-        color: #f5a623;
+      .cond-viaje-card .vc-detail-item i {
+        color: var(--cond-gold);
         font-size: 1rem;
       }
-      .viaje-card .viaje-acciones {
-        margin-top: 1rem;
+
+      .cond-viaje-card .vc-pasajeros {
+        margin-top: 0.8rem;
+        padding-top: 0.8rem;
+        border-top: 1px solid #f0f2f5;
+      }
+      .cond-viaje-card .vc-pasajeros .btn-toggle-pax {
+        background: none;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.4rem 1rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--cond-blue);
+        transition: all 0.2s ease;
+        cursor: pointer;
+      }
+      .cond-viaje-card .vc-pasajeros .btn-toggle-pax:hover {
+        background: #f8fafc;
+        border-color: var(--cond-gold);
+      }
+      .cond-viaje-card .vc-pasajeros .pax-list {
+        margin-top: 0.8rem;
+        display: none;
+      }
+      .cond-viaje-card .vc-pasajeros .pax-list.show {
+        display: block;
+      }
+      .cond-viaje-card .vc-pasajeros .pax-list table {
+        font-size: 0.85rem;
+        margin-bottom: 0;
+      }
+      .cond-viaje-card .vc-pasajeros .pax-list table th {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: #94a3b8;
+        font-weight: 700;
+        border-bottom: 2px solid #f1f5f9;
+        padding: 0.4rem 0.5rem;
+      }
+      .cond-viaje-card .vc-pasajeros .pax-list table td {
+        padding: 0.4rem 0.5rem;
+        vertical-align: middle;
+      }
+
+      .cond-viaje-card .vc-actions {
+        margin-top: 0.8rem;
         padding-top: 0.8rem;
         border-top: 1px solid #f0f2f5;
         display: flex;
         gap: 0.6rem;
         flex-wrap: wrap;
       }
+      .cond-viaje-card .vc-actions .btn-iniciar {
+        background: linear-gradient(135deg, var(--cond-gold) 0%, #e89800 100%);
+        border: none;
+        color: #1a1a1a;
+        font-weight: 700;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(245,166,35,0.3);
+        font-size: 0.85rem;
+      }
+      .cond-viaje-card .vc-actions .btn-iniciar:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245,166,35,0.4);
+      }
+      .cond-viaje-card .vc-actions .btn-iniciar:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+      }
 
-      .alertas-section {
-        margin-bottom: 2rem;
+      .cond-viaje-card .vc-pasajeros-empty {
+        text-align: center;
+        padding: 1rem;
+        color: #94a3b8;
+        font-size: 0.85rem;
+      }
+
+      .cond-sinviajes {
+        text-align: center;
+        padding: 3rem 1rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+      }
+      .cond-sinviajes i {
+        font-size: 3rem;
+        color: #cbd5e1;
+        display: block;
+        margin-bottom: 1rem;
+      }
+      .cond-sinviajes h5 {
+        font-weight: 700;
+        color: var(--cond-blue);
+        margin-bottom: 0.3rem;
+      }
+      .cond-sinviajes p {
+        color: #94a3b8;
+        margin-bottom: 0;
+        font-size: 0.9rem;
       }
     </style>
 
     <section class="cond-dashboard">
       <div class="container">
 
-        <!-- HEADER DE BIENVENIDA -->
+        <!-- ========== FLASH MESSAGES ========== -->
+        <div th:if="${mensajeExito}" class="cond-alert alert alert-success">
+          <i class="bi bi-check-circle-fill fs-5"></i>
+          <span th:text="${mensajeExito}"></span>
+        </div>
+        <div th:if="${mensajeError}" class="cond-alert alert alert-danger">
+          <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+          <span th:text="${mensajeError}"></span>
+        </div>
+
+        <!-- ========== HEADER ========== -->
         <div class="cond-header">
           <div>
             <h1>🚛 ¡Buenos días, <span th:text="${nombreCompleto}"></span>!</h1>
-            <p>Panel del conductor — Revisa tu jornada de hoy y gestiona tus actividades.</p>
-            <span class="cond-badge mt-2">
+            <p>Panel del conductor — Revisa tu jornada y gestiona tus viajes asignados.</p>
+            <span class="cond-badge">
               <i class="bi bi-person-check-fill"></i> Conductor activo
             </span>
           </div>
         </div>
 
-        <!-- RESUMEN: 3 cards pequeñas en grid -->
-        <h5 class="section-label">
-          <i class="bi bi-bar-chart-fill"></i> Resumen
-        </h5>
-        <div class="resumen-grid">
-          <div class="resumen-card">
-            <div class="res-icon res-icon-viajes"><i class="bi bi-bus-front"></i></div>
-            <div class="res-num" th:text="${totalViajes}">0</div>
-            <div class="res-label">Total de viajes</div>
-          </div>
-          <div class="resumen-card">
-            <div class="res-icon res-icon-pasajeros"><i class="bi bi-people"></i></div>
-            <div class="res-num" th:text="${totalPasajeros}">0</div>
-            <div class="res-label">Pasajeros transportados</div>
-          </div>
-          <div class="resumen-card">
-            <div class="res-icon res-icon-encomiendas"><i class="bi bi-box-seam"></i></div>
-            <div class="res-num" th:text="${totalEncomiendas}">0</div>
-            <div class="res-label">Encomiendas entregadas</div>
-          </div>
-        </div>
-
-        <!-- ALERTAS -->
-        <h5 class="section-label">
-          <i class="bi bi-exclamation-triangle-fill text-warning"></i> Alertas
-        </h5>
-        <div class="alertas-section">
-          <div class="alert alert-warning d-flex align-items-center" role="alert" th:if="${hayViajeProximo}">
-            <i class="bi bi-clock-fill me-3 fs-4"></i>
-            <div>
-              <strong>¡Atención!</strong> Tienes un viaje en 30 minutos. Prepárate para iniciar tu ruta.
+        <!-- ========== COUNTDOWN ========== -->
+        <div id="countdown-container" class="cond-countdown" th:if="${#lists.size(viajesConPasajeros) > 0}">
+          <div class="cond-countdown-info">
+            <div class="cd-icon"><i class="bi bi-clock-fill"></i></div>
+            <div class="cd-text">
+              <h6 id="cd-titulo">Próximo viaje</h6>
+              <small id="cd-ruta" th:text="${viajesConPasajeros[0].viaje.origen + ' → ' + viajesConPasajeros[0].viaje.destino}">—</small>
             </div>
           </div>
-          <div class="alert alert-info d-flex align-items-center" role="alert" th:if="${faltanPasajeros}">
-            <i class="bi bi-people-fill me-3 fs-4"></i>
-            <div>
-              <strong>Faltan pasajeros por abordar</strong> — Revisa los viajes pendientes y confirma el abordaje.
+          <div class="cond-countdown-timer" id="cd-timer">
+            <div class="cd-unit">
+              <span class="cd-num" id="cd-hours">00</span>
+              <span class="cd-label">Horas</span>
             </div>
-          </div>
-          <div class="alert alert-success d-flex align-items-center" role="alert" th:if="${!viajesConPasajeros.empty}">
-            <i class="bi bi-check-circle-fill me-3 fs-4"></i>
-            <div>
-              <strong>Jornada activa</strong> — Tienes <span th:text="${#lists.size(viajesConPasajeros)}"></span> viaje(s) programado(s) para hoy.
+            <span class="cd-sep">:</span>
+            <div class="cd-unit">
+              <span class="cd-num" id="cd-minutes">00</span>
+              <span class="cd-label">Minutos</span>
             </div>
-          </div>
-          <div class="alert alert-secondary d-flex align-items-center" role="alert" th:if="${viajesConPasajeros.empty}">
-            <i class="bi bi-calendar-check me-3 fs-4"></i>
-            <div>
-              <strong>Sin viajes hoy</strong> — No tienes viajes programados para esta fecha. Disfruta tu día libre.
+            <span class="cd-sep">:</span>
+            <div class="cd-unit">
+              <span class="cd-num" id="cd-seconds">00</span>
+              <span class="cd-label">Segundos</span>
             </div>
           </div>
         </div>
 
-        <!-- MI JORNADA DE HOY -->
-        <h5 class="section-label">
-          <i class="bi bi-calendar-day"></i> Mi jornada de hoy
-        </h5>
-
-        <div th:if="${viajesConPasajeros.empty}" class="text-center py-5">
-          <i class="bi bi-calendar-check text-muted" style="font-size: 3rem;"></i>
-          <p class="text-muted mt-3 mb-0">No hay viajes programados para hoy.</p>
+        <!-- ========== COUNTDOWN SIN VIAJES ========== -->
+        <div th:if="${#lists.size(viajesConPasajeros) == 0}" class="cond-countdown">
+          <div class="cond-countdown-sinviaje">
+            <i class="bi bi-calendar-check fs-2" style="color:#94a3b8;"></i>
+            <div>
+              <strong style="color:var(--cond-blue);">Sin viajes asignados para hoy</strong>
+              <br><small class="text-muted">Disfruta tu día libre. Los nuevos viajes aparecerán aquí cuando el administrador te los asigne.</small>
+            </div>
+          </div>
         </div>
 
+        <!-- ========== STATS ========== -->
+        <h5 class="cond-section-title">
+          <i class="bi bi-bar-chart-fill" style="color:var(--cond-gold);"></i> Mi resumen
+        </h5>
+        <div class="cond-stats">
+          <div class="cond-stat">
+            <div class="cs-icon cs-icon-trips"><i class="bi bi-bus-front"></i></div>
+            <div class="cs-num" th:text="${totalViajes}">0</div>
+            <div class="cs-label">Viajes realizados</div>
+          </div>
+          <div class="cond-stat">
+            <div class="cs-icon cs-icon-pax"><i class="bi bi-people"></i></div>
+            <div class="cs-num" th:text="${totalPasajeros}">0</div>
+            <div class="cs-label">Pasajeros transportados</div>
+          </div>
+          <div class="cond-stat">
+            <div class="cs-icon cs-icon-packages"><i class="bi bi-box-seam"></i></div>
+            <div class="cs-num" th:text="${totalEncomiendas}">0</div>
+            <div class="cs-label">Encomiendas entregadas</div>
+          </div>
+        </div>
+
+        <!-- ========== MI JORNADA ========== -->
+        <h5 class="cond-section-title">
+          <i class="bi bi-calendar-day" style="color:var(--cond-gold);"></i> Mi jornada de hoy
+        </h5>
+
+        <!-- Sin viajes -->
+        <div th:if="${#lists.size(viajesConPasajeros) == 0}" class="cond-sinviajes">
+          <i class="bi bi-calendar-check"></i>
+          <h5>Sin viajes asignados</h5>
+          <p>No tienes viajes programados para hoy. Cuando el administrador te asigne uno, aparecerá aquí.</p>
+        </div>
+
+        <!-- Tarjetas de viaje -->
         <div th:each="item : ${viajesConPasajeros}" th:object="${item}">
-          <div class="viaje-card">
-            <div class="viaje-ruta">
-              <i class="bi bi-geo-alt-fill text-primario"></i>
-              <span th:text="${item.viaje.origen}">Origen</span>
-              <span class="arrow"><i class="bi bi-arrow-right"></i></span>
-              <i class="bi bi-geo-alt-fill text-success"></i>
-              <span th:text="${item.viaje.destino}">Destino</span>
+          <div class="cond-viaje-card"
+               th:classappend="${item.viaje.estadoViaje == 'EN_CURSO' ? 'en-curso' : ''}">
+            <!-- Header: Ruta + Estado -->
+            <div class="vc-header">
+              <div class="vc-ruta">
+                <i class="bi bi-geo-alt-fill" style="color:var(--cond-blue);"></i>
+                <span th:text="${item.viaje.origen}">Origen</span>
+                <span class="arrow"><i class="bi bi-arrow-right"></i></span>
+                <i class="bi bi-geo-alt-fill text-success"></i>
+                <span th:text="${item.viaje.destino}">Destino</span>
+              </div>
+              <span class="vc-badge"
+                    th:classappend="'vc-badge-' + ${#strings.toLowerCase(item.viaje.estadoViaje)}"
+                    th:text="${item.viaje.estadoViaje}">PROGRAMADO</span>
             </div>
-            <div class="viaje-detalles">
-              <span class="viaje-detalle-item">
+
+            <!-- Detalles -->
+            <div class="vc-details">
+              <span class="vc-detail-item">
                 <i class="bi bi-clock"></i>
                 <span th:text="${item.viaje.horaSalida}">08:00</span>
               </span>
-              <span class="viaje-detalle-item">
+              <span class="vc-detail-item">
                 <i class="bi bi-people"></i>
                 <span th:text="${item.pasajerosCount}">0</span> pasajeros
               </span>
-              <span class="viaje-detalle-item">
-                <i class="bi bi-box-seam"></i>
-                <span th:text="${item.encomiendasCount}">0</span> encomiendas
-              </span>
-              <span class="viaje-detalle-item">
+              <span class="vc-detail-item">
                 <i class="bi bi-bus-front"></i>
                 <span th:text="${item.viaje.tipoBus}">MINIVAN</span>
               </span>
-              <span class="viaje-detalle-item">
+              <span class="vc-detail-item">
                 <i class="bi bi-ticket"></i>
                 S/ <span th:text="${#numbers.formatDecimal(item.viaje.precio, 1, 2)}">12.00</span>
               </span>
-              <span class="viaje-detalle-item ms-auto">
-                <span class="badge bg-success rounded-pill px-3 py-1">
-                  <i class="bi bi-check-circle me-1"></i>Programado
-                </span>
+              <span class="vc-detail-item">
+                <i class="bi bi-seat"></i>
+                <span th:text="${item.viaje.totalAsientos}">15</span> asientos
               </span>
             </div>
-            <div class="viaje-acciones">
-              <button class="btn btn-amarillo btn-sm fw-bold" onclick="alert('Función de inicio de viaje próximamente.')">
-                <i class="bi bi-play-fill me-1"></i>Iniciar viaje
+
+            <!-- Pasajeros toggle -->
+            <div class="vc-pasajeros">
+              <button class="btn-toggle-pax" type="button"
+                      th:attr="data-viaje-id=${item.viaje.id}"
+                      onclick="togglePasajeros(this)">
+                <i class="bi bi-people-fill me-1"></i>
+                <span th:text="'Ver pasajeros (' + ${item.pasajerosCount} + ')'"></span>
               </button>
-              <a th:href="@{/viajes/{id}(id=${item.viaje.id})}" class="btn btn-outline-secondary btn-sm fw-semibold">
-                <i class="bi bi-eye me-1"></i>Ver detalles
-              </a>
+
+              <div class="pax-list" th:id="'pax-list-' + ${item.viaje.id}">
+                <div th:if="${#lists.size(item.pasajeros) > 0}">
+                  <table class="table table-sm table-borderless align-middle mb-0">
+                    <thead>
+                      <tr>
+                        <th>Nombre</th>
+                        <th>DNI</th>
+                        <th>Asiento</th>
+                        <th>Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr th:each="pax : ${item.pasajeros}">
+                        <td class="fw-semibold" th:text="${pax.nombrePasajero}">—</td>
+                        <td class="text-muted small" th:text="${pax.dniPasajero}">—</td>
+                        <td>
+                          <span class="badge badge-light-blue px-2 py-1" th:text="'#' + ${pax.asiento}">#0</span>
+                        </td>
+                        <td>
+                          <span class="badge-estado"
+                                th:classappend="'badge-' + ${#strings.toLowerCase(pax.estado)}"
+                                th:text="${pax.estado}">—</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div th:if="${#lists.size(item.pasajeros) == 0}" class="cond-pasajeros-empty">
+                  <i class="bi bi-inbox me-2"></i>No hay pasajeros registrados para este viaje.
+                </div>
+              </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="vc-actions" th:if="${item.viaje.estadoViaje == 'PROGRAMADO'}">
+              <form th:action="@{'/conductor/viaje/iniciar/' + ${item.viaje.id}}" method="post" style="display:inline">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn-iniciar"
+                        onclick="return confirm('¿Iniciar el viaje a ' + '${item.viaje.destino}' + '? Una vez iniciado, los pasajeros verán el viaje como En curso.')">
+                  <i class="bi bi-play-fill me-1"></i> Iniciar viaje
+                </button>
+              </form>
             </div>
           </div>
         </div>
@@ -308,5 +592,122 @@
       </div>
     </section>
     <div th:replace="~{layout :: scripts}"></div>
+
+    <style>
+      .badge-estado { font-size: 0.6rem; padding: 0.2rem 0.6rem; border-radius: 50px; font-weight: 600; }
+      .badge-reservado { background: #fef7e0; color: #e37400; }
+      .badge-pagado { background: #e6f4ea; color: #1e8e3e; }
+      .badge-cancelado { background: #fce8e6; color: #d93025; }
+      .badge-finalizado { background: #e8f0fe; color: #1967d2; }
+      .badge-en_curso { background: #fef7e0; color: #e37400; }
+      .badge-light-blue { background: rgba(13,27,62,0.08); color: #0d1b3e; font-weight: 700; }
+    </style>
+
+    <script>
+      // ========== COUNTDOWN ==========
+      document.addEventListener('DOMContentLoaded', function() {
+        // Auto-ocultar alertas flash
+        document.querySelectorAll('.cond-alert').forEach(function(el) {
+          setTimeout(function() {
+            el.style.transition = 'opacity 0.5s ease';
+            el.style.opacity = '0';
+            setTimeout(function() { el.style.display = 'none'; }, 500);
+          }, 5000);
+        });
+
+        // Countdown timer
+        iniciarCountdown();
+      });
+
+      function iniciarCountdown() {
+        var viajes = [];
+        // Recopilar datos de viajes desde el DOM
+        var cards = document.querySelectorAll('.cond-viaje-card');
+        cards.forEach(function(card) {
+          var rutaEl = card.querySelector('.vc-ruta');
+          var ruta = rutaEl ? rutaEl.textContent.trim() : '';
+          var horaEl = card.querySelector('.vc-detail-item .bi-clock');
+          var hora = horaEl ? horaEl.parentElement.textContent.trim() : '';
+          if (hora) {
+            var partesHora = hora.split(':');
+            if (partesHora.length === 2) {
+              var now = new Date();
+              var tripDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
+                parseInt(partesHora[0]), parseInt(partesHora[1]));
+              viajes.push({ ruta: ruta, time: tripDate, horaStr: hora });
+            }
+          }
+        });
+
+        if (viajes.length === 0) return;
+
+        // Ordenar por hora
+        viajes.sort(function(a, b) { return a.time - b.time; });
+
+        // Encontrar el próximo viaje (el primero cuya hora no haya pasado)
+        var now = new Date();
+        var nextTrip = null;
+        for (var i = 0; i < viajes.length; i++) {
+          if (viajes[i].time > now) {
+            nextTrip = viajes[i];
+            break;
+          }
+        }
+        // Si todos pasaron, mostrar el último
+        if (!nextTrip && viajes.length > 0) {
+          nextTrip = viajes[viajes.length - 1];
+        }
+
+        if (!nextTrip) return;
+
+        // Actualizar info del countdown
+        var tituloEl = document.getElementById('cd-titulo');
+        var rutaEl = document.getElementById('cd-ruta');
+        if (tituloEl) tituloEl.textContent = 'Próximo viaje';
+        if (rutaEl) rutaEl.textContent = nextTrip.ruta;
+
+        // Actualizar countdown cada segundo
+        function updateCountdown() {
+          var now = new Date();
+          var diff = nextTrip.time - now;
+
+          if (diff <= 0) {
+            // Ya pasó la hora del viaje
+            document.getElementById('cd-hours').textContent = '00';
+            document.getElementById('cd-minutes').textContent = '00';
+            document.getElementById('cd-seconds').textContent = '00';
+            if (tituloEl) tituloEl.textContent = '¡Hora del viaje!';
+            return;
+          }
+
+          var hours = Math.floor(diff / (1000 * 60 * 60));
+          var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+          document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
+          document.getElementById('cd-minutes').textContent = String(minutes).padStart(2, '0');
+          document.getElementById('cd-seconds').textContent = String(seconds).padStart(2, '0');
+        }
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+      }
+
+      // ========== TOGGLE PASAJEROS ==========
+      function togglePasajeros(btn) {
+        var viajeId = btn.getAttribute('data-viaje-id');
+        if (!viajeId) return;
+        var list = document.getElementById('pax-list-' + viajeId);
+        if (!list) return;
+
+        var isShow = list.classList.toggle('show');
+        var span = btn.querySelector('span');
+        if (span) {
+          var count = span.textContent.match(/\d+/);
+          var num = count ? count[0] : '0';
+          span.textContent = (isShow ? 'Ocultar pasajeros (' : 'Ver pasajeros (') + num + ')';
+        }
+      }
+    </script>
   </body>
 </html>
