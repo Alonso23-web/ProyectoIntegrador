@@ -94,6 +94,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Apache POI for Excel reports -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.2.3</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
