@@ -38,7 +38,8 @@
                 <span th:text="${error}"></span>
               </div>
 
-              <form th:action="@{/registro}" method="post" enctype="multipart/form-data">
+              <form id="formRegistro" th:action="@{/registro}" method="post" enctype="multipart/form-data">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div class="row">
                   <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Nombre Completo</label>
@@ -47,6 +48,7 @@
                         ><i class="bi bi-person"></i
                       ></span>
                       <input
+                        id="nombreCompleto"
                         type="text"
                         name="nombreCompleto"
                         class="form-control"
@@ -54,6 +56,7 @@
                         placeholder="Juan Pérez"
                         required
                       />
+                      <div class="invalid-feedback" id="nombreCompletoError"></div>
                     </div>
                   </div>
                   <div class="col-md-6 mb-3">
@@ -63,6 +66,7 @@
                         ><i class="bi bi-card-text"></i
                       ></span>
                       <input
+                        id="dni"
                         type="text"
                         name="dni"
                         class="form-control"
@@ -70,6 +74,7 @@
                         placeholder="12345678"
                         required
                       />
+                      <div class="invalid-feedback" id="dniError"></div>
                     </div>
                   </div>
                 </div>
@@ -81,6 +86,7 @@
                         ><i class="bi bi-envelope"></i
                       ></span>
                       <input
+                        id="email"
                         type="email"
                         name="email"
                         class="form-control"
@@ -88,6 +94,7 @@
                         placeholder="correo@ejemplo.com"
                         required
                       />
+                      <div class="invalid-feedback" id="emailError"></div>
                     </div>
                   </div>
                   <div class="col-md-6 mb-3">
@@ -97,6 +104,7 @@
                         ><i class="bi bi-telephone"></i
                       ></span>
                       <input
+                        id="telefono"
                         type="tel"
                         name="telefono"
                         class="form-control"
@@ -104,9 +112,11 @@
                         placeholder="+51 999 888 777"
                         required
                       />
+                      <div class="invalid-feedback" id="telefonoError"></div>
                     </div>
                   </div>
                 </div>
+
                 <div class="mb-3">
                   <label class="form-label fw-bold">Tipo de Cuenta</label>
                   <div class="row g-2">
@@ -166,6 +176,7 @@
                     </div>
                   </div>
                 </div>
+
                 <!-- ==================== CAMPOS DE CONDUCTOR (dinámicos) ==================== -->
                 <div id="conductorFields" style="display: none;">
                   <hr class="my-4" />
@@ -183,10 +194,12 @@
                           type="text"
                           name="numeroLicencia"
                           class="form-control"
-                          placeholder="Ej: LIC-001234"
+                          maxlength="9"
+                          placeholder="Ej: T12345678"
                           id="numeroLicencia"
                         />
                       </div>
+                      <div class="invalid-feedback d-block" id="numeroLicenciaError"></div>
                     </div>
                     <div class="col-md-6 mb-3">
                       <label class="form-label fw-bold">Años de Experiencia</label>
@@ -203,6 +216,7 @@
                           max="60"
                           id="aniosExperiencia"
                         />
+                        <div class="invalid-feedback d-block" id="aniosExperienciaError"></div>
                       </div>
                     </div>
                   </div>
@@ -219,6 +233,7 @@
                         <option value="Camión">Camión</option>
                         <option value="Automóvil">Automóvil</option>
                       </select>
+                      <div class="invalid-feedback d-block" id="tipoVehiculoError"></div>
                     </div>
                   </div>
                   <div class="mb-3">
@@ -234,6 +249,7 @@
                         accept=".pdf,.jpg,.png"
                         id="documento"
                       />
+                      <div class="invalid-feedback d-block" id="documentoError"></div>
                     </div>
                     <small class="text-muted">PDF, JPG o PNG (máx. 5MB)</small>
                   </div>
@@ -247,12 +263,14 @@
                         ><i class="bi bi-lock"></i
                       ></span>
                       <input
+                        id="password"
                         type="password"
                         name="password"
                         class="form-control"
                         placeholder="Mínimo 6 caracteres"
                         required
                       />
+                      <div class="invalid-feedback" id="passwordError"></div>
                     </div>
                   </div>
                   <div class="col-md-6 mb-3">
@@ -264,12 +282,14 @@
                         ><i class="bi bi-lock-fill"></i
                       ></span>
                       <input
+                        id="confirmarPassword"
                         type="password"
                         name="confirmarPassword"
                         class="form-control"
                         placeholder="Repite tu contraseña"
                         required
                       />
+                      <div class="invalid-feedback" id="confirmarPasswordError"></div>
                     </div>
                   </div>
                 </div>
@@ -296,34 +316,8 @@
     <div th:replace="~{layout :: footer}"></div>
     <div th:replace="~{layout :: scripts}"></div>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const radios = document.querySelectorAll('input[name="rol"]');
-        const conductorFields = document.getElementById('conductorFields');
-        const btnTexto = document.getElementById('btnTexto');
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/registro/registro.js"></script>
 
-        function toggleConductorFields() {
-          const selected = document.querySelector('input[name="rol"]:checked');
-          const isConductor = selected && selected.value === 'CONDUCTOR';
-
-          conductorFields.style.display = isConductor ? 'block' : 'none';
-          btnTexto.textContent = isConductor ? 'Enviar postulación' : 'Crear Cuenta';
-
-          // Deshabilitar campos para que no se envíen vacíos al elegir CLIENTE
-          ['numeroLicencia', 'aniosExperiencia', 'tipoVehiculo', 'documento'].forEach(function(id) {
-            var el = document.getElementById(id);
-            el.disabled = !isConductor;
-            el.required = isConductor;
-          });
-        }
-
-        radios.forEach(function(radio) {
-          radio.addEventListener('change', toggleConductorFields);
-        });
-
-        // Ejecutar al cargar por si ya viene seleccionado
-        toggleConductorFields();
-      });
-    </script>
   </body>
 </html>
