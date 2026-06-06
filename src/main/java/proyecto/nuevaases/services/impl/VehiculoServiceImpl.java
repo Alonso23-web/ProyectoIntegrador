@@ -57,6 +57,7 @@ public class VehiculoServiceImpl implements IVehiculoService {
                 .estado(entity.getEstado())
                 .precioPorDia(entity.getPrecioPorDia())
                 .imagen(entity.getImagen())
+                .descripcion(entity.getDescripcion())
                 .build();
     }
 
@@ -66,12 +67,14 @@ public class VehiculoServiceImpl implements IVehiculoService {
                 .placa(dto.getPlaca())
                 .marca(dto.getMarca())
                 .modelo(dto.getModelo())
-                .anio(dto.getAnio())
-                .capacidad(dto.getCapacidad())
+                .anio(dto.getAnio() != null ? dto.getAnio() : 0)
+                .capacidad(dto.getCapacidad() != null ? dto.getCapacidad() : 0)
                 .tipo(dto.getTipo())
                 .estado(dto.getEstado())
-                .precioPorDia(dto.getPrecioPorDia())
+                .precioPorDia(dto.getPrecioPorDia() != null ? dto.getPrecioPorDia() : 0.0)
                 .imagen(dto.getImagen())
+                .descripcion(dto.getDescripcion())
+                .tipoPropiedad("PROPIO")
                 .build();
     }
 }

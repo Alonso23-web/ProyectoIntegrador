@@ -71,7 +71,7 @@
           </div>
         </div>
 
-        <form th:action="@{/alquiler}" method="get" class="mb-4">
+        <form id="alquilerForm" th:action="@{/alquiler}" method="get" class="mb-4" novalidate>
           <div class="card shadow-sm border-0">
             <div class="card-body p-4">
               <div class="row g-3">
@@ -86,37 +86,44 @@
                 </div>
 
                 <div class="col-md-4">
-                  <label class="form-label fw-semibold">Fecha de inicio</label>
+                  <label class="form-label fw-semibold">Fecha de inicio <span class="text-danger">*</span></label>
                   <input
+                    id="fechaInicio"
                     name="fechaInicio"
                     type="date"
                     class="form-control"
                     th:value="${param.fechaInicio}"
                   />
+                  <div class="invalid-feedback" id="error-fechaInicio"></div>
                 </div>
 
                 <div class="col-md-4">
-                  <label class="form-label fw-semibold">Fecha fin</label>
+                  <label class="form-label fw-semibold">Fecha fin <span class="text-danger">*</span></label>
                   <input
+                    id="fechaFin"
                     name="fechaFin"
                     type="date"
                     class="form-control"
                     th:value="${param.fechaFin}"
                   />
+                  <div class="invalid-feedback" id="error-fechaFin"></div>
                 </div>
 
                 <div class="col-md-3">
                   <label class="form-label fw-semibold"
-                    >Cantidad de personas</label
+                    >Cantidad de personas <span class="text-danger">*</span></label
                   >
                   <input
+                    id="personas"
                     name="personas"
                     type="number"
                     min="1"
+                    max="15"
                     class="form-control"
                     placeholder="Ej: 15"
                     th:value="${param.personas}"
                   />
+                  <div class="invalid-feedback" id="error-personas"></div>
                 </div>
 
                 <div class="col-md-4">
@@ -130,7 +137,7 @@
                 </div>
 
                 <div class="col-md-5 d-grid align-items-end">
-                  <button class="btn btn-amarillo btn-lg fw-bold" type="submit">
+                  <button class="btn btn-amarillo btn-lg fw-bold" type="submit" id="btnBuscar">
                     <i class="bi bi-search me-2"></i>Buscar disponibilidad
                   </button>
                 </div>
@@ -223,5 +230,111 @@
 
     <div th:replace="~{layout :: footer}"></div>
     <div th:replace="~{layout :: scripts}"></div>
+
+    <style>
+      .invalid-feedback {
+        display: none;
+        color: #dc3545;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+      }
+      .invalid-feedback.show {
+        display: block;
+      }
+      .form-control.is-invalid,
+      .form-select.is-invalid {
+        border-color: #dc3545 !important;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15) !important;
+      }
+    </style>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var form = document.getElementById('alquilerForm');
+        if (!form) return;
+
+        function limpiarError(id) {
+          var input = document.getElementById(id);
+          var errorEl = document.getElementById('error-' + id);
+          if (input) input.classList.remove('is-invalid');
+          if (errorEl) {
+            errorEl.classList.remove('show');
+            errorEl.textContent = '';
+          }
+        }
+
+        function mostrarError(id, mensaje) {
+          var input = document.getElementById(id);
+          var errorEl = document.getElementById('error-' + id);
+          if (input) input.classList.add('is-invalid');
+          if (errorEl) {
+            errorEl.textContent = mensaje;
+            errorEl.classList.add('show');
+          }
+        }
+
+        function limpiarTodosErrores() {
+          ['fechaInicio', 'fechaFin', 'personas'].forEach(function(id) {
+            limpiarError(id);
+          });
+        }
+
+        // Limpiar errores en tiempo real
+        form.querySelectorAll('input').forEach(function(el) {
+          el.addEventListener('input', function() {
+            limpiarError(el.id);
+          });
+          el.addEventListener('change', function() {
+            limpiarError(el.id);
+          });
+        });
+
+        form.addEventListener('submit', function(e) {
+          limpiarTodosErrores();
+
+          var fechaInicio = document.getElementById('fechaInicio').value;
+          var fechaFin = document.getElementById('fechaFin').value;
+          var personas = document.getElementById('personas').value;
+          var valido = true;
+
+          // Validar fecha de inicio
+          if (!fechaInicio) {
+            mostrarError('fechaInicio', 'Selecciona una fecha de inicio.');
+            valido = false;
+          }
+
+          // Validar fecha de fin
+          if (!fechaFin) {
+            mostrarError('fechaFin', 'Selecciona una fecha de fin.');
+            valido = false;
+          }
+
+          // Validar que fecha fin no sea anterior a fecha inicio
+          if (fechaInicio && fechaFin && fechaFin < fechaInicio) {
+            mostrarError('fechaFin', 'La fecha de fin no puede ser anterior a la fecha de inicio.');
+            valido = false;
+          }
+
+          // Validar cantidad de personas
+          if (!personas || personas === '') {
+            mostrarError('personas', 'Ingresa la cantidad de personas.');
+            valido = false;
+          } else {
+            var numPersonas = parseInt(personas);
+            if (isNaN(numPersonas) || numPersonas < 1 || numPersonas > 15) {
+              mostrarError('personas', 'La cantidad debe estar entre 1 y 15 personas.');
+              valido = false;
+            }
+          }
+
+          if (!valido) {
+            e.preventDefault();
+            // Scroll al primer error
+            var firstError = document.querySelector('.is-invalid');
+            if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        });
+      });
+    </script>
   </body>
 </html>

@@ -4,85 +4,507 @@
   <body>
     <div th:replace="~{layout :: navbar}"></div>
 
-    <div class="container my-4">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-primario">Nuestra Flota de Vehículos</h2>
-        <a href="/vehiculos/nuevo" class="btn btn-amarillo fw-bold"
-          ><i class="bi bi-plus-lg me-1"></i>Nuevo Vehículo</a
-        >
-      </div>
+    <style>
+      :root {
+        --color-available: #22c55e;
+        --color-rented: #f59e0b;
+        --color-maintenance: #ef4444;
+        --color-blue: #0d1b3e;
+        --color-gold: #f5a623;
+      }
 
-      <div class="row g-4">
-        <div class="col-md-6 col-lg-4" th:each="v : ${vehiculos}">
-          <div class="card card-servicio h-100 shadow-sm">
-            <img
-              th:src="${v.imagen != null and !v.imagen.isEmpty()} ? ${v.imagen} : 'https://via.placeholder.com/400x250?text=' + ${v.tipo}"
-              class="card-img-top"
-              alt="Vehículo"
-              style="height: 200px; object-fit: cover"
-            />
-            <div class="card-body">
-              <div
-                class="d-flex justify-content-between align-items-start mb-2"
-              >
-                <h5
-                  class="card-title fw-bold text-primario mb-0"
-                  th:text="${v.marca} + ' ' + ${v.modelo}"
-                ></h5>
-                <span
-                  class="badge"
-                  style="border-radius: 50px"
-                  th:classappend="${v.estado == 'DISPONIBLE' ? 'bg-success' : (v.estado == 'ALQUILADO' ? 'bg-danger' : 'bg-warning')}"
-                  th:text="${v.estado}"
-                ></span>
-              </div>
-              <p class="text-muted mb-2">
-                <i class="bi bi-car-front me-1"></i
-                ><span th:text="${v.tipo}"></span> |
-                <i class="bi bi-calendar me-1"></i
-                ><span th:text="${v.anio}"></span> |
-                <i class="bi bi-people me-1"></i
-                ><span th:text="${v.capacidad} + ' pasajeros'"></span>
-              </p>
-              <p class="text-muted mb-2">
-                <i class="bi bi-upc me-1"></i>Placa:
-                <strong th:text="${v.placa}"></strong>
-              </p>
-              <h6 class="text-amarillo fw-bold">
-                S/ <span th:text="${v.precioPorDia}"></span> / día
-              </h6>
+      .vh-page {
+        background: #f0f2f5;
+        min-height: calc(100vh - 130px);
+        padding: 2rem 0;
+      }
+
+      .vh-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .vh-header h2 {
+        font-weight: 800;
+        color: var(--color-blue);
+        margin: 0;
+      }
+
+      .vh-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .vh-stat {
+        background: white;
+        border-radius: 16px;
+        padding: 1.2rem 1.5rem;
+        box-shadow: 0 4px 15px rgba(13,27,62,0.06);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        border-left: 4px solid var(--color-blue);
+      }
+
+      .vh-stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+      }
+
+      .vh-stat-icon.available { background: #f0fdf4; color: var(--color-available); }
+      .vh-stat-icon.rented { background: #fffbeb; color: var(--color-rented); }
+      .vh-stat-icon.maintenance { background: #fef2f2; color: var(--color-maintenance); }
+      .vh-stat-icon.total { background: #e8f0fe; color: var(--color-blue); }
+
+      .vh-stat-num {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: var(--color-blue);
+        line-height: 1.1;
+      }
+
+      .vh-stat-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        font-weight: 600;
+        color: #64748b;
+      }
+
+      /* Vehicle Card */
+      .vh-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(13,27,62,0.08);
+        transition: all 0.3s ease;
+        height: 100%;
+        position: relative;
+      }
+
+      .vh-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 35px rgba(13,27,62,0.14);
+      }
+
+      /* Top border color based on status */
+      .vh-card.border-available { border-top: 5px solid var(--color-available); }
+      .vh-card.border-rented { border-top: 5px solid var(--color-rented); }
+      .vh-card.border-maintenance { border-top: 5px solid var(--color-maintenance); }
+
+      .vh-card-img {
+        height: 180px;
+        object-fit: cover;
+        width: 100%;
+        background: #f1f5f9;
+      }
+
+      .vh-card-img-placeholder {
+        height: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+        color: #94a3b8;
+        font-size: 3rem;
+      }
+
+      .vh-card-body {
+        padding: 1.25rem;
+      }
+
+      .vh-card-title {
+        font-weight: 700;
+        color: var(--color-blue);
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      .vh-status-badge {
+        font-size: 0.65rem;
+        font-weight: 700;
+        padding: 0.3rem 0.8rem;
+        border-radius: 50px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+      }
+
+      .vh-status-badge.available {
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+      }
+
+      .vh-status-badge.rented {
+        background: #fffbeb;
+        color: #92400e;
+        border: 1px solid #fde68a;
+      }
+
+      .vh-status-badge.maintenance {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+      }
+
+      .vh-card-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        margin: 0.75rem 0;
+      }
+
+      .vh-card-info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.82rem;
+        color: #475569;
+      }
+
+      .vh-card-info-item i {
+        color: var(--color-gold);
+        width: 16px;
+        text-align: center;
+        font-size: 0.8rem;
+      }
+
+      .vh-card-price {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--color-blue);
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #f1f5f9;
+      }
+
+      .vh-card-footer {
+        padding: 0.75rem 1.25rem 1.25rem;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .vh-btn {
+        border: none;
+        padding: 0.45rem 0.9rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.78rem;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      .vh-btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .vh-btn-edit {
+        background: #e8f0fe;
+        color: #1967d2;
+      }
+      .vh-btn-edit:hover {
+        background: #d2e3fc;
+        color: #1557b0;
+      }
+
+      .vh-btn-status {
+        background: #fef7e0;
+        color: #e37400;
+      }
+      .vh-btn-status:hover {
+        background: #fce8b0;
+        color: #c46100;
+      }
+
+      .vh-btn-detail {
+        background: #f1f5f9;
+        color: #475569;
+      }
+      .vh-btn-detail:hover {
+        background: #e2e8f0;
+        color: #334155;
+      }
+
+      .vh-btn-delete {
+        background: #fef2f2;
+        color: #dc2626;
+      }
+      .vh-btn-delete:hover {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+
+      /* Modal */
+      .vh-modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 1050;
+        align-items: center;
+        justify-content: center;
+      }
+      .vh-modal-overlay.show {
+        display: flex;
+      }
+      .vh-modal {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        max-width: 420px;
+        width: 90%;
+        box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+      }
+      .vh-modal h5 {
+        color: var(--color-blue);
+        font-weight: 700;
+        margin-bottom: 1rem;
+      }
+      .vh-modal select {
+        width: 100%;
+        padding: 0.6rem 1rem;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+      }
+      .vh-modal select:focus {
+        border-color: var(--color-gold);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(245,166,35,0.15);
+      }
+      .vh-modal-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
+      }
+    </style>
+
+    <section class="vh-page">
+      <div class="container">
+        <!-- Header -->
+        <div class="vh-header">
+          <h2>
+            <i class="bi bi-truck me-2 text-amarillo"></i>Gestión de Flota
+          </h2>
+          <a href="/vehiculos/nuevo" class="btn btn-amarillo fw-bold">
+            <i class="bi bi-plus-lg me-1"></i>Nuevo Vehículo
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="vh-stats" th:if="${!#lists.isEmpty(vehiculos)}">
+          <div class="vh-stat">
+            <div class="vh-stat-icon total"><i class="bi bi-truck"></i></div>
+            <div>
+              <div class="vh-stat-num" th:text="${#lists.size(vehiculos)}">0</div>
+              <div class="vh-stat-label">Total vehículos</div>
             </div>
-            <div class="card-footer bg-white border-0 pt-0 pb-3 px-3">
-              <div class="d-flex gap-2">
-                <a
-                  th:href="@{'/vehiculos/editar/' + ${v.id}}"
-                  class="btn btn-sm btn-outline-primary flex-fill"
-                  ><i class="bi bi-pencil me-1"></i>Editar</a
-                >
-                <a
-                  th:href="@{'/vehiculos/eliminar/' + ${v.id}}"
-                  class="btn btn-sm btn-outline-danger flex-fill"
-                  onclick="
-                    return confirm('¿Estás seguro de eliminar este vehículo?');
-                  "
-                  ><i class="bi bi-trash me-1"></i>Eliminar</a
-                >
+          </div>
+          <div class="vh-stat">
+            <div class="vh-stat-icon available"><i class="bi bi-check-circle"></i></div>
+            <div>
+              <div class="vh-stat-num" th:text="${#lists.size(vehiculos.?[estado == 'DISPONIBLE'])}">0</div>
+              <div class="vh-stat-label">Disponibles</div>
+            </div>
+          </div>
+          <div class="vh-stat">
+            <div class="vh-stat-icon rented"><i class="bi bi-clock"></i></div>
+            <div>
+              <div class="vh-stat-num" th:text="${#lists.size(vehiculos.?[estado == 'ALQUILADO'])}">0</div>
+              <div class="vh-stat-label">Alquilados</div>
+            </div>
+          </div>
+          <div class="vh-stat">
+            <div class="vh-stat-icon maintenance"><i class="bi bi-tools"></i></div>
+            <div>
+              <div class="vh-stat-num" th:text="${#lists.size(vehiculos.?[estado == 'MANTENIMIENTO'])}">0</div>
+              <div class="vh-stat-label">En mantenimiento</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cards Grid -->
+        <div th:if="${!#lists.isEmpty(vehiculos)}" class="row g-4">
+          <div class="col-md-6 col-lg-4" th:each="v : ${vehiculos}">
+            <div class="vh-card"
+                 th:classappend="${v.estado == 'DISPONIBLE'} ? 'border-available' : (${v.estado == 'ALQUILADO'} ? 'border-rented' : 'border-maintenance')">
+
+              <!-- Imagen -->
+              <div th:if="${v.imagen != null and !v.imagen.isEmpty()}">
+                <img th:src="${v.imagen}" class="vh-card-img" alt="Vehículo" />
+              </div>
+              <div th:unless="${v.imagen != null and !v.imagen.isEmpty()}" class="vh-card-img-placeholder">
+                <i class="bi bi-car-front"></i>
+              </div>
+
+              <div class="vh-card-body">
+                <div class="vh-card-title">
+                  <span th:text="${v.marca} + ' ' + ${v.modelo}">Marca Modelo</span>
+                  <span class="vh-status-badge"
+                        th:classappend="${v.estado == 'DISPONIBLE'} ? 'available' : (${v.estado == 'ALQUILADO'} ? 'rented' : 'maintenance')"
+                        th:text="${v.estado}">ESTADO</span>
+                </div>
+
+                <div class="vh-card-info">
+                  <span class="vh-card-info-item">
+                    <i class="bi bi-upc-scan"></i> <span th:text="${v.placa}">ABC-123</span>
+                  </span>
+                  <span class="vh-card-info-item">
+                    <i class="bi bi-calendar"></i> <span th:text="${v.anio}">2024</span>
+                  </span>
+                  <span class="vh-card-info-item">
+                    <i class="bi bi-people"></i> <span th:text="${v.capacidad} + ' personas'">15</span>
+                  </span>
+                  <span class="vh-card-info-item">
+                    <i class="bi bi-car-front"></i> <span th:text="${v.tipo}">BUS</span>
+                  </span>
+                </div>
+
+                <!-- Descripción si existe -->
+                <div th:if="${v.descripcion != null and !v.descripcion.isEmpty()}"
+                     class="small text-muted mb-2"
+                     style="font-size: 0.78rem;"
+                     th:text="${v.descripcion}">
+                </div>
+
+                <div class="vh-card-price">
+                  S/ <span th:text="${#numbers.formatDecimal(v.precioPorDia, 1, 2)}"></span> <span class="small fw-normal text-muted">/ día</span>
+                </div>
+              </div>
+
+              <div class="vh-card-footer">
+                <a th:href="@{'/vehiculos/editar/' + ${v.id}}" class="vh-btn vh-btn-edit">
+                  <i class="bi bi-pencil"></i> Editar
+                </a>
+                <button type="button" class="vh-btn vh-btn-status" th:data-id="${v.id}" th:data-estado="${v.estado}" onclick="abrirModalEstado(this)">
+                  <i class="bi bi-arrow-repeat"></i> Estado
+                </button>
+                <a th:href="@{'/vehiculos/detalle/' + ${v.id}}" class="vh-btn vh-btn-detail">
+                  <i class="bi bi-eye"></i> Detalle
+                </a>
+                <a th:href="@{'/vehiculos/eliminar/' + ${v.id}}" class="vh-btn vh-btn-delete"
+                   onclick="return confirm('¿Estás seguro de eliminar este vehículo?')">
+                  <i class="bi bi-trash"></i>
+                </a>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="text-center py-5" th:if="${#lists.isEmpty(vehiculos)}">
-        <i class="bi bi-car-front fs-1 text-muted"></i>
-        <h4 class="text-muted mt-3">No hay vehículos registrados</h4>
-        <a href="/vehiculos/nuevo" class="btn btn-amarillo mt-2"
-          >Registrar primer vehículo</a
-        >
+        <!-- Empty state -->
+        <div th:if="${#lists.isEmpty(vehiculos)}" class="text-center py-5">
+          <div style="font-size: 4rem; color: #cbd5e1; margin-bottom: 1rem;">
+            <i class="bi bi-car-front"></i>
+          </div>
+          <h4 class="text-muted mb-2">No hay vehículos registrados</h4>
+          <p class="text-muted mb-4">Agrega tu primer vehículo para empezar a gestionar tu flota.</p>
+          <a href="/vehiculos/nuevo" class="btn btn-amarillo fw-bold btn-lg">
+            <i class="bi bi-plus-lg me-1"></i>Registrar primer vehículo
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Modal Cambiar Estado -->
+    <div class="vh-modal-overlay" id="estadoModal">
+      <div class="vh-modal">
+        <h5><i class="bi bi-arrow-repeat me-2 text-amarillo"></i>Cambiar Estado</h5>
+        <p class="text-muted small mb-3">Selecciona el nuevo estado para el vehículo:</p>
+        <select id="nuevoEstado" class="form-select">
+          <option value="DISPONIBLE">Disponible</option>
+          <option value="ALQUILADO">Alquilado</option>
+          <option value="MANTENIMIENTO">Mantenimiento</option>
+        </select>
+        <div id="estadoModalError" class="alert alert-danger d-none py-2 small" role="alert"></div>
+        <div class="vh-modal-actions">
+          <button type="button" class="btn btn-outline-secondary" onclick="cerrarModalEstado()">Cancelar</button>
+          <button type="button" class="btn btn-amarillo fw-bold" id="btnConfirmarEstado">
+            <i class="bi bi-check-lg me-1"></i>Confirmar
+          </button>
+        </div>
       </div>
     </div>
 
     <div th:replace="~{layout :: footer}"></div>
     <div th:replace="~{layout :: scripts}"></div>
+
+    <script>
+      var vehiculoIdActual = null;
+
+      function abrirModalEstado(btn) {
+        vehiculoIdActual = btn.getAttribute('data-id');
+        document.getElementById('nuevoEstado').value = btn.getAttribute('data-estado');
+        document.getElementById('estadoModalError').classList.add('d-none');
+        document.getElementById('estadoModal').classList.add('show');
+      }
+
+      function cerrarModalEstado() {
+        document.getElementById('estadoModal').classList.remove('show');
+        vehiculoIdActual = null;
+      }
+
+      document.getElementById('btnConfirmarEstado').addEventListener('click', function() {
+        if (!vehiculoIdActual) return;
+
+        var nuevoEstado = document.getElementById('nuevoEstado').value;
+        var errorEl = document.getElementById('estadoModalError');
+        var btn = this;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando...';
+
+        fetch('/vehiculos/cambiar-estado/' + vehiculoIdActual, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          },
+          body: 'nuevoEstado=' + encodeURIComponent(nuevoEstado)
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          if (data.success) {
+            location.reload();
+          } else {
+            errorEl.textContent = data.message || 'Error al cambiar estado.';
+            errorEl.classList.remove('d-none');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Confirmar';
+          }
+        })
+        .catch(function() {
+          errorEl.textContent = 'Error de conexión.';
+          errorEl.classList.remove('d-none');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Confirmar';
+        });
+      });
+
+      // Cerrar modal al hacer clic fuera
+      document.getElementById('estadoModal').addEventListener('click', function(e) {
+        if (e.target === this) cerrarModalEstado();
+      });
+    </script>
   </body>
 </html>
