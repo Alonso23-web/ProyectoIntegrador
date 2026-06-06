@@ -40,5 +40,13 @@ public class Viaje {
 
     @Column(nullable = false)
     private String creadoPorEmail;
+
+    // ==================== CAMPOS DE ASIGNACIÓN ====================
+
+    private String conductorEmail; // Email del conductor asignado
+
+    @Column(nullable = false)
+    @Builder.Default
+    private String estadoViaje = "PROGRAMADO"; // PROGRAMADO, EN_CURSO, FINALIZADO
 }
 

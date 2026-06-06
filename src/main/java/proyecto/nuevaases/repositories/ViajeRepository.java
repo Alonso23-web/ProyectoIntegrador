@@ -14,5 +14,13 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
 
     List<Viaje> findByFecha(LocalDate fecha);
 
+    List<Viaje> findByConductorEmailAndFechaOrderByHoraSalida(String conductorEmail, LocalDate fecha);
+
+    List<Viaje> findByConductorEmail(String conductorEmail);
+
+    long countByConductorEmail(String conductorEmail);
+
+    long countByConductorEmailAndEstadoViaje(String conductorEmail, String estadoViaje);
+
 }
 

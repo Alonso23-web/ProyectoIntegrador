@@ -97,44 +97,61 @@ public class DashboardController {
 
         if (rol.equals("CONDUCTOR")) {
             var usuario = usuarioOpt.get();
+            String conductorEmail = usuario.getEmail();
             model.addAttribute("nombreCompleto", usuario.getNombreCompleto());
 
-            // Datos de viajes de hoy
-            var viajesHoy = viajeRepository.findByFecha(LocalDate.now());
-            model.addAttribute("viajesHoy", viajesHoy);
+            LocalDate hoy = LocalDate.now();
 
-            // Por cada viaje, contar pasajeros
+            // ==================== VIAJES ASIGNADOS DE HOY ====================
+            var viajesHoy = viajeRepository.findByConductorEmailAndFechaOrderByHoraSalida(conductorEmail, hoy);
+
+            // Por cada viaje, obtener datos completos
             var viajesConPasajeros = viajesHoy.stream()
                 .map(v -> {
                     var pasajeros = reservaRepository.findByViajeAndEstadoIn(
-                        v, List.of("RESERVADO", "PAGADO", "FINALIZADO"));
-                    var encomiendas = encomiendaRepository.findByCreadoPorEmail(usuario.getEmail());
-                    return new ViajeConPasajeros(v, pasajeros.size(), encomiendas.size());
+                        v, List.of("RESERVADO", "PAGADO", "FINALIZADO", "EN_CURSO"));
+                    return new ViajeConPasajerosYLista(v, pasajeros.size(), pasajeros);
                 })
                 .toList();
             model.addAttribute("viajesConPasajeros", viajesConPasajeros);
 
-            // Total pasajeros transportados (reservas en estado FINALIZADO)
-            long totalPasajeros = reservaRepository.count();
-            model.addAttribute("totalPasajeros", totalPasajeros);
+            // ==================== ESTADÍSTICAS PROPIAS ====================
+            // Total de viajes históricos del conductor
+            long totalViajesCond = viajeRepository.countByConductorEmailAndEstadoViaje(conductorEmail, "FINALIZADO");
 
-            // Datos generales
-            model.addAttribute("totalViajes", viajeRepository.count());
-            model.addAttribute("totalEncomiendas", encomiendaRepository.count());
+            // Total de pasajeros transportados (reservas en viajes del conductor con estado FINALIZADO)
+            var viajesConductor = viajeRepository.findByConductorEmail(conductorEmail);
+            long totalPasajerosCond = viajesConductor.stream()
+                .flatMap(v -> reservaRepository.findByViajeAndEstadoIn(v, List.of("FINALIZADO")).stream())
+                .count();
 
-            // Alertas específicas
-            boolean hayViajeProximo = viajesHoy.stream()
-                .anyMatch(v -> v.getHoraSalida() != null && !v.getHoraSalida().isEmpty());
-            model.addAttribute("hayViajeProximo", hayViajeProximo);
+            // Total encomiendas entregadas (asociadas al conductor por su email)
+            long totalEncomiendasCond = encomiendaRepository.countByCreadoPorEmail(conductorEmail);
 
-            boolean faltanPasajeros = viajesHoy.stream()
-                .anyMatch(v -> reservaRepository.findByViajeAndEstadoIn(v, List.of("RESERVADO")).size() > 0);
-            model.addAttribute("faltanPasajeros", faltanPasajeros);
+            model.addAttribute("totalViajes", totalViajesCond);
+            model.addAttribute("totalPasajeros", totalPasajerosCond);
+            model.addAttribute("totalEncomiendas", totalEncomiendasCond);
 
             return "dashboard/conductor";
         }
 
         return "dashboard/cliente";
+    }
+
+    // ==================== INICIAR VIAJE ====================
+
+    @PostMapping("/conductor/viaje/iniciar/{id}")
+    public String iniciarViaje(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            var viaje = viajeRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Viaje no encontrado"));
+            viaje.setEstadoViaje("EN_CURSO");
+            viajeRepository.save(viaje);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Viaje iniciado correctamente. ¡Buen viaje!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al iniciar viaje: " + e.getMessage());
+        }
+        return "redirect:/dashboard";
     }
 
     // ==================== APROBACIÓN DE CONDUCTORES ====================
@@ -162,5 +179,7 @@ public class DashboardController {
     }
 
     // Clase interna para pasar datos de viaje con pasajeros a la vista
+    public record ViajeConPasajerosYLista(Viaje viaje, int pasajerosCount, List<Reserva> pasajeros) {}
+
     public record ViajeConPasajeros(Viaje viaje, int pasajerosCount, int encomiendasCount) {}
 }
