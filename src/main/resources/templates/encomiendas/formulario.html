@@ -63,7 +63,7 @@
                       th:field="*{dniRemitente}"
                       required
                       inputmode="numeric"
-                      pattern="\\d{8}"
+                      pattern="\d{8}"
                       maxlength="8"
                       oninput="
                         this.value = this.value.replace(/\D/g, '').slice(0, 8)
@@ -92,7 +92,7 @@
                       th:field="*{dniDestinatario}"
                       required
                       inputmode="numeric"
-                      pattern="\\d{8}"
+                      pattern="\d{8}"
                       maxlength="8"
                       oninput="
                         this.value = this.value.replace(/\D/g, '').slice(0, 8)
