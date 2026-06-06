@@ -1,111 +1,82 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head
-    th:replace="~{layout :: head('Iniciar Sesión - Nueva Ases Express')}"
-  ></head>
+  <head th:replace="~{layout :: head('Iniciar Sesión - Nueva Ases Express')}"></head>
   <body>
     <div th:replace="~{layout :: navbar}"></div>
 
     <div class="container my-5">
       <div class="row justify-content-center">
         <div class="col-md-5">
-          <div
-            class="card shadow-lg border-0"
-            style="border-radius: 20px; overflow: hidden"
-          >
+          <div class="card shadow-lg border-0" style="border-radius: 20px; overflow: hidden">
             <div class="card-header bg-primario text-white text-center py-4">
               <img
                 th:src="@{/img/logonuevaases.png}"
                 alt="Nueva Ases Express"
-                style="
-                  height: 60px;
-                  background: white;
-                  padding: 5px;
-                  border-radius: 12px;
-                  margin-bottom: 1rem;
-                "
+                style="height: 60px; background: white; padding: 5px; border-radius: 12px; margin-bottom: 1rem;"
                 onerror="this.style.display = 'none'"
               />
               <h4 class="mb-0 fw-bold">Iniciar Sesión</h4>
-              <small class="text-white-50"
-                >Acceso al sistema administrativo</small
-              >
+              <small class="text-white-50">Acceso al sistema administrativo</small>
             </div>
             <div class="card-body p-4">
-              <form th:attr="action=@{/login}" method="post">
-                <input
-                  type="hidden"
-                  th:name="${_csrf.parameterName}"
-                  th:value="${_csrf.token}"
-                />
+              <form th:action="@{/login}" method="post">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 <div class="mb-3">
-                  <label for="username" class="form-label fw-bold"
-                    >Correo Electrónico / Usuario</label
-                  >
+                  <label for="username" class="form-label fw-bold">Correo Electrónico / Usuario</label>
                   <div class="input-group">
-                    <span class="input-group-text bg-light"
-                      ><i class="bi bi-person"></i
-                    ></span>
+                    <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
                     <input
                       type="text"
                       class="form-control"
                       id="username"
                       name="username"
                       placeholder="admin@empresa.com"
+                      autocomplete="username"
                       required
                     />
                   </div>
                 </div>
                 <div class="mb-3">
-                  <label for="password" class="form-label fw-bold"
-                    >Contraseña</label
-                  >
+                  <label for="password" class="form-label fw-bold">Contraseña</label>
                   <div class="input-group">
-                    <span class="input-group-text bg-light"
-                      ><i class="bi bi-lock"></i
-                    ></span>
+                    <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
                     <input
                       type="password"
                       class="form-control"
                       id="password"
                       name="password"
                       placeholder="••••••••"
+                      autocomplete="current-password"
                       required
                     />
                   </div>
                 </div>
-                <div
-                  th:if="${param.error}"
-                  class="alert alert-danger d-flex align-items-center"
-                >
+                <div th:if="${param.error}" class="alert alert-danger d-flex align-items-center">
                   <i class="bi bi-exclamation-triangle-fill me-2"></i>
                   <span>Usuario o contraseña incorrectos.</span>
                 </div>
-                <div
-                  th:if="${exito}"
-                  class="alert alert-success d-flex align-items-center"
-                >
+                <div th:if="${param.logout}" class="alert alert-success d-flex align-items-center">
+                  <i class="bi bi-check-circle-fill me-2"></i>
+                  <span>Sesión cerrada correctamente.</span>
+                </div>
+                <div th:if="${exito}" class="alert alert-success d-flex align-items-center">
                   <i class="bi bi-check-circle-fill me-2"></i>
                   <span th:text="${exito}"></span>
                 </div>
                 <div class="d-grid">
                   <button type="submit" class="btn btn-amarillo fw-bold">
-                    <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar al
-                    Sistema
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Ingresar al Sistema
                   </button>
                 </div>
               </form>
               <div class="text-center mt-3">
                 <p class="mb-1">
                   ¿No tienes una cuenta?
-                  <a href="/registro" class="fw-bold text-primario"
-                    >Regístrate aquí</a
-                  >
+                  <a href="/registro" class="fw-bold text-primario">Regístrate aquí</a>
                 </p>
-                <small class="text-muted"
-                  >Usuario por defecto: <strong>admin@empresa.com</strong> /
-                  <strong>admin123</strong></small
-                >
+                <small class="text-muted">
+                  Usuario por defecto: <strong>admin@empresa.com</strong> / <strong>admin123</strong>
+                </small>
               </div>
             </div>
           </div>

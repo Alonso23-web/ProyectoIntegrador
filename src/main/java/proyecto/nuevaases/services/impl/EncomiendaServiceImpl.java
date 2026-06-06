@@ -71,11 +71,23 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
                 .stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
+    private static final double CARGO_MANEJO = 1.50;
+    private static final double CARGO_PESO_EXTRA = 1.50;
+    private static final double PRECIO_POR_KG = 1.50; // precio unitario por kg (para vista de 'precio por peso')
+    private static final double PESO_NORMAL_INCLUIDO = 10.0; // peso normal sin cargo extra
+
     @Override
     public double calcularPrecio(String origen, String destino, double peso) {
         double tarifaBase = obtenerTarifaBase(origen, destino);
-        double cargoPeso = peso > 1 ? (peso - 1) * 1.50 : 0;
-        return Math.round((tarifaBase + cargoPeso) * 100.0) / 100.0;
+        double cargoPeso = peso > PESO_NORMAL_INCLUIDO ? (peso - PESO_NORMAL_INCLUIDO) * CARGO_PESO_EXTRA : 0;
+        double total = tarifaBase + cargoPeso + CARGO_MANEJO;
+        return Math.round(total * 100.0) / 100.0;
+    }
+
+    @Override
+    public double calcularPrecioPorPeso(double peso) {
+        double total = peso * PRECIO_POR_KG;
+        return Math.round(total * 100.0) / 100.0;
     }
 
     private double obtenerTarifaBase(String origen, String destino) {

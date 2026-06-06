@@ -1,4 +1,4 @@
-package proyecto.nuevaases.controllers;
+package proyecto.nuevaases.controllers.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @RequestMapping("/api/encomiendas")
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
-public class EncomiendaController {
+public class EncomiendaApiController {
 
     private final IEncomiendaService encomiendaService;
     private final IUsuarioService usuarioService;
@@ -51,8 +51,13 @@ public class EncomiendaController {
         encomienda.setCodigoRastreo("NAE-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
         encomienda.setFechaEnvio(LocalDate.now());
         encomienda.setEstado("REGISTRADO");
-        encomienda.setPrecio(encomiendaService.calcularPrecio(
-                encomienda.getOrigen(), encomienda.getDestino(), encomienda.getPeso()));
+
+        // Flujo solicitado: el cliente registra sin pesaje.
+        // Guardamos peso/precio en 0; el admin asigna el peso y puede ajustar el precio
+        // final.
+        encomienda.setPeso(0);
+        encomienda.setPrecio(0);
+
         return ResponseEntity.ok(encomiendaService.guardar(encomienda));
     }
 
@@ -67,6 +72,14 @@ public class EncomiendaController {
                 "destino", destino,
                 "peso", peso,
                 "precio", precio));
+    }
+
+    @GetMapping("/precio-por-peso")
+    public ResponseEntity<?> calcularPrecioPorPeso(@RequestParam double peso) {
+        double precio = encomiendaService.calcularPrecioPorPeso(peso);
+        return ResponseEntity.ok(Map.of(
+                "peso", peso,
+                "precioPorPeso", precio));
     }
 
     @GetMapping("/historial")
@@ -89,5 +102,33 @@ public class EncomiendaController {
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
         encomiendaService.eliminar(id);
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<?> cambiarEstado(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        EncomiendaDTO enc = encomiendaService.buscarPorId(id);
+        enc.setEstado(body.get("estado"));
+        return ResponseEntity.ok(encomiendaService.guardar(enc));
+    }
+
+    @PatchMapping("/{id}/precio")
+    public ResponseEntity<?> asignarPrecio(@PathVariable Long id, @RequestBody Map<String, Double> body) {
+        EncomiendaDTO enc = encomiendaService.buscarPorId(id);
+        enc.setPrecio(body.get("precio"));
+        return ResponseEntity.ok(encomiendaService.guardar(enc));
+    }
+
+    // Admin asigna peso y el backend recalcula el precio real.
+    @PatchMapping("/{id}/peso")
+    public ResponseEntity<?> asignarPeso(@PathVariable Long id, @RequestBody Map<String, Double> body) {
+        EncomiendaDTO enc = encomiendaService.buscarPorId(id);
+        Double peso = body.get("peso");
+        if (peso == null || peso <= 0) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Peso inválido"));
+        }
+        enc.setPeso(peso);
+        double precio = encomiendaService.calcularPrecio(enc.getOrigen(), enc.getDestino(), peso);
+        enc.setPrecio(precio);
+        return ResponseEntity.ok(encomiendaService.guardar(enc));
     }
 }

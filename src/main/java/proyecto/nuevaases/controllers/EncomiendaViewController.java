@@ -62,7 +62,13 @@ public class EncomiendaViewController {
                         encomienda.getOrigen(), encomienda.getDestino(), encomienda.getPeso());
                 encomienda.setPrecio(precio);
             }
+        } else {
+            // IMPORTANTÍSIMO: al editar, preservamos creadoPorEmail.
+            // Si no lo enviamos desde el formulario, el DTO llega con creadoPorEmail=null y se pierde el filtro de "Mis registros".
+            EncomiendaDTO existente = encomiendaService.buscarPorId(encomienda.getId());
+            encomienda.setCreadoPorEmail(existente.getCreadoPorEmail());
         }
+
         encomiendaService.guardar(encomienda);
         return "redirect:/encomiendas";
     }
