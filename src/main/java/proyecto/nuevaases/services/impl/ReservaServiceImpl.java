@@ -9,7 +9,9 @@ import proyecto.nuevaases.models.Viaje;
 import proyecto.nuevaases.repositories.ReservaRepository;
 import proyecto.nuevaases.repositories.ViajeRepository;
 import proyecto.nuevaases.dto.PasajeroReservaDTO;
+import proyecto.nuevaases.models.Vehiculo;
 import proyecto.nuevaases.services.IReservaService;
+import proyecto.nuevaases.services.IPagoService;
 import proyecto.nuevaases.services.ReservaService;
 
 import java.util.List;
@@ -23,9 +25,10 @@ public class ReservaServiceImpl implements ReservaService, IReservaService {
 
     private final ReservaRepository reservaRepository;
     private final ViajeRepository viajeRepository;
+    private final IPagoService pagoService;
 
     // ========================================================================
-    // Implementación de ReservaService (entity-based — usada por PasajesApiController)
+    // Implementación de ReservaService (entity-based)
     // ========================================================================
 
     @Override
@@ -54,7 +57,18 @@ public class ReservaServiceImpl implements ReservaService, IReservaService {
                 .dniPasajero(dniPasajero)
                 .build();
 
-        return reservaRepository.save(reserva);
+        Reserva guardada = reservaRepository.save(reserva);
+
+        // Registrar pago automático
+        pagoService.registrarPago(
+                usuarioEmail,
+                precioViaje,
+                "EFECTIVO",
+                guardada.getId(),
+                "Pago automático - Boleto " + codigo
+        );
+
+        return guardada;
     }
 
     @Override
@@ -92,7 +106,8 @@ public class ReservaServiceImpl implements ReservaService, IReservaService {
 
         return pasajeros.stream().map(p -> {
             String codigo = "B" + UUID.randomUUID().toString().substring(0, 10).toUpperCase();
-            return Reserva.builder()
+
+            Reserva reserva = Reserva.builder()
                     .usuarioEmail(usuarioEmail)
                     .viaje(viaje)
                     .asiento(p.asiento())
@@ -102,7 +117,20 @@ public class ReservaServiceImpl implements ReservaService, IReservaService {
                     .nombrePasajero(p.nombrePasajero())
                     .dniPasajero(p.dniPasajero())
                     .build();
-        }).map(reservaRepository::save).toList();
+
+            Reserva guardada = reservaRepository.save(reserva);
+
+            // Registrar pago automático por cada reserva
+            pagoService.registrarPago(
+                    usuarioEmail,
+                    precioViaje,
+                    "EFECTIVO",
+                    guardada.getId(),
+                    "Pago automático - Boleto " + codigo
+            );
+
+            return guardada;
+        }).toList();
     }
 
     @Override
@@ -151,23 +179,33 @@ public class ReservaServiceImpl implements ReservaService, IReservaService {
     }
 
     /**
-     * Convierte una entidad Reserva a su DTO correspondiente, incluyendo el ViajeDTO anidado.
+     * Convierte una entidad Reserva a su DTO con todos los campos de ViajeDTO.
      */
     private ReservaDTO convertToDTO(Reserva entity) {
+        Viaje v = entity.getViaje();
+        ViajeDTO.ViajeDTOBuilder viajeBuilder = ViajeDTO.builder()
+                .id(v.getId())
+                .origen(v.getOrigen())
+                .destino(v.getDestino())
+                .fecha(v.getFecha())
+                .horaSalida(v.getHoraSalida())
+                .tipoBus(v.getTipoBus())
+                .totalAsientos(v.getTotalAsientos())
+                .precio(v.getPrecio())
+                .creadoPorEmail(v.getCreadoPorEmail())
+                .conductorEmail(v.getConductorEmail())
+                .estadoViaje(v.getEstadoViaje());
+
+        if (v.getVehiculo() != null) {
+            Vehiculo veh = v.getVehiculo();
+            viajeBuilder.vehiculoId(veh.getId())
+                    .vehiculoInfo(veh.getMarca() + " " + veh.getModelo() + " - " + veh.getPlaca());
+        }
+
         return ReservaDTO.builder()
                 .id(entity.getId())
                 .usuarioEmail(entity.getUsuarioEmail())
-                .viaje(ViajeDTO.builder()
-                        .id(entity.getViaje().getId())
-                        .origen(entity.getViaje().getOrigen())
-                        .destino(entity.getViaje().getDestino())
-                        .fecha(entity.getViaje().getFecha())
-                        .horaSalida(entity.getViaje().getHoraSalida())
-                        .tipoBus(entity.getViaje().getTipoBus())
-                        .totalAsientos(entity.getViaje().getTotalAsientos())
-                        .precio(entity.getViaje().getPrecio())
-                        .creadoPorEmail(entity.getViaje().getCreadoPorEmail())
-                        .build())
+                .viaje(viajeBuilder.build())
                 .nombrePasajero(entity.getNombrePasajero())
                 .dniPasajero(entity.getDniPasajero())
                 .asiento(entity.getAsiento())

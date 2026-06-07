@@ -12,62 +12,101 @@
           <div class="col-lg-8">
             <div class="card shadow-sm border-0">
               <div class="card-body p-4 p-md-5">
-                <div class="text-center mb-4">
-                  <div
-                    class="d-inline-flex align-items-center justify-content-center rounded-circle"
-                    style="
-                      width: 72px;
-                      height: 72px;
-                      background: rgba(244, 180, 0, 0.18);
-                      border: 1px solid rgba(244, 180, 0, 0.35);
-                    "
-                  >
-                    <i class="bi bi-check2-circle fs-1 text-amarillo"></i>
-                  </div>
-                  <h1 class="fw-bold text-primario mt-3">Solicitud enviada</h1>
-                  <p class="text-muted fs-5 mb-0">
-                    Gracias por tu interés. Nuestro equipo se comunicará
-                    contigo.
-                  </p>
+                <!-- Error -->
+                <div th:if="${error}" class="alert alert-danger" style="border-radius: 16px">
+                  <i class="bi bi-exclamation-triangle me-2"></i>
+                  <span th:text="${error}"></span>
                 </div>
 
-                <div class="alert alert-success" style="border-radius: 16px">
-                  <i class="bi bi-lightning-charge me-2"></i>
-                  <strong
-                    th:text="${nombre != null ? nombre : 'Tu solicitud'}"
-                  ></strong
-                  >, recibimos tus datos.
-                </div>
-
-                <div class="row g-3">
-                  <div class="col-md-6">
+                <!-- Success -->
+                <div th:if="${enviado}">
+                  <div class="text-center mb-4">
                     <div
-                      class="p-3 rounded-4 bg-primario text-white"
-                      style="background: rgba(13, 27, 76, 0.9) !important"
+                      class="d-inline-flex align-items-center justify-content-center rounded-circle"
+                      style="
+                        width: 72px;
+                        height: 72px;
+                        background: rgba(244, 180, 0, 0.18);
+                        border: 1px solid rgba(244, 180, 0, 0.35);
+                      "
                     >
-                      <div class="d-flex align-items-center mb-2">
-                        <i class="bi bi-people me-2"></i>
-                        <h5 class="mb-0">Próximo paso</h5>
+                      <i class="bi bi-check2-circle fs-1 text-amarillo"></i>
+                    </div>
+                    <h1 class="fw-bold text-primario mt-3">Solicitud enviada</h1>
+                    <p class="text-muted fs-5 mb-0">
+                      Gracias por tu interés. Nuestro equipo se comunicará
+                      contigo.
+                    </p>
+                  </div>
+
+                  <div class="alert alert-success" style="border-radius: 16px">
+                    <i class="bi bi-lightning-charge me-2"></i>
+                    <strong th:text="${nombre != null ? nombre : 'Tu solicitud'}"></strong>, recibimos tus datos correctamente.
+                  </div>
+
+                  <!-- Resumen de la solicitud -->
+                  <div class="card bg-light border-0 mb-4" th:if="${solicitud}">
+                    <div class="card-body p-4">
+                      <h5 class="fw-bold text-primario mb-3"><i class="bi bi-file-text me-2"></i>Resumen de tu solicitud</h5>
+                      <div class="row g-2">
+                        <div class="col-md-6">
+                          <small class="text-muted d-block">Vehículo</small>
+                          <span class="fw-bold" th:text="${solicitud.vehiculoInfo != null ? solicitud.vehiculoInfo : solicitud.tipoVehiculo}"></span>
+                        </div>
+                        <div class="col-md-6">
+                          <small class="text-muted d-block">Personas</small>
+                          <span class="fw-bold" th:text="${solicitud.cantidadPersonas != null ? solicitud.cantidadPersonas + ' personas' : 'No especificado'}"></span>
+                        </div>
+                        <div class="col-md-6">
+                          <small class="text-muted d-block">Ruta</small>
+                          <span class="fw-bold" th:text="${solicitud.origen != null ? solicitud.origen : '?'} + ' → ' + ${solicitud.destino != null ? solicitud.destino : '?'}"></span>
+                        </div>
+                        <div class="col-md-6">
+                          <small class="text-muted d-block">Fecha de inicio</small>
+                          <span class="fw-bold" th:text="${solicitud.fechaInicio}"></span>
+                        </div>
+                        <div class="col-md-6" th:if="${solicitud.empresa != null && !solicitud.empresa.isEmpty()}">
+                          <small class="text-muted d-block">Empresa</small>
+                          <span class="fw-bold" th:text="${solicitud.empresa}"></span>
+                        </div>
+                        <div class="col-md-6">
+                          <small class="text-muted d-block">Estado</small>
+                          <span class="badge bg-amarillo text-dark fw-bold" th:text="${solicitud.estado}"></span>
+                        </div>
                       </div>
-                      <p class="mb-0 text-white-50">
-                        Te enviaremos una propuesta de alquiler según
-                        disponibilidad y fechas indicadas.
-                      </p>
                     </div>
                   </div>
-                  <div class="col-md-6">
-                    <div
-                      class="p-3 rounded-4"
-                      style="border: 1px solid rgba(13, 27, 76, 0.12)"
-                    >
-                      <div class="d-flex align-items-center mb-2">
-                        <i class="bi bi-telephone-fill me-2 text-amarillo"></i>
-                        <h5 class="mb-0">Contacto</h5>
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div
+                        class="p-3 rounded-4 bg-primario text-white"
+                        style="background: rgba(13, 27, 76, 0.9) !important"
+                      >
+                        <div class="d-flex align-items-center mb-2">
+                          <i class="bi bi-people me-2"></i>
+                          <h5 class="mb-0">Próximo paso</h5>
+                        </div>
+                        <p class="mb-0 text-white-50">
+                          Te enviaremos una propuesta de alquiler según
+                          disponibilidad y fechas indicadas.
+                        </p>
                       </div>
-                      <p class="mb-0 text-muted">
-                        Si lo deseas, contáctanos también desde la sección
-                        <strong>Contacto</strong>.
-                      </p>
+                    </div>
+                    <div class="col-md-6">
+                      <div
+                        class="p-3 rounded-4"
+                        style="border: 1px solid rgba(13, 27, 76, 0.12)"
+                      >
+                        <div class="d-flex align-items-center mb-2">
+                          <i class="bi bi-telephone-fill me-2 text-amarillo"></i>
+                          <h5 class="mb-0">Contacto</h5>
+                        </div>
+                        <p class="mb-0 text-muted">
+                          Si lo deseas, contáctanos también desde la sección
+                          <strong>Contacto</strong>.
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>

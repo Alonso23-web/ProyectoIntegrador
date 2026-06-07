@@ -27,10 +27,10 @@ public class Viaje {
     private LocalDate fecha;
 
     @Column(nullable = false)
-    private String horaSalida; // 08:00, 12:00, 16:00, 20:00
+    private String horaSalida;
 
     @Column(nullable = false)
-    private String tipoBus; // BUS, MINIVAN, CAMION
+    private String tipoBus;
 
     @Column(nullable = false)
     private int totalAsientos;
@@ -43,10 +43,16 @@ public class Viaje {
 
     // ==================== CAMPOS DE ASIGNACIÓN ====================
 
-    private String conductorEmail; // Email del conductor asignado
+    private String conductorEmail;
 
     @Column(nullable = false)
     @Builder.Default
-    private String estadoViaje = "PROGRAMADO"; // PROGRAMADO, EN_CURSO, FINALIZADO
+    private String estadoViaje = "PROGRAMADO";
+
+    // ==================== VEHÍCULO ASIGNADO ====================
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "vehiculo_id")
+    private Vehiculo vehiculo;
 }
 
