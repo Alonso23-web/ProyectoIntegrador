@@ -7,6 +7,7 @@ import proyecto.nuevaases.exception.ResourceNotFoundException;
 import proyecto.nuevaases.models.Encomienda;
 import proyecto.nuevaases.repositories.EncomiendaRepository;
 import proyecto.nuevaases.services.IEncomiendaService;
+import proyecto.nuevaases.services.IHistorialEncomiendaService;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 public class EncomiendaServiceImpl implements IEncomiendaService {
 
     private final EncomiendaRepository encomiendaRepository;
+    private final IHistorialEncomiendaService historialEncomiendaService;
 
     @Override
     public List<EncomiendaDTO> listarTodos() {
@@ -35,11 +37,36 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
 
     @Override
     public EncomiendaDTO guardar(EncomiendaDTO dto) {
+        // Detectar cambio de estado para registrar historial
+        String estadoAnterior = null;
+        if (dto.getId() != null) {
+            Optional<Encomienda> existente = encomiendaRepository.findById(dto.getId());
+            if (existente.isPresent()) {
+                estadoAnterior = existente.get().getEstado();
+            }
+        }
+
         Encomienda entity = convertToEntity(dto);
-        if (entity.getCodigoRastreo() == null || entity.getCodigoRastreo().isEmpty()) {
+        boolean esNuevo = (entity.getCodigoRastreo() == null || entity.getCodigoRastreo().isEmpty());
+        if (esNuevo) {
             entity.setCodigoRastreo(generarCodigoRastreo());
         }
-        return convertToDTO(encomiendaRepository.save(entity));
+
+        Encomienda guardada = encomiendaRepository.save(entity);
+
+        // Registrar historial si el estado cambió
+        if (estadoAnterior != null && !estadoAnterior.equals(guardada.getEstado())) {
+            String email = dto.getCreadoPorEmail() != null ? dto.getCreadoPorEmail() : "sistema";
+            historialEncomiendaService.registrarCambio(
+                    guardada.getId(),
+                    estadoAnterior,
+                    guardada.getEstado(),
+                    email,
+                    "Cambio de estado: " + estadoAnterior + " → " + guardada.getEstado()
+            );
+        }
+
+        return convertToDTO(guardada);
     }
 
     @Override

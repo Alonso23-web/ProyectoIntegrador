@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import proyecto.nuevaases.dto.ViajeDTO;
 import proyecto.nuevaases.exception.ResourceNotFoundException;
+import proyecto.nuevaases.models.Vehiculo;
 import proyecto.nuevaases.models.Viaje;
+import proyecto.nuevaases.repositories.VehiculoRepository;
 import proyecto.nuevaases.repositories.ViajeRepository;
 import proyecto.nuevaases.services.IViajeService;
 import proyecto.nuevaases.services.ViajeService;
@@ -19,9 +21,10 @@ import java.util.stream.Collectors;
 public class ViajeServiceImpl implements ViajeService, IViajeService {
 
     private final ViajeRepository viajeRepository;
+    private final VehiculoRepository vehiculoRepository;
 
     // ========================================================================
-    // Implementación de ViajeService (entity-based — usada por ViajeController)
+    // Implementación de ViajeService (entity-based)
     // ========================================================================
 
     @Override
@@ -90,7 +93,7 @@ public class ViajeServiceImpl implements ViajeService, IViajeService {
     }
 
     private ViajeDTO convertToDTO(Viaje entity) {
-        return ViajeDTO.builder()
+        ViajeDTO.ViajeDTOBuilder builder = ViajeDTO.builder()
                 .id(entity.getId())
                 .origen(entity.getOrigen())
                 .destino(entity.getDestino())
@@ -100,11 +103,20 @@ public class ViajeServiceImpl implements ViajeService, IViajeService {
                 .totalAsientos(entity.getTotalAsientos())
                 .precio(entity.getPrecio())
                 .creadoPorEmail(entity.getCreadoPorEmail())
-                .build();
+                .conductorEmail(entity.getConductorEmail())
+                .estadoViaje(entity.getEstadoViaje());
+
+        if (entity.getVehiculo() != null) {
+            Vehiculo v = entity.getVehiculo();
+            builder.vehiculoId(v.getId());
+            builder.vehiculoInfo(v.getMarca() + " " + v.getModelo() + " - " + v.getPlaca());
+        }
+
+        return builder.build();
     }
 
     private Viaje convertToEntity(ViajeDTO dto) {
-        return Viaje.builder()
+        Viaje.ViajeBuilder builder = Viaje.builder()
                 .id(dto.getId())
                 .origen(dto.getOrigen())
                 .destino(dto.getDestino())
@@ -114,6 +126,13 @@ public class ViajeServiceImpl implements ViajeService, IViajeService {
                 .totalAsientos(dto.getTotalAsientos())
                 .precio(dto.getPrecio())
                 .creadoPorEmail(dto.getCreadoPorEmail())
-                .build();
+                .conductorEmail(dto.getConductorEmail())
+                .estadoViaje(dto.getEstadoViaje() != null ? dto.getEstadoViaje() : "PROGRAMADO");
+
+        if (dto.getVehiculoId() != null) {
+            vehiculoRepository.findById(dto.getVehiculoId()).ifPresent(builder::vehiculo);
+        }
+
+        return builder.build();
     }
 }

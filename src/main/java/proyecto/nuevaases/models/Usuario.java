@@ -36,6 +36,7 @@ public class Usuario {
     @Column(nullable = false)
     private String rol; // CLIENTE, ADMINISTRADOR, CONDUCTOR
 
+    @Builder.Default
     private boolean activo = true;
 
     @CreationTimestamp

@@ -30,8 +30,9 @@ public class Vehiculo {
     @Column(nullable = false)
     private int capacidad;
 
+    @Builder.Default
     @Column(name = "tipo", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'BUS'")
-    private String tipo = "BUS"; // BUS, MINIVAN, CAMION
+    private String tipo = "BUS";
 
     // Columna legacy: indica si el vehículo es PROPIO de la empresa, ALQUILADO o de TERCEROS
     // Siempre será "PROPIO" para este negocio, nunca se expone en el formulario

@@ -23,9 +23,11 @@ public class Pasaje {
     @Column(nullable = false)
     private String dni;
 
+    @Builder.Default
     @Column(nullable = false)
     private String origen = "Trujillo";
 
+    @Builder.Default
     @Column(nullable = false)
     private String destino = "Chepén";
 

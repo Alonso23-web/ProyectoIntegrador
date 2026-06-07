@@ -17,4 +17,10 @@ public class ViajeDTO {
     private int totalAsientos;
     private double precio;
     private String creadoPorEmail;
+
+    // ==================== CAMPOS AGREGADOS ====================
+    private String conductorEmail;
+    private String estadoViaje;
+    private Long vehiculoId;
+    private String vehiculoInfo; // Marca + Modelo + Placa
 }
