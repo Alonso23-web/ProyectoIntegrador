@@ -9,6 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import proyecto.nuevaases.dto.PasajeDTO;
 import proyecto.nuevaases.exception.ResourceNotFoundException;
 import proyecto.nuevaases.models.Pasaje;
+import proyecto.nuevaases.models.enums.EstadoPasaje;
 import proyecto.nuevaases.repositories.PasajeRepository;
 import proyecto.nuevaases.services.impl.PasajeServiceImpl;
 
@@ -44,7 +45,7 @@ class PasajeServiceImplTest {
                 .horaViaje("10:30")
                 .asiento(5)
                 .precio(500.0)
-                .estado("CONFIRMADO")
+                .estado("RESERVADO")
                 .creadoPorEmail("admin@example.com")
                 .build();
 
@@ -58,7 +59,7 @@ class PasajeServiceImplTest {
                 .horaViaje("10:30")
                 .asiento(5)
                 .precio(500.0)
-                .estado("CONFIRMADO")
+                .estado(EstadoPasaje.RESERVADO)
                 .creadoPorEmail("admin@example.com")
                 .build();
     }
@@ -66,7 +67,11 @@ class PasajeServiceImplTest {
     @Test
     void listarTodos_debeRetornarListaDePasajes() {
         // Arrange
-        Pasaje p2 = Pasaje.builder().id(2L).nombrePasajero("María").build();
+        Pasaje p2 = Pasaje.builder()
+                .id(2L)
+                .nombrePasajero("María")
+                .estado(EstadoPasaje.RESERVADO)
+                .build();
         when(pasajeRepository.findAll()).thenReturn(List.of(pasaje, p2));
 
         // Act
@@ -147,12 +152,14 @@ class PasajeServiceImplTest {
         PasajeDTO pasajeNegativo = PasajeDTO.builder()
                 .nombrePasajero("Test")
                 .precio(-100.0)
+                .estado("RESERVADO")
                 .build();
 
         Pasaje pasajeGuardado = Pasaje.builder()
                 .id(1L)
                 .nombrePasajero("Test")
                 .precio(-100.0)
+                .estado(EstadoPasaje.RESERVADO)
                 .build();
 
         when(pasajeRepository.save(any(Pasaje.class))).thenReturn(pasajeGuardado);

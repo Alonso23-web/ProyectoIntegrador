@@ -10,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import proyecto.nuevaases.dto.UsuarioDTO;
 import proyecto.nuevaases.exception.ResourceNotFoundException;
 import proyecto.nuevaases.models.Usuario;
+import proyecto.nuevaases.models.enums.EstadoPostulacion;
+import proyecto.nuevaases.models.enums.Rol;
 import proyecto.nuevaases.repositories.UsuarioRepository;
 import proyecto.nuevaases.services.impl.UsuarioServiceImpl;
 
@@ -39,8 +41,10 @@ class UsuarioServiceImplTest {
                 .email("test@example.com")
                 .nombreCompleto("Test User")
                 .dni("12345678")
-                .rol("CLIENTE")
+                .rol(Rol.CLIENTE.name())
                 .build();
+
+
     }
 
     @Test
@@ -55,7 +59,7 @@ class UsuarioServiceImplTest {
                 .dni("12345678")
                 .password(encryptedPassword)
                 .activo(true)
-                .rol("CLIENTE")
+                .rol(Rol.CLIENTE)
                 .build();
 
         when(passwordEncoder.encode(password)).thenReturn(encryptedPassword);
@@ -99,8 +103,8 @@ class UsuarioServiceImplTest {
         Usuario conductor = Usuario.builder()
                 .id(conductorId)
                 .email("conductor@example.com")
-                .rol("CONDUCTOR")
-                .estadoPostulacion("PENDIENTE")
+                .rol(Rol.CONDUCTOR)
+                .estadoPostulacion(EstadoPostulacion.PENDIENTE)
                 .activo(false)
                 .build();
 
@@ -113,7 +117,8 @@ class UsuarioServiceImplTest {
         // Assert
         verify(usuarioRepository, times(1)).findById(conductorId);
         verify(usuarioRepository, times(1))
-                .save(argThat(u -> u.getEstadoPostulacion().equals("APROBADO") && u.isActivo()));
+                .save(argThat(u -> u.getEstadoPostulacion() == EstadoPostulacion.APROBADO && u.isActivo()));
+
     }
 
     @Test
@@ -133,8 +138,8 @@ class UsuarioServiceImplTest {
         Usuario conductor = Usuario.builder()
                 .id(conductorId)
                 .email("conductor2@example.com")
-                .rol("CONDUCTOR")
-                .estadoPostulacion("PENDIENTE")
+                .rol(Rol.CONDUCTOR)
+                .estadoPostulacion(EstadoPostulacion.PENDIENTE)
                 .activo(true)
                 .build();
 
@@ -146,7 +151,8 @@ class UsuarioServiceImplTest {
 
         // Assert
         verify(usuarioRepository, times(1))
-                .save(argThat(u -> u.getEstadoPostulacion().equals("RECHAZADO") && !u.isActivo()));
+                .save(argThat(u -> u.getEstadoPostulacion() == EstadoPostulacion.RECHAZADO && !u.isActivo()));
+
     }
 
     @Test

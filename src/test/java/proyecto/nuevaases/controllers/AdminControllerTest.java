@@ -11,7 +11,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 
 import proyecto.nuevaases.controllers.admin.AdminController;
 import proyecto.nuevaases.repositories.EncomiendaRepository;
-import proyecto.nuevaases.repositories.ReservaRepository;
+import proyecto.nuevaases.repositories.PasajeRepository;
+
 import proyecto.nuevaases.services.IUsuarioService;
 
 import java.io.ByteArrayInputStream;
@@ -31,7 +32,8 @@ class AdminControllerTest {
     MockMvc mockMvc;
 
     @MockBean
-    ReservaRepository reservaRepository;
+    PasajeRepository pasajeRepository;
+
 
     @MockBean
     EncomiendaRepository encomiendaRepository;
@@ -42,12 +44,13 @@ class AdminControllerTest {
     @Test
     @WithMockUser(roles = "ADMINISTRADOR")
     void generarReporte_returnsXlsx() throws Exception {
-        when(reservaRepository.count()).thenReturn(10L);
-        when(reservaRepository.sumAllPrecio()).thenReturn(1234.56);
-        when(reservaRepository.countDistinctViajeFecha()).thenReturn(5L);
+        when(pasajeRepository.count()).thenReturn(10L);
+        when(pasajeRepository.sumAllPrecio()).thenReturn(1234.56);
+        when(pasajeRepository.countDistinctViajeFecha()).thenReturn(5L);
         java.util.List<Object[]> pasajes = new java.util.ArrayList<>();
         pasajes.add(new Object[] { LocalDate.of(2026, 1, 1), 2L, 100.0 });
-        when(reservaRepository.countAndSumByFecha()).thenReturn(pasajes);
+        when(pasajeRepository.countAndSumByFecha()).thenReturn(pasajes);
+
 
         when(encomiendaRepository.count()).thenReturn(3L);
         java.util.List<Object[]> encomiendas = new java.util.ArrayList<>();
@@ -68,5 +71,6 @@ class AdminControllerTest {
             assertTrue(wb.getNumberOfSheets() >= 1);
             assertNotNull(wb.getSheet("Resumen"));
         }
+
     }
 }
