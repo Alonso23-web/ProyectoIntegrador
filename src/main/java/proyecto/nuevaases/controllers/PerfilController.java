@@ -25,7 +25,6 @@ public class PerfilController {
         UsuarioDTO usuario = usuarioService.buscarPorEmail(email).orElse(null);
 
         model.addAttribute("usuario", usuario);
-        model.addAttribute("nombreUsuario", email);
 
         return "perfil";
     }

@@ -5,14 +5,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import proyecto.nuevaases.dto.PasajeDTO;
 import proyecto.nuevaases.dto.PasajeroReservaDTO;
-import proyecto.nuevaases.dto.ReservaDTO;
 import proyecto.nuevaases.dto.ViajeDTO;
 import proyecto.nuevaases.models.Viaje;
 import proyecto.nuevaases.repositories.ViajeRepository;
-import proyecto.nuevaases.services.IReservaService;
+import proyecto.nuevaases.services.IPasajeService;
 import proyecto.nuevaases.services.IViajeService;
-import proyecto.nuevaases.services.ReservaService;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -27,8 +26,7 @@ import java.util.Optional;
 public class PasajesApiController {
 
     private final IViajeService viajeService;
-    private final ReservaService reservaService;
-    private final IReservaService reservaDTOService;
+    private final IPasajeService pasajeService;
     private final ViajeRepository viajeRepository;
 
     @GetMapping("/rutas")
@@ -53,10 +51,7 @@ public class PasajesApiController {
 
     @GetMapping("/{viajeId}/ocupacion")
     public ResponseEntity<List<Integer>> ocupacion(@PathVariable Long viajeId) {
-        ViajeDTO viajeDTO = viajeService.obtenerPorIdDTO(viajeId)
-                .orElseThrow(() -> new RuntimeException("Viaje no encontrado"));
-        return ResponseEntity.ok(reservaService.asientosOcupados(
-                viajeRepository.findById(viajeId).orElseThrow()));
+        return ResponseEntity.ok(pasajeService.asientosOcupados(viajeId));
     }
 
     @PostMapping("/{viajeId}/reservar")
@@ -70,10 +65,8 @@ public class PasajesApiController {
         String email = authentication != null ? authentication.getName() : null;
         if (email == null || email.isBlank()) return ResponseEntity.status(401).body("No autenticado");
 
-        ViajeDTO viajeDTO = viajeService.obtenerPorIdDTO(viajeId)
-                .orElseThrow(() -> new RuntimeException("Viaje no encontrado"));
-        ReservaDTO reserva = reservaDTOService.reservar(email, viajeDTO, asiento, nombrePasajero, dniPasajero);
-        return ResponseEntity.ok(reserva);
+        PasajeDTO pasaje = pasajeService.reservarDTO(email, viajeId, asiento, nombrePasajero, dniPasajero);
+        return ResponseEntity.ok(pasaje);
     }
 
     @PostMapping("/{viajeId}/reservar-multiples")
@@ -91,13 +84,9 @@ public class PasajesApiController {
 
         Viaje viaje = viajeRepository.findById(viajeId).orElseThrow();
 
-        List<proyecto.nuevaases.models.Reserva> reservas = reservaService.reservarMultiples(
-                email,
-                viaje,
-                pasajeros
-        );
+        var pasajes = pasajeService.reservarMultiples(email, viaje, pasajeros);
 
-        return ResponseEntity.ok(reservas);
+        return ResponseEntity.ok(pasajes);
     }
 
 
@@ -109,7 +98,7 @@ public class PasajesApiController {
         List<Viaje> viajes = viajeRepository.findByOrigenAndDestinoAndFecha(origen, destino, fecha);
         java.util.List<Map<String, Object>> result = new java.util.ArrayList<>();
         for (Viaje v : viajes) {
-            List<Integer> ocupados = reservaService.asientosOcupados(v);
+            List<Integer> ocupados = pasajeService.asientosOcupados(v);
             java.util.Map<String, Object> item = new java.util.LinkedHashMap<>();
             item.put("hora", v.getHoraSalida());
             item.put("viajeId", v.getId());
@@ -126,58 +115,57 @@ public class PasajesApiController {
     public ResponseEntity<?> mis(Authentication authentication) {
         String email = authentication != null ? authentication.getName() : null;
         if (email == null || email.isBlank()) return ResponseEntity.status(401).build();
-        return ResponseEntity.ok(reservaDTOService.obtenerReservasDTO(email));
+        return ResponseEntity.ok(pasajeService.obtenerPasajesDTO(email));
     }
 
     @GetMapping("/estado/{codigoBoleto}")
     public ResponseEntity<Map<String, Object>> getEstadoViaje(@PathVariable String codigoBoleto) {
-        Optional<ReservaDTO> reservaOpt = reservaDTOService.obtenerReservaDTOPorCodigo(codigoBoleto);
-        if (reservaOpt.isEmpty()) return ResponseEntity.notFound().build();
-        
-        ReservaDTO r = reservaOpt.get();
-        ViajeDTO v = r.getViaje();
-        
+        Optional<PasajeDTO> pasajeOpt = pasajeService.obtenerPasajeDTOPorCodigo(codigoBoleto);
+        if (pasajeOpt.isEmpty()) return ResponseEntity.notFound().build();
+
+        PasajeDTO p = pasajeOpt.get();
+
         // Determinar estado según la fecha/hora actual
-        String estado = r.getEstado();
+        String estado = p.getEstado();
         String detalles = "Su viaje está programado.";
-        
+
         LocalDate hoy = LocalDate.now();
         LocalTime ahora = LocalTime.now();
-        
+
         try {
-            LocalTime horaSalida = LocalTime.parse(v.getHoraSalida());
-            
-            if (v.getFecha().isBefore(hoy)) {
+            LocalTime horaSalida = LocalTime.parse(p.getHoraViaje());
+
+            if (p.getFechaViaje().isBefore(hoy)) {
                 estado = "FINALIZADO";
                 detalles = "El viaje ha concluido.";
-            } else if (v.getFecha().isEqual(hoy)) {
+            } else if (p.getFechaViaje().isEqual(hoy)) {
                 if (ahora.isAfter(horaSalida)) {
                     estado = "EN_RUTA";
                     detalles = "El bus se encuentra actualmente en trayecto.";
                 } else {
-                    detalles = "El bus sale hoy a las " + v.getHoraSalida();
+                    detalles = "El bus sale hoy a las " + p.getHoraViaje();
                 }
             } else {
-                detalles = "Viaje programado para el " + v.getFecha() + " a las " + v.getHoraSalida();
+                detalles = "Viaje programado para el " + p.getFechaViaje() + " a las " + p.getHoraViaje();
             }
         } catch (Exception e) {
             detalles = "Viaje programado.";
         }
-        
+
         Map<String, Object> response = new java.util.LinkedHashMap<>();
-        response.put("codigoBoleto", r.getCodigoBoleto());
+        response.put("codigoBoleto", p.getCodigoBoleto());
         response.put("estado", estado);
         response.put("detalles", detalles);
-        response.put("origen", v.getOrigen());
-        response.put("destino", v.getDestino());
-        response.put("fecha", v.getFecha().toString());
-        response.put("horaSalida", v.getHoraSalida());
-        response.put("tipoBus", v.getTipoBus());
-        response.put("precio", r.getPrecio());
-        response.put("asiento", r.getAsiento());
-        response.put("nombrePasajero", r.getNombrePasajero());
-        response.put("dniPasajero", r.getDniPasajero());
-        
+        response.put("origen", p.getOrigen());
+        response.put("destino", p.getDestino());
+        response.put("fecha", p.getFechaViaje() != null ? p.getFechaViaje().toString() : "");
+        response.put("horaSalida", p.getHoraViaje());
+        response.put("tipoBus", "");
+        response.put("precio", p.getPrecio());
+        response.put("asiento", p.getAsiento());
+        response.put("nombrePasajero", p.getNombrePasajero());
+        response.put("dniPasajero", p.getDni());
+
         return ResponseEntity.ok(response);
     }
 }

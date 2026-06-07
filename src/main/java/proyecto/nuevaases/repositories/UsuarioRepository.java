@@ -3,6 +3,8 @@ package proyecto.nuevaases.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import proyecto.nuevaases.models.Usuario;
+import proyecto.nuevaases.models.enums.EstadoPostulacion;
+import proyecto.nuevaases.models.enums.Rol;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,12 +15,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     boolean existsByEmail(String email);
     boolean existsByDni(String dni);
 
-    List<Usuario> findByRolAndEstadoPostulacion(String rol, String estadoPostulacion);
+    List<Usuario> findByRolAndEstadoPostulacion(Rol rol, EstadoPostulacion estadoPostulacion);
 
-    long countByRolAndEstadoPostulacion(String rol, String estadoPostulacion);
+    long countByRolAndEstadoPostulacion(Rol rol, EstadoPostulacion estadoPostulacion);
 
-    long countByRolAndActivo(String rol, boolean activo);
+    long countByRolAndActivo(Rol rol, boolean activo);
 
-    List<Usuario> findByRol(String rol);
+    List<Usuario> findByRol(Rol rol);
 }
 

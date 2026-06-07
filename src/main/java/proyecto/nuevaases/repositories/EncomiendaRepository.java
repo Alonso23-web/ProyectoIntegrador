@@ -3,6 +3,7 @@ package proyecto.nuevaases.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import proyecto.nuevaases.models.Encomienda;
+import proyecto.nuevaases.models.enums.EstadoEncomienda;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,7 @@ public interface EncomiendaRepository extends JpaRepository<Encomienda, Long> {
         List<Encomienda> findByDniRemitenteOrDniDestinatario(String dniRemitente, String dniDestinatario);
 
         List<Encomienda> findByDniRemitenteOrDniDestinatarioAndEstado(
-                        String dniRemitente, String dniDestinatario, String estado);
+                        String dniRemitente, String dniDestinatario, EstadoEncomienda estado);
 
         long countByDniRemitenteOrDniDestinatario(String dniRemitente, String dniDestinatario);
 
@@ -29,9 +30,9 @@ public interface EncomiendaRepository extends JpaRepository<Encomienda, Long> {
 
         List<Encomienda> findTop5ByOrderByFechaEnvioDesc();
 
-        long countByEstadoNot(String estado);
+        long countByEstadoNot(EstadoEncomienda estado);
 
-        List<Encomienda> findByEstado(String estado);
+        List<Encomienda> findByEstado(EstadoEncomienda estado);
 
         @Query("SELECT e.estado as estado, COUNT(e) as total FROM Encomienda e GROUP BY e.estado")
         List<Object[]> countGroupByEstado();

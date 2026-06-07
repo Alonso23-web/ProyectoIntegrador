@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import proyecto.nuevaases.repositories.EncomiendaRepository;
-import proyecto.nuevaases.repositories.ReservaRepository;
+import proyecto.nuevaases.repositories.PasajeRepository;
 import proyecto.nuevaases.services.IUsuarioService;
 
 @Controller
@@ -37,7 +37,7 @@ import proyecto.nuevaases.services.IUsuarioService;
 public class AdminController {
 
     private final IUsuarioService usuarioService;
-    private final ReservaRepository reservaRepository;
+    private final PasajeRepository pasajeRepository;
     private final EncomiendaRepository encomiendaRepository;
 
     // ==================== USUARIOS ====================
@@ -68,10 +68,10 @@ public class AdminController {
     @GetMapping("/reportes")
     public String reportes(Model model) {
         // Métricas clave
-        long totalPasajes = reservaRepository.count();
-        double ingresosHistoricos = reservaRepository.sumAllPrecio();
+        long totalPasajes = pasajeRepository.count();
+        double ingresosHistoricos = pasajeRepository.sumAllPrecio();
         long totalEncomiendas = encomiendaRepository.count();
-        long diasConViajes = reservaRepository.countDistinctViajeFecha();
+        long diasConViajes = pasajeRepository.countDistinctViajeFecha();
         double promedioDiario = diasConViajes > 0 ? (double) totalPasajes / diasConViajes : 0;
 
         model.addAttribute("totalPasajes", totalPasajes);
@@ -80,7 +80,7 @@ public class AdminController {
         model.addAttribute("promedioDiario", Math.round(promedioDiario * 100.0) / 100.0);
 
         // Pasajes agrupados por fecha
-        model.addAttribute("pasajesPorFecha", reservaRepository.countAndSumByFecha());
+        model.addAttribute("pasajesPorFecha", pasajeRepository.countAndSumByFecha());
 
         // Encomiendas por estado
         model.addAttribute("encomiendasPorEstado", encomiendaRepository.countGroupByEstado());
@@ -90,13 +90,13 @@ public class AdminController {
 
     @GetMapping(value = "/reportes/generar", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     public ResponseEntity<byte[]> generarReporte() throws IOException {
-        long totalPasajes = reservaRepository.count();
-        double ingresosHistoricos = reservaRepository.sumAllPrecio();
+        long totalPasajes = pasajeRepository.count();
+        double ingresosHistoricos = pasajeRepository.sumAllPrecio();
         long totalEncomiendas = encomiendaRepository.count();
-        long diasConViajes = reservaRepository.countDistinctViajeFecha();
+        long diasConViajes = pasajeRepository.countDistinctViajeFecha();
         double promedioDiario = diasConViajes > 0 ? (double) totalPasajes / diasConViajes : 0;
 
-        List<Object[]> pasajesPorFecha = reservaRepository.countAndSumByFecha();
+        List<Object[]> pasajesPorFecha = pasajeRepository.countAndSumByFecha();
         List<Object[]> encomiendasPorEstado = encomiendaRepository.countGroupByEstado();
 
         try (XSSFWorkbook workbook = new XSSFWorkbook();

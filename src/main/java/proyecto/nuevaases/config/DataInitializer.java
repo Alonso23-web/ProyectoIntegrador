@@ -3,11 +3,16 @@ package proyecto.nuevaases.config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import proyecto.nuevaases.models.Usuario;
 import proyecto.nuevaases.models.Vehiculo;
 import proyecto.nuevaases.models.Viaje;
+import proyecto.nuevaases.models.enums.EstadoVehiculo;
+import proyecto.nuevaases.models.enums.Rol;
+import proyecto.nuevaases.models.enums.TipoVehiculo;
 import proyecto.nuevaases.repositories.UsuarioRepository;
 import proyecto.nuevaases.repositories.VehiculoRepository;
 import proyecto.nuevaases.repositories.ViajeRepository;
@@ -23,9 +28,13 @@ public class DataInitializer implements CommandLineRunner {
     private final VehiculoRepository vehiculoRepository;
     private final ViajeRepository viajeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
+    @Transactional
     public void run(String... args) {
+        limpiarEnumsInvalidos();
+
         // ==================== USUARIOS ====================
         if (!usuarioRepository.existsByEmail("admin@empresa.com")) {
             Usuario admin = Usuario.builder()
@@ -34,7 +43,7 @@ public class DataInitializer implements CommandLineRunner {
                     .nombreCompleto("Administrador del Sistema")
                     .dni("00000001")
                     .telefono("999888001")
-                    .rol("ADMINISTRADOR")
+                    .rol(Rol.ADMINISTRADOR)
                     .activo(true)
                     .build();
             usuarioRepository.save(admin);
@@ -48,7 +57,7 @@ public class DataInitializer implements CommandLineRunner {
                     .nombreCompleto("Cliente de Prueba")
                     .dni("12345678")
                     .telefono("999888002")
-                    .rol("CLIENTE")
+                    .rol(Rol.CLIENTE)
                     .activo(true)
                     .build();
             usuarioRepository.save(cliente);
@@ -62,7 +71,7 @@ public class DataInitializer implements CommandLineRunner {
                     .nombreCompleto("Conductor de Prueba")
                     .dni("87654321")
                     .telefono("999888003")
-                    .rol("CONDUCTOR")
+                    .rol(Rol.CONDUCTOR)
                     .activo(true)
                     .build();
             usuarioRepository.save(conductor);
@@ -77,8 +86,8 @@ public class DataInitializer implements CommandLineRunner {
                     .modelo("Sprinter")
                     .anio(2023)
                     .capacidad(20)
-                    .tipo("BUS")
-                    .estado("DISPONIBLE")
+                    .tipo(TipoVehiculo.BUS)
+                    .estado(EstadoVehiculo.DISPONIBLE)
                     .precioPorDia(350.0)
                     .imagen("/img/minivanblanca.png")
                     .build());
@@ -89,8 +98,8 @@ public class DataInitializer implements CommandLineRunner {
                     .modelo("Hiace")
                     .anio(2022)
                     .capacidad(12)
-                    .tipo("MINIVAN")
-                    .estado("DISPONIBLE")
+                    .tipo(TipoVehiculo.MINIVAN)
+                    .estado(EstadoVehiculo.DISPONIBLE)
                     .precioPorDia(220.0)
                     .imagen("/img/minivanploma.png")
                     .build());
@@ -101,8 +110,8 @@ public class DataInitializer implements CommandLineRunner {
                     .modelo("Frontier")
                     .anio(2023)
                     .capacidad(5)
-                    .tipo("CAMIONETA")
-                    .estado("DISPONIBLE")
+                    .tipo(TipoVehiculo.CAMIONETA)
+                    .estado(EstadoVehiculo.DISPONIBLE)
                     .precioPorDia(180.0)
                     .imagen("")
                     .build());
@@ -113,8 +122,8 @@ public class DataInitializer implements CommandLineRunner {
                     .modelo("Crafter")
                     .anio(2024)
                     .capacidad(30)
-                    .tipo("BUS")
-                    .estado("DISPONIBLE")
+                    .tipo(TipoVehiculo.BUS)
+                    .estado(EstadoVehiculo.DISPONIBLE)
                     .precioPorDia(450.0)
                     .imagen("/img/minivanploma2.png")
                     .build());
@@ -182,6 +191,16 @@ public class DataInitializer implements CommandLineRunner {
             log.info("✅ {} viajes de ejemplo creados (MINIVAN Trujillo ↔ Chepén, 30 días, S/12.00)", totalViajes);
         } else {
             log.info("ℹ️ Viajes ya existen y son correctos ({} viajes)", count);
+        }
+    }
+
+    private void limpiarEnumsInvalidos() {
+        int viajes = jdbcTemplate.update("UPDATE viajes SET estado_viaje = 'PROGRAMADO' WHERE estado_viaje IS NULL OR estado_viaje = '' OR estado_viaje NOT IN ('PROGRAMADO','EN_CURSO','FINALIZADO')");
+        int pasajes = jdbcTemplate.update("UPDATE pasajes SET estado = 'RESERVADO' WHERE estado IS NULL OR estado = '' OR estado NOT IN ('RESERVADO','PAGADO','CANCELADO','FINALIZADO')");
+        int encomiendas = jdbcTemplate.update("UPDATE encomiendas SET estado = 'REGISTRADO' WHERE estado IS NULL OR estado = '' OR estado NOT IN ('REGISTRADO','EN_TRANSITO','EN_DESTINO','ENTREGADO')");
+        int usuarios = jdbcTemplate.update("UPDATE usuarios SET estado_postulacion = 'PENDIENTE' WHERE estado_postulacion IS NULL OR estado_postulacion = '' OR estado_postulacion NOT IN ('PENDIENTE','APROBADO','RECHAZADO')");
+        if (viajes > 0 || pasajes > 0 || encomiendas > 0 || usuarios > 0) {
+            log.warn("🧹 Limpieza de enums inválidos: {} viajes, {} pasajes, {} encomiendas, {} usuarios reparados", viajes, pasajes, encomiendas, usuarios);
         }
     }
 }

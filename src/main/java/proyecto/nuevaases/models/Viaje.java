@@ -2,6 +2,7 @@ package proyecto.nuevaases.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import proyecto.nuevaases.models.enums.EstadoViaje;
 
 import java.time.LocalDate;
 
@@ -45,14 +46,20 @@ public class Viaje {
 
     private String conductorEmail;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private String estadoViaje = "PROGRAMADO";
+    private EstadoViaje estadoViaje = EstadoViaje.PROGRAMADO;
 
     // ==================== VEHÍCULO ASIGNADO ====================
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehiculo_id")
     private Vehiculo vehiculo;
-}
 
+    // ==================== NUEVOS CAMPOS ====================
+
+    private String horaLlegadaEstimada;
+
+    private Integer duracionEstimada;
+}

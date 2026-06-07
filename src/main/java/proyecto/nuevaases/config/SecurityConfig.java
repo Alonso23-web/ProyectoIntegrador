@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import proyecto.nuevaases.models.enums.EstadoPostulacion;
+import proyecto.nuevaases.models.enums.Rol;
 import proyecto.nuevaases.repositories.UsuarioRepository;
 
 @Configuration
@@ -24,7 +26,7 @@ public class SecurityConfig {
 
                // En securityFilterChain:
 CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
-requestHandler.setCsrfRequestAttributeName(null); // ✅ clave: null fuerza resolución inmediata
+requestHandler.setCsrfRequestAttributeName(null);
 
 http
     .csrf(csrf -> csrf
@@ -67,13 +69,14 @@ http
                                         throw new UsernameNotFoundException("Usuario inactivo");
                                 }
                                 // Bloquear conductores no aprobados
-                                if ("CONDUCTOR".equals(usuario.getRol()) && !"APROBADO".equals(usuario.getEstadoPostulacion())) {
-                                        throw new UsernameNotFoundException("Conductor no aprobado. Tu postulación está " + usuario.getEstadoPostulacion().toLowerCase());
+                                if (usuario.getRol() == Rol.CONDUCTOR && usuario.getEstadoPostulacion() != EstadoPostulacion.APROBADO) {
+                                        String estado = usuario.getEstadoPostulacion() != null ? usuario.getEstadoPostulacion().name().toLowerCase() : "pendiente";
+                                        throw new UsernameNotFoundException("Conductor no aprobado. Tu postulación está " + estado);
                                 }
                                 return org.springframework.security.core.userdetails.User.builder()
                                                 .username(usuario.getEmail())
                                                 .password(usuario.getPassword())
-                                                .roles(usuario.getRol())
+                                                .roles(usuario.getRol().name())
                                                 .build();
                         }
 

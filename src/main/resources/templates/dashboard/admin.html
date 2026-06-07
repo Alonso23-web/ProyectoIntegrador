@@ -484,7 +484,7 @@
         <!-- ============================================================ -->
         <div class="adm-welcome">
           <div>
-            <h1>👋 ¡Bienvenido, <span th:text="${nombreAdmin != null ? nombreAdmin : nombreUsuario}"></span>!</h1>
+            <h1>👋 ¡Bienvenido, <span th:text="${usuario != null ? usuario.nombreCompleto : nombreUsuario}"></span>!</h1>
             <p>Panel de control del sistema. Gestiona pasajes, encomiendas, conductores y más desde un solo lugar.</p>
             <span class="adm-welcome-badge mt-2">
               <i class="bi bi-shield-lock-fill"></i> Administrador del sistema

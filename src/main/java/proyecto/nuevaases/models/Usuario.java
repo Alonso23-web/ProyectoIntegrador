@@ -3,7 +3,10 @@ package proyecto.nuevaases.models;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import proyecto.nuevaases.models.enums.EstadoPostulacion;
+import proyecto.nuevaases.models.enums.Rol;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,8 +36,9 @@ public class Usuario {
     @Column(nullable = false)
     private String telefono;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String rol; // CLIENTE, ADMINISTRADOR, CONDUCTOR
+    private Rol rol;
 
     @Builder.Default
     private boolean activo = true;
@@ -49,12 +53,17 @@ public class Usuario {
 
     private Integer aniosExperiencia;
 
-    private String tipoVehiculo; // Minivan, Bus, Camión, Automóvil
+    private String tipoVehiculo;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     @Builder.Default
-    private String estadoPostulacion = "PENDIENTE"; // PENDIENTE, APROBADO, RECHAZADO
+    private EstadoPostulacion estadoPostulacion = EstadoPostulacion.PENDIENTE;
 
     private String documentoUrl;
-}
 
+    // ==================== NUEVOS CAMPOS ====================
+
+    private String direccion;
+
+    private LocalDate fechaNacimiento;
+}

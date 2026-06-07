@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import proyecto.nuevaases.dto.UsuarioDTO;
 import proyecto.nuevaases.exception.ResourceNotFoundException;
 import proyecto.nuevaases.models.Usuario;
+import proyecto.nuevaases.models.enums.EstadoPostulacion;
+import proyecto.nuevaases.models.enums.Rol;
 import proyecto.nuevaases.repositories.UsuarioRepository;
 import proyecto.nuevaases.services.IUsuarioService;
 
@@ -52,28 +54,28 @@ public class UsuarioServiceImpl implements IUsuarioService {
 
     @Override
     public List<UsuarioDTO> listarConductoresPendientes() {
-        return usuarioRepository.findByRolAndEstadoPostulacion("CONDUCTOR", "PENDIENTE")
+        return usuarioRepository.findByRolAndEstadoPostulacion(Rol.CONDUCTOR, EstadoPostulacion.PENDIENTE)
                 .stream().map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<UsuarioDTO> listarConductores() {
-        return usuarioRepository.findByRol("CONDUCTOR")
+        return usuarioRepository.findByRol(Rol.CONDUCTOR)
                 .stream().map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public long contarConductoresActivos() {
-        return usuarioRepository.countByRolAndEstadoPostulacion("CONDUCTOR", "APROBADO");
+        return usuarioRepository.countByRolAndEstadoPostulacion(Rol.CONDUCTOR, EstadoPostulacion.APROBADO);
     }
 
     @Override
     public void aprobarConductor(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Conductor no encontrado con ID: " + id));
-        usuario.setEstadoPostulacion("APROBADO");
+        usuario.setEstadoPostulacion(EstadoPostulacion.APROBADO);
         usuario.setActivo(true);
         usuarioRepository.save(usuario);
     }
@@ -82,7 +84,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
     public void rechazarConductor(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Conductor no encontrado con ID: " + id));
-        usuario.setEstadoPostulacion("RECHAZADO");
+        usuario.setEstadoPostulacion(EstadoPostulacion.RECHAZADO);
         usuario.setActivo(false);
         usuarioRepository.save(usuario);
     }
@@ -117,13 +119,13 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 .nombreCompleto(entity.getNombreCompleto())
                 .dni(entity.getDni())
                 .telefono(entity.getTelefono())
-                .rol(entity.getRol())
+                .rol(entity.getRol().name())
                 .activo(entity.isActivo())
                 .fechaRegistro(entity.getFechaRegistro())
                 .numeroLicencia(entity.getNumeroLicencia())
                 .aniosExperiencia(entity.getAniosExperiencia())
                 .tipoVehiculo(entity.getTipoVehiculo())
-                .estadoPostulacion(entity.getEstadoPostulacion())
+                .estadoPostulacion(entity.getEstadoPostulacion() != null ? entity.getEstadoPostulacion().name() : null)
                 .documentoUrl(entity.getDocumentoUrl())
                 .build();
     }
@@ -132,16 +134,16 @@ public class UsuarioServiceImpl implements IUsuarioService {
         return Usuario.builder()
                 .id(dto.getId())
                 .email(dto.getEmail())
-                .password("") // La contraseña se asigna en registrar()
+                .password("")
                 .nombreCompleto(dto.getNombreCompleto())
                 .dni(dto.getDni())
                 .telefono(dto.getTelefono())
-                .rol(dto.getRol())
+                .rol(dto.getRol() != null ? Rol.valueOf(dto.getRol()) : Rol.CLIENTE)
                 .activo(dto.isActivo())
                 .numeroLicencia(dto.getNumeroLicencia())
                 .aniosExperiencia(dto.getAniosExperiencia())
                 .tipoVehiculo(dto.getTipoVehiculo())
-                .estadoPostulacion(dto.getEstadoPostulacion() != null ? dto.getEstadoPostulacion() : "PENDIENTE")
+                .estadoPostulacion(dto.getEstadoPostulacion() != null ? EstadoPostulacion.valueOf(dto.getEstadoPostulacion()) : EstadoPostulacion.PENDIENTE)
                 .documentoUrl(dto.getDocumentoUrl())
                 .build();
     }

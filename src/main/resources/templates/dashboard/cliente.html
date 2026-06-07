@@ -187,7 +187,7 @@
 
         <!-- Bienvenida -->
         <div class="welcome-card">
-          <h1>👋 ¡Bienvenido, <span th:text="${nombreUsuario}"></span>!</h1>
+          <h1>👋 ¡Bienvenido, <span th:text="${usuario != null ? usuario.nombreCompleto : nombreUsuario}"></span>!</h1>
           <p>Tu panel de cliente. Compra pasajes, envía encomiendas y rastrea tus envíos de forma rápida y sencilla.</p>
           <span class="badge-rol">👤 Cliente</span>
         </div>

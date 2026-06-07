@@ -10,6 +10,13 @@ import org.springframework.web.multipart.MultipartFile;
 import proyecto.nuevaases.dto.UsuarioDTO;
 import proyecto.nuevaases.services.IUsuarioService;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
+
 @Controller
 @RequiredArgsConstructor
 public class RegistroController {
@@ -99,7 +106,7 @@ public class RegistroController {
         if ("CONDUCTOR".equals(rol)) {
             String documentoUrl = null;
             if (documento != null && !documento.isEmpty()) {
-                documentoUrl = documento.getOriginalFilename();
+                documentoUrl = guardarArchivo(documento);
             }
             builder
                 .numeroLicencia(numeroLicencia)
@@ -119,6 +126,24 @@ public class RegistroController {
 
         model.addAttribute("exito", "¡Registro exitoso! Ahora puedes iniciar sesión.");
         return "login";
+    }
+
+    private String guardarArchivo(MultipartFile archivo) {
+        try {
+            String uploadDir = "uploads/documentos/";
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            String nombreArchivo = UUID.randomUUID().toString() + "_" + archivo.getOriginalFilename();
+            Path rutaArchivo = uploadPath.resolve(nombreArchivo);
+            Files.copy(archivo.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
+
+            return "/uploads/documentos/" + nombreArchivo;
+        } catch (IOException e) {
+            throw new RuntimeException("Error al guardar el archivo: " + e.getMessage(), e);
+        }
     }
 
     @GetMapping("/postulacion-enviada")
@@ -143,4 +168,3 @@ public class RegistroController {
         return builder.build();
     }
 }
-
