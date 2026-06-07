@@ -1,4 +1,4 @@
-package proyecto.nuevaases.controllers.admin;
+package proyecto.nuevaases.controllers;
 
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.Test;
@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.security.test.context.support.WithMockUser;
 
+import proyecto.nuevaases.controllers.admin.AdminController;
 import proyecto.nuevaases.repositories.EncomiendaRepository;
 import proyecto.nuevaases.repositories.ReservaRepository;
 import proyecto.nuevaases.services.IUsuarioService;
