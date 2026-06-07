@@ -3,6 +3,7 @@ package proyecto.nuevaases.repositories;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import proyecto.nuevaases.models.Viaje;
+import proyecto.nuevaases.models.enums.EstadoViaje;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,7 +21,7 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
 
     long countByConductorEmail(String conductorEmail);
 
-    long countByConductorEmailAndEstadoViaje(String conductorEmail, String estadoViaje);
+    long countByConductorEmailAndEstadoViaje(String conductorEmail, EstadoViaje estadoViaje);
 
 }
 

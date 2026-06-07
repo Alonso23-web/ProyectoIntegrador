@@ -31,11 +31,9 @@ public class PasajesController {
         // Pasar datos del usuario autenticado para autocompletar primer pasajero
         if (authentication != null && authentication.isAuthenticated()) {
             String email = authentication.getName();
-            usuarioService.buscarPorEmail(email).ifPresent(usuario -> {
-                model.addAttribute("currentUserName", usuario.getNombreCompleto());
-                model.addAttribute("currentUserDni", usuario.getDni());
-                model.addAttribute("currentUserEmail", usuario.getEmail());
-            });
+            usuarioService.buscarPorEmail(email).ifPresent(usuario -> 
+                model.addAttribute("usuario", usuario)
+            );
         }
 
         return "pasajes/cliente-pasajes";

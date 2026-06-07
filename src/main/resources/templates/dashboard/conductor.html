@@ -412,7 +412,7 @@
         <!-- ========== HEADER ========== -->
         <div class="cond-header">
           <div>
-            <h1>🚛 ¡Buenos días, <span th:text="${nombreCompleto}"></span>!</h1>
+            <h1>🚛 ¡Buenos días, <span th:text="${usuario.nombreCompleto}"></span>!</h1>
             <p>Panel del conductor — Revisa tu jornada y gestiona tus viajes asignados.</p>
             <span class="cond-badge">
               <i class="bi bi-person-check-fill"></i> Conductor activo
@@ -557,7 +557,7 @@
                     <tbody>
                       <tr th:each="pax : ${item.pasajeros}">
                         <td class="fw-semibold" th:text="${pax.nombrePasajero}">—</td>
-                        <td class="text-muted small" th:text="${pax.dniPasajero}">—</td>
+                        <td class="text-muted small" th:text="${pax.dni}">—</td>
                         <td>
                           <span class="badge badge-light-blue px-2 py-1" th:text="'#' + ${pax.asiento}">#0</span>
                         </td>

@@ -8,9 +8,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import proyecto.nuevaases.models.Pasaje;
 import proyecto.nuevaases.models.Viaje;
+import proyecto.nuevaases.models.enums.EstadoEncomienda;
+import proyecto.nuevaases.models.enums.EstadoPasaje;
+import proyecto.nuevaases.models.enums.EstadoViaje;
+import proyecto.nuevaases.models.enums.Rol;
 import proyecto.nuevaases.repositories.EncomiendaRepository;
-import proyecto.nuevaases.repositories.ReservaRepository;
+import proyecto.nuevaases.repositories.PasajeRepository;
 import proyecto.nuevaases.repositories.UsuarioRepository;
 import proyecto.nuevaases.repositories.VehiculoRepository;
 import proyecto.nuevaases.repositories.ViajeRepository;
@@ -20,14 +25,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
-import proyecto.nuevaases.models.Reserva;
 
 @Controller
 @RequiredArgsConstructor
 public class DashboardController {
 
     private final UsuarioRepository usuarioRepository;
-    private final ReservaRepository reservaRepository;
+    private final PasajeRepository pasajeRepository;
     private final EncomiendaRepository encomiendaRepository;
     private final VehiculoRepository vehiculoRepository;
     private final ViajeRepository viajeRepository;
@@ -44,15 +48,15 @@ public class DashboardController {
         model.addAttribute("nombreUsuario", email);
 
         var usuarioOpt = usuarioRepository.findByEmail(email);
-        String rol = usuarioOpt.map(u -> u.getRol()).orElse("ADMINISTRADOR");
-        model.addAttribute("rolUsuario", rol);
+        Rol rol = usuarioOpt.map(u -> u.getRol()).orElse(Rol.ADMINISTRADOR);
+        usuarioOpt.ifPresent(u -> model.addAttribute("usuario", u));
 
-        if (rol.equals("ADMINISTRADOR")) {
+        if (rol == Rol.ADMINISTRADOR) {
             // ==================== ESTADÍSTICAS DEL DÍA ====================
             LocalDate hoy = LocalDate.now();
-            long pasajesDelDia = reservaRepository.countByViajeFecha(hoy);
-            double ingresosDelDia = reservaRepository.sumPrecioByViajeFecha(hoy);
-            long encomiendasActivas = encomiendaRepository.countByEstadoNot("ENTREGADO");
+            long pasajesDelDia = pasajeRepository.countByViajeFecha(hoy);
+            double ingresosDelDia = pasajeRepository.sumPrecioByViajeFecha(hoy);
+            long encomiendasActivas = encomiendaRepository.countByEstadoNot(EstadoEncomienda.ENTREGADO);
             long conductoresActivos = usuarioService.contarConductoresActivos();
 
             model.addAttribute("pasajesDelDia", pasajesDelDia);
@@ -67,13 +71,12 @@ public class DashboardController {
             model.addAttribute("conductores", usuarioService.listarConductores());
 
             // ==================== TABLAS RECIENTES ====================
-            model.addAttribute("totalPasajes", reservaRepository.count());
+            model.addAttribute("totalPasajes", pasajeRepository.count());
             model.addAttribute("totalEncomiendas", encomiendaRepository.count());
-            model.addAttribute("ultimosPasajes", reservaRepository.findByViajeFechaOrderByIdDesc(hoy));
+            model.addAttribute("ultimosPasajes", pasajeRepository.findByViajeFechaOrderByIdDesc(hoy));
             model.addAttribute("ultimasEncomiendas", encomiendaRepository.findTop5ByOrderByFechaEnvioDesc());
 
-            // Nombre del admin desde la BD
-            usuarioOpt.ifPresent(u -> model.addAttribute("nombreAdmin", u.getNombreCompleto()));
+
 
             // Fecha formateada en español
             java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' yyyy", new java.util.Locale("es", "PE"));
@@ -82,10 +85,9 @@ public class DashboardController {
             return "dashboard/admin";
         }
 
-        if (rol.equals("CLIENTE")) {
-            List<String> estados = List.of("RESERVADO", "PAGADO", "FINALIZADO");
-            List<Reserva> ultimosPasajes = reservaRepository.findByUsuarioEmailAndEstadoIn(email, estados);
-            // Limitar a 5 solo para mostrar
+        if (rol == Rol.CLIENTE) {
+            List<EstadoPasaje> estados = List.of(EstadoPasaje.RESERVADO, EstadoPasaje.PAGADO, EstadoPasaje.FINALIZADO);
+            List<Pasaje> ultimosPasajes = pasajeRepository.findByUsuarioEmailAndEstadoIn(email, estados);
             model.addAttribute("pasajesComprados", ultimosPasajes.size());
             model.addAttribute("encomiendasRegistradas", encomiendaRepository.countByCreadoPorEmail(email));
             model.addAttribute("ultimosPasajes",
@@ -95,11 +97,9 @@ public class DashboardController {
             return "dashboard/cliente";
         }
 
-        if (rol.equals("CONDUCTOR")) {
+        if (rol == Rol.CONDUCTOR) {
             var usuario = usuarioOpt.get();
             String conductorEmail = usuario.getEmail();
-            model.addAttribute("nombreCompleto", usuario.getNombreCompleto());
-
             LocalDate hoy = LocalDate.now();
 
             // ==================== VIAJES ASIGNADOS DE HOY ====================
@@ -108,24 +108,21 @@ public class DashboardController {
             // Por cada viaje, obtener datos completos
             var viajesConPasajeros = viajesHoy.stream()
                 .map(v -> {
-                    var pasajeros = reservaRepository.findByViajeAndEstadoIn(
-                        v, List.of("RESERVADO", "PAGADO", "FINALIZADO", "EN_CURSO"));
+                    var pasajeros = pasajeRepository.findByViajeAndEstadoIn(
+                        v, List.of(EstadoPasaje.RESERVADO, EstadoPasaje.PAGADO, EstadoPasaje.FINALIZADO));
                     return new ViajeConPasajerosYLista(v, pasajeros.size(), pasajeros);
                 })
                 .toList();
             model.addAttribute("viajesConPasajeros", viajesConPasajeros);
 
             // ==================== ESTADÍSTICAS PROPIAS ====================
-            // Total de viajes históricos del conductor
-            long totalViajesCond = viajeRepository.countByConductorEmailAndEstadoViaje(conductorEmail, "FINALIZADO");
+            long totalViajesCond = viajeRepository.countByConductorEmailAndEstadoViaje(conductorEmail, EstadoViaje.FINALIZADO);
 
-            // Total de pasajeros transportados (reservas en viajes del conductor con estado FINALIZADO)
             var viajesConductor = viajeRepository.findByConductorEmail(conductorEmail);
             long totalPasajerosCond = viajesConductor.stream()
-                .flatMap(v -> reservaRepository.findByViajeAndEstadoIn(v, List.of("FINALIZADO")).stream())
+                .flatMap(v -> pasajeRepository.findByViajeAndEstadoIn(v, List.of(EstadoPasaje.FINALIZADO)).stream())
                 .count();
 
-            // Total encomiendas entregadas (asociadas al conductor por su email)
             long totalEncomiendasCond = encomiendaRepository.countByCreadoPorEmail(conductorEmail);
 
             model.addAttribute("totalViajes", totalViajesCond);
@@ -145,7 +142,7 @@ public class DashboardController {
         try {
             var viaje = viajeRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Viaje no encontrado"));
-            viaje.setEstadoViaje("EN_CURSO");
+            viaje.setEstadoViaje(EstadoViaje.EN_CURSO);
             viajeRepository.save(viaje);
             redirectAttributes.addFlashAttribute("mensajeExito", "Viaje iniciado correctamente. ¡Buen viaje!");
         } catch (Exception e) {
@@ -179,7 +176,7 @@ public class DashboardController {
     }
 
     // Clase interna para pasar datos de viaje con pasajeros a la vista
-    public record ViajeConPasajerosYLista(Viaje viaje, int pasajerosCount, List<Reserva> pasajeros) {}
+    public record ViajeConPasajerosYLista(Viaje viaje, int pasajerosCount, List<Pasaje> pasajeros) {}
 
     public record ViajeConPasajeros(Viaje viaje, int pasajerosCount, int encomiendasCount) {}
 }

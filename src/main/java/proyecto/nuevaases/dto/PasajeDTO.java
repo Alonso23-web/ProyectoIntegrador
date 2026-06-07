@@ -9,6 +9,8 @@ import java.time.LocalDate;
 @Builder
 public class PasajeDTO {
     private Long id;
+    private String usuarioEmail;
+    private Long viajeId;
     private String nombrePasajero;
     private String dni;
     private String origen;
@@ -19,4 +21,5 @@ public class PasajeDTO {
     private Double precio;
     private String estado;
     private String creadoPorEmail;
+    private String codigoBoleto;
 }

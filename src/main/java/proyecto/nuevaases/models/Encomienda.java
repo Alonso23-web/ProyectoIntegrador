@@ -2,6 +2,7 @@ package proyecto.nuevaases.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import proyecto.nuevaases.models.enums.EstadoEncomienda;
 
 import java.time.LocalDate;
 
@@ -51,10 +52,23 @@ public class Encomienda {
 
     private LocalDate fechaEstimadaEntrega;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String estado; // REGISTRADO, EN_TRANSITO, EN_DESTINO, ENTREGADO
+    private EstadoEncomienda estado;
 
     private String observaciones;
 
     private String creadoPorEmail;
+
+    // ==================== NUEVOS CAMPOS ====================
+
+    private String telefonoRemitente;
+
+    private String telefonoDestinatario;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "viaje_id")
+    private Viaje viajeAsignado;
+
+    private LocalDate fechaEntregaReal;
 }

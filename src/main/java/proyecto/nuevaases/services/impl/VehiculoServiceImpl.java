@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import proyecto.nuevaases.dto.VehiculoDTO;
 import proyecto.nuevaases.exception.ResourceNotFoundException;
 import proyecto.nuevaases.models.Vehiculo;
+import proyecto.nuevaases.models.enums.EstadoVehiculo;
+import proyecto.nuevaases.models.enums.TipoVehiculo;
 import proyecto.nuevaases.repositories.VehiculoRepository;
 import proyecto.nuevaases.services.IVehiculoService;
 
@@ -53,8 +55,8 @@ public class VehiculoServiceImpl implements IVehiculoService {
                 .modelo(entity.getModelo())
                 .anio(entity.getAnio())
                 .capacidad(entity.getCapacidad())
-                .tipo(entity.getTipo())
-                .estado(entity.getEstado())
+                .tipo(entity.getTipo().name())
+                .estado(entity.getEstado().name())
                 .precioPorDia(entity.getPrecioPorDia())
                 .imagen(entity.getImagen())
                 .descripcion(entity.getDescripcion())
@@ -69,8 +71,8 @@ public class VehiculoServiceImpl implements IVehiculoService {
                 .modelo(dto.getModelo())
                 .anio(dto.getAnio() != null ? dto.getAnio() : 0)
                 .capacidad(dto.getCapacidad() != null ? dto.getCapacidad() : 0)
-                .tipo(dto.getTipo())
-                .estado(dto.getEstado())
+                .tipo(dto.getTipo() != null ? TipoVehiculo.valueOf(dto.getTipo()) : TipoVehiculo.BUS)
+                .estado(dto.getEstado() != null ? EstadoVehiculo.valueOf(dto.getEstado()) : EstadoVehiculo.DISPONIBLE)
                 .precioPorDia(dto.getPrecioPorDia() != null ? dto.getPrecioPorDia() : 0.0)
                 .imagen(dto.getImagen())
                 .descripcion(dto.getDescripcion())

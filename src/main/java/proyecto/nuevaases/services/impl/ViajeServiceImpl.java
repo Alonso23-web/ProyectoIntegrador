@@ -6,6 +6,7 @@ import proyecto.nuevaases.dto.ViajeDTO;
 import proyecto.nuevaases.exception.ResourceNotFoundException;
 import proyecto.nuevaases.models.Vehiculo;
 import proyecto.nuevaases.models.Viaje;
+import proyecto.nuevaases.models.enums.EstadoViaje;
 import proyecto.nuevaases.repositories.VehiculoRepository;
 import proyecto.nuevaases.repositories.ViajeRepository;
 import proyecto.nuevaases.services.IViajeService;
@@ -104,7 +105,7 @@ public class ViajeServiceImpl implements ViajeService, IViajeService {
                 .precio(entity.getPrecio())
                 .creadoPorEmail(entity.getCreadoPorEmail())
                 .conductorEmail(entity.getConductorEmail())
-                .estadoViaje(entity.getEstadoViaje());
+                .estadoViaje(entity.getEstadoViaje().name());
 
         if (entity.getVehiculo() != null) {
             Vehiculo v = entity.getVehiculo();
@@ -127,7 +128,7 @@ public class ViajeServiceImpl implements ViajeService, IViajeService {
                 .precio(dto.getPrecio())
                 .creadoPorEmail(dto.getCreadoPorEmail())
                 .conductorEmail(dto.getConductorEmail())
-                .estadoViaje(dto.getEstadoViaje() != null ? dto.getEstadoViaje() : "PROGRAMADO");
+                .estadoViaje(dto.getEstadoViaje() != null ? EstadoViaje.valueOf(dto.getEstadoViaje()) : EstadoViaje.PROGRAMADO);
 
         if (dto.getVehiculoId() != null) {
             vehiculoRepository.findById(dto.getVehiculoId()).ifPresent(builder::vehiculo);

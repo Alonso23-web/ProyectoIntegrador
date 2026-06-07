@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import proyecto.nuevaases.dto.EncomiendaDTO;
 import proyecto.nuevaases.exception.ResourceNotFoundException;
 import proyecto.nuevaases.models.Encomienda;
+import proyecto.nuevaases.models.enums.EstadoEncomienda;
 import proyecto.nuevaases.repositories.EncomiendaRepository;
 import proyecto.nuevaases.services.IEncomiendaService;
 import proyecto.nuevaases.services.IHistorialEncomiendaService;
@@ -42,7 +43,7 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
         if (dto.getId() != null) {
             Optional<Encomienda> existente = encomiendaRepository.findById(dto.getId());
             if (existente.isPresent()) {
-                estadoAnterior = existente.get().getEstado();
+                estadoAnterior = existente.get().getEstado().name();
             }
         }
 
@@ -55,14 +56,14 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
         Encomienda guardada = encomiendaRepository.save(entity);
 
         // Registrar historial si el estado cambió
-        if (estadoAnterior != null && !estadoAnterior.equals(guardada.getEstado())) {
+        if (estadoAnterior != null && !estadoAnterior.equals(guardada.getEstado().name())) {
             String email = dto.getCreadoPorEmail() != null ? dto.getCreadoPorEmail() : "sistema";
             historialEncomiendaService.registrarCambio(
                     guardada.getId(),
                     estadoAnterior,
-                    guardada.getEstado(),
+                    guardada.getEstado().name(),
                     email,
-                    "Cambio de estado: " + estadoAnterior + " → " + guardada.getEstado()
+                    "Cambio de estado: " + estadoAnterior + " → " + guardada.getEstado().name()
             );
         }
 
@@ -85,7 +86,7 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
     @Override
     public List<EncomiendaDTO> buscarPorDni(String dni, String estado) {
         if (estado != null && !estado.isEmpty()) {
-            return encomiendaRepository.findByDniRemitenteOrDniDestinatarioAndEstado(dni, dni, estado)
+            return encomiendaRepository.findByDniRemitenteOrDniDestinatarioAndEstado(dni, dni, EstadoEncomienda.valueOf(estado))
                     .stream().map(this::convertToDTO).collect(Collectors.toList());
         }
         return encomiendaRepository.findByDniRemitenteOrDniDestinatario(dni, dni)
@@ -100,8 +101,8 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
 
     private static final double CARGO_MANEJO = 1.50;
     private static final double CARGO_PESO_EXTRA = 1.50;
-    private static final double PRECIO_POR_KG = 1.50; // precio unitario por kg (para vista de 'precio por peso')
-    private static final double PESO_NORMAL_INCLUIDO = 10.0; // peso normal sin cargo extra
+    private static final double PRECIO_POR_KG = 1.50;
+    private static final double PESO_NORMAL_INCLUIDO = 10.0;
 
     @Override
     public double calcularPrecio(String origen, String destino, double peso) {
@@ -139,7 +140,8 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
                 .origen(entity.getOrigen()).destino(entity.getDestino())
                 .descripcion(entity.getDescripcion()).peso(entity.getPeso())
                 .precio(entity.getPrecio()).fechaEnvio(entity.getFechaEnvio())
-                .fechaEstimadaEntrega(entity.getFechaEstimadaEntrega()).estado(entity.getEstado())
+                .fechaEstimadaEntrega(entity.getFechaEstimadaEntrega())
+                .estado(entity.getEstado().name())
                 .observaciones(entity.getObservaciones())
                 .creadoPorEmail(entity.getCreadoPorEmail()).build();
     }
@@ -152,7 +154,8 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
                 .origen(dto.getOrigen()).destino(dto.getDestino())
                 .descripcion(dto.getDescripcion()).peso(dto.getPeso())
                 .precio(dto.getPrecio()).fechaEnvio(dto.getFechaEnvio())
-                .fechaEstimadaEntrega(dto.getFechaEstimadaEntrega()).estado(dto.getEstado())
+                .fechaEstimadaEntrega(dto.getFechaEstimadaEntrega())
+                .estado(dto.getEstado() != null ? EstadoEncomienda.valueOf(dto.getEstado()) : EstadoEncomienda.REGISTRADO)
                 .observaciones(dto.getObservaciones())
                 .creadoPorEmail(dto.getCreadoPorEmail()).build();
     }

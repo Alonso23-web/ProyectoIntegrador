@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import proyecto.nuevaases.dto.SolicitudAlquilerDTO;
 import proyecto.nuevaases.models.Vehiculo;
+import proyecto.nuevaases.models.enums.EstadoVehiculo;
 import proyecto.nuevaases.repositories.VehiculoRepository;
 import proyecto.nuevaases.services.ISolicitudAlquilerService;
 
@@ -34,14 +35,14 @@ public class AlquilerSolicitudController {
         List<Vehiculo> filtered = new ArrayList<>();
 
         for (Vehiculo v : all) {
-            if (v.getEstado() == null || !v.getEstado().equalsIgnoreCase("DISPONIBLE")) {
+            if (v.getEstado() == null || v.getEstado() != EstadoVehiculo.DISPONIBLE) {
                 continue;
             }
 
             boolean ok = true;
 
             if (tipo != null && !tipo.isBlank()) {
-                String tipoVeh = safeStr(v.getTipo());
+                String tipoVeh = v.getTipo().name();
                 ok = ok && tipoVeh.toLowerCase(Locale.ROOT).contains(tipo.toLowerCase(Locale.ROOT));
             }
 
@@ -132,10 +133,6 @@ public class AlquilerSolicitudController {
         return "alquiler/confirmacion";
     }
 
-    private static String safeStr(String s) {
-        return s == null ? "" : s;
-    }
-
     private static String trim(String s) {
         return s == null ? null : s.trim();
     }
@@ -158,4 +155,3 @@ public class AlquilerSolicitudController {
         }
     }
 }
-

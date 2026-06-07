@@ -3,7 +3,7 @@
   <head
     th:replace="~{layout :: head('Pasajes - Nueva Ases Express')}"
   ></head>
-  <body th:attr="data-current-user-name=${currentUserName},data-current-user-dni=${currentUserDni}">
+  <body th:attr="data-current-user-name=${usuario.nombreCompleto},data-current-user-dni=${usuario.dni}">
     <div th:replace="~{layout :: navbar}"></div>
 
     <section class="py-4 bg-primario text-white text-center">

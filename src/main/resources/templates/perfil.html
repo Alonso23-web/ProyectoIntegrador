@@ -66,9 +66,7 @@
                     <h2 class="profile-title mb-1">Mi perfil</h2>
                     <div class="text-secondary fw-semibold">
                       Bienvenido/a:
-                      <span
-                        th:text="${usuario != null ? usuario.nombreCompleto : nombreUsuario}"
-                      ></span>
+                      <span th:text="${usuario != null ? usuario.nombreCompleto : 'Usuario'}"></span>
                     </div>
                   </div>
                   <span

@@ -2,8 +2,12 @@ package proyecto.nuevaases.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import proyecto.nuevaases.models.enums.EstadoPasaje;
+import proyecto.nuevaases.models.enums.TipoPago;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "pasajes")
@@ -16,6 +20,12 @@ public class Pasaje {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String usuarioEmail;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "viaje_id")
+    private Viaje viaje;
 
     @Column(nullable = false)
     private String nombrePasajero;
@@ -35,7 +45,7 @@ public class Pasaje {
     private LocalDate fechaViaje;
 
     @Column(nullable = false)
-    private String horaViaje; // 08:00, 12:00, 16:00, 20:00
+    private String horaViaje;
 
     @Column(nullable = false)
     private int asiento;
@@ -43,8 +53,23 @@ public class Pasaje {
     @Column(nullable = false)
     private double precio;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String estado; // RESERVADO, PAGADO, CANCELADO
+    private EstadoPasaje estado;
 
     private String creadoPorEmail;
+
+    @Column(unique = true)
+    private String codigoBoleto;
+
+    // ==================== NUEVOS CAMPOS ====================
+
+    private String telefonoPasajero;
+
+    @Enumerated(EnumType.STRING)
+    private TipoPago tipoPago;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime fechaCompra;
 }

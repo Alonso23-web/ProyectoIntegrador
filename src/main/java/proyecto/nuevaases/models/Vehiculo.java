@@ -2,6 +2,10 @@ package proyecto.nuevaases.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import proyecto.nuevaases.models.enums.EstadoVehiculo;
+import proyecto.nuevaases.models.enums.TipoVehiculo;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "vehiculos")
@@ -30,25 +34,35 @@ public class Vehiculo {
     @Column(nullable = false)
     private int capacidad;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     @Builder.Default
-    @Column(name = "tipo", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'BUS'")
-    private String tipo = "BUS";
+    private TipoVehiculo tipo = TipoVehiculo.BUS;
 
-    // Columna legacy: indica si el vehículo es PROPIO de la empresa, ALQUILADO o de TERCEROS
-    // Siempre será "PROPIO" para este negocio, nunca se expone en el formulario
     @Builder.Default
     @Column(name = "tipo_propiedad", nullable = false, updatable = false)
     private String tipoPropiedad = "PROPIO";
 
-    @Column(nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'DISPONIBLE'")
-    private String estado; // DISPONIBLE, ALQUILADO, MANTENIMIENTO
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private EstadoVehiculo estado = EstadoVehiculo.DISPONIBLE;
 
     @Column(nullable = false)
     private double precioPorDia;
 
-    private String imagen; // URL de la imagen
+    private String imagen;
 
     @Column(columnDefinition = "TEXT")
     private String descripcion;
-}
 
+    // ==================== NUEVOS CAMPOS ====================
+
+    private LocalDate fechaUltimoMantenimiento;
+
+    private LocalDate fechaProximoMantenimiento;
+
+    private Boolean aireAcondicionado;
+
+    private Boolean wifi;
+}
