@@ -105,6 +105,43 @@
                   </div>
                 </div>
 
+                <hr class="my-4" />
+                <h5 class="fw-bold text-primario mb-3">
+                  <i class="bi bi-person-check me-2"></i>Asignación
+                </h5>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Conductor</label>
+                    <select class="form-select" th:field="*{conductorEmail}">
+                      <option value="">Sin asignar</option>
+                      <option th:each="c : ${conductores}"
+                              th:value="${c.email}"
+                              th:text="${c.nombreCompleto} + ' (' + ${c.email} + ')'"></option>
+                    </select>
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Vehículo</label>
+                    <select class="form-select" th:field="*{vehiculoId}">
+                      <option value="">Sin asignar</option>
+                      <option th:each="v : ${vehiculos}"
+                              th:value="${v.id}"
+                              th:text="${v.marca} + ' ' + ${v.modelo} + ' - ' + ${v.placa}"></option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Estado del Viaje</label>
+                    <select class="form-select" th:field="*{estadoViaje}">
+                      <option th:each="est : ${estadosViaje}"
+                              th:value="${est.name()}"
+                              th:text="${est.name()}"></option>
+                    </select>
+                  </div>
+                </div>
+
                 <div class="d-flex gap-2">
                   <button type="submit" class="btn btn-amarillo fw-bold">
                     <i class="bi bi-check-lg me-1"></i>Guardar

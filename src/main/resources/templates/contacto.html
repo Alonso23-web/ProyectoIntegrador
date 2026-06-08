@@ -20,7 +20,8 @@
               style="border-radius: 20px"
             >
               <h4 class="fw-bold text-primario mb-4">Envíanos un mensaje</h4>
-              <form action="/contacto" method="POST">
+              <form th:action="@{/contacto}" method="POST">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <div class="mb-3">
                   <label class="form-label">Nombre Completo</label>
                   <input type="text" class="form-control" name="nombre" required />

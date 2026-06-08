@@ -451,40 +451,78 @@
                 ><i class="bi bi-speedometer2 me-1"></i>Dashboard</a
               >
             </li>
-            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
-              <a class="nav-link" href="/pasajes"
-                ><i class="bi bi-ticket-perforated me-1"></i>Pasajes</a
-              >
+
+            <li class="nav-item dropdown" sec:authorize="hasRole('ADMINISTRADOR')"
+                th:with="nav=${adminNavData}">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
+                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-gear me-1"></i>Operaciones
+                <span th:if="${nav.totalAlertas() > 0}"
+                      class="badge ms-1"
+                      style="background: #dc3545; color: #fff; font-size: 0.6rem; padding: 0.2em 0.5em;"
+                      th:text="${nav.totalAlertas()}"></span>
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item d-flex align-items-center justify-content-between" href="/viajes">
+                    <span><i class="bi bi-signpost-2 me-2"></i>Viajes</span>
+                    <span th:if="${nav.viajesEnCurso > 0}"
+                          class="badge" style="background: #f5a623; color: #fff; font-size: 0.6rem;"
+                          th:text="${nav.viajesEnCurso} + ' en curso'"></span>
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/pasajes">
+                    <i class="bi bi-ticket-perforated me-2"></i>Pasajes
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item d-flex align-items-center justify-content-between" href="/dashboard#conductores">
+                    <span><i class="bi bi-person-badge me-2"></i>Conductores</span>
+                    <span th:if="${nav.conductoresPendientes > 0}"
+                          class="badge" style="background: #dc3545; color: #fff; font-size: 0.6rem;"
+                          th:text="${nav.conductoresPendientes}"></span>
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/vehiculos">
+                    <i class="bi bi-truck me-2"></i>Vehículos
+                  </a>
+                </li>
+              </ul>
             </li>
-            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
-              <a class="nav-link" href="/dashboard#conductores"
-                ><i class="bi bi-person-badge me-1"></i>Conductores</a
-              >
-            </li>
-            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
-              <a class="nav-link" href="/encomiendas/listar"
-                ><i class="bi bi-box-seam me-1"></i>Encomiendas</a
-              >
-            </li>
-            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
-              <a class="nav-link" href="/viajes"
-                ><i class="bi bi-signpost-2 me-1"></i>Viajes</a
-              >
-            </li>
-            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
-              <a class="nav-link" href="/vehiculos"
-                ><i class="bi bi-truck me-1"></i>Vehículos</a
-              >
-            </li>
-            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
-              <a class="nav-link" href="/admin/usuarios"
-                ><i class="bi bi-people me-1"></i>Usuarios</a
-              >
-            </li>
-            <li class="nav-item" sec:authorize="hasRole('ADMINISTRADOR')">
-              <a class="nav-link" href="/admin/reportes"
-                ><i class="bi bi-file-earmark-bar-graph me-1"></i>Reportes</a
-              >
+
+            <li class="nav-item dropdown" sec:authorize="hasRole('ADMINISTRADOR')">
+              <a class="nav-link dropdown-toggle" href="#"
+                 role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-sliders me-1"></i>Control
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a class="dropdown-item" href="/encomiendas/listar">
+                    <i class="bi bi-box-seam me-2"></i>Encomiendas
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/admin/usuarios">
+                    <i class="bi bi-people me-2"></i>Usuarios
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="/admin/reportes">
+                    <i class="bi bi-file-earmark-bar-graph me-2"></i>Reportes
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item d-flex align-items-center justify-content-between"
+                     th:with="nav=${adminNavData}" href="/admin/contacto-mensajes">
+                    <span><i class="bi bi-chat-dots me-2"></i>Mensajes</span>
+                    <span th:if="${nav.mensajesNoLeidos > 0}"
+                          class="badge" style="background: #dc3545; color: #fff; font-size: 0.6rem;"
+                          th:text="${nav.mensajesNoLeidos}"></span>
+                  </a>
+                </li>
+              </ul>
             </li>
 
             <!-- ==================== CLIENTE ==================== -->
@@ -579,17 +617,26 @@
             </li>
 
             <!-- ==================== PERFIL (todos los roles autenticados) ==================== -->
-            <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+            <li class="nav-item dropdown" sec:authorize="isAuthenticated()"
+                th:with="nav=${adminNavData}">
               <a
-                class="nav-link dropdown-toggle"
+                class="nav-link dropdown-toggle d-flex align-items-center gap-1"
                 href="#"
                 role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
-                <i class="bi bi-person-circle me-1"></i>
+                <i class="bi bi-person-circle fs-5"></i>
+                <span class="d-none d-lg-inline small" th:if="${nav.esAdmin}"
+                      th:text="${nav.nombreCompleto}"></span>
               </a>
-              <ul class="dropdown-menu dropdown-menu-end">
+              <ul class="dropdown-menu dropdown-menu-end" style="min-width: 220px;">
+                <li th:if="${nav.esAdmin}">
+                  <div class="px-3 py-2 text-muted small border-bottom">
+                    <div class="fw-semibold text-dark" th:text="${nav.nombreCompleto}"></div>
+                    <div th:text="${nav.email}"></div>
+                  </div>
+                </li>
                 <li>
                   <a class="dropdown-item" href="/perfil"
                     ><i class="bi bi-person me-2"></i>Mi perfil</a

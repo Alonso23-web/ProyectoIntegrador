@@ -9,6 +9,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import proyecto.nuevaases.dto.ViajeDTO;
+import proyecto.nuevaases.models.enums.EstadoPostulacion;
+import proyecto.nuevaases.models.enums.EstadoViaje;
+import proyecto.nuevaases.models.enums.Rol;
+import proyecto.nuevaases.repositories.UsuarioRepository;
+import proyecto.nuevaases.repositories.VehiculoRepository;
 import proyecto.nuevaases.services.IViajeService;
 
 @Controller
@@ -18,6 +23,8 @@ public class ViajeController {
 
     private static final Logger log = LoggerFactory.getLogger(ViajeController.class);
     private final IViajeService viajeService;
+    private final UsuarioRepository usuarioRepository;
+    private final VehiculoRepository vehiculoRepository;
 
     @GetMapping
     public String listar(Model model) {
@@ -34,6 +41,7 @@ public class ViajeController {
                     .build();
             model.addAttribute("viaje", viaje);
         }
+        cargarDatosAsignacion(model);
         return "viajes/formulario";
     }
 
@@ -41,7 +49,15 @@ public class ViajeController {
     public String editar(@PathVariable Long id, Model model) {
         model.addAttribute("viaje", viajeService.obtenerPorIdDTO(id)
                 .orElseThrow(() -> new RuntimeException("Viaje no encontrado")));
+        cargarDatosAsignacion(model);
         return "viajes/formulario";
+    }
+
+    private void cargarDatosAsignacion(Model model) {
+        model.addAttribute("conductores", usuarioRepository.findByRolAndEstadoPostulacion(
+                Rol.CONDUCTOR, EstadoPostulacion.APROBADO));
+        model.addAttribute("vehiculos", vehiculoRepository.findAll());
+        model.addAttribute("estadosViaje", EstadoViaje.values());
     }
 
     @PostMapping("/guardar")

@@ -23,5 +23,7 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
 
     long countByConductorEmailAndEstadoViaje(String conductorEmail, EstadoViaje estadoViaje);
 
+    long countByEstadoViajeAndFecha(EstadoViaje estado, LocalDate fecha);
+
 }
 

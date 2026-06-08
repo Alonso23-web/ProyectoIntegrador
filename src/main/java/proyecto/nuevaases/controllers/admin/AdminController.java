@@ -27,8 +27,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import proyecto.nuevaases.repositories.ContactoMensajeRepository;
 import proyecto.nuevaases.repositories.EncomiendaRepository;
 import proyecto.nuevaases.repositories.PasajeRepository;
+import proyecto.nuevaases.services.IContactoMensajeService;
 import proyecto.nuevaases.services.IUsuarioService;
 
 @Controller
@@ -39,6 +41,8 @@ public class AdminController {
     private final IUsuarioService usuarioService;
     private final PasajeRepository pasajeRepository;
     private final EncomiendaRepository encomiendaRepository;
+    private final IContactoMensajeService contactoMensajeService;
+    private final ContactoMensajeRepository contactoMensajeRepository;
 
     // ==================== USUARIOS ====================
 
@@ -267,7 +271,27 @@ public class AdminController {
             headers.setContentDispositionFormData("attachment", "reportes.xlsx");
             headers.setContentLength(bytes.length);
 
-            return ResponseEntity.ok().headers(headers).body(bytes);
+                    return ResponseEntity.ok().headers(headers).body(bytes);
         }
+    }
+
+    // ==================== MENSAJES DE CONTACTO ====================
+
+    @GetMapping("/contacto-mensajes")
+    public String listarMensajes(Model model) {
+        model.addAttribute("mensajes", contactoMensajeService.listarTodos());
+        model.addAttribute("noLeidos", contactoMensajeService.contarNoLeidos());
+        return "admin/contacto-mensajes";
+    }
+
+    @PostMapping("/contacto-mensajes/leido/{id}")
+    public String marcarLeido(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            contactoMensajeService.marcarComoLeido(id);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Mensaje marcado como leído.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error: " + e.getMessage());
+        }
+        return "redirect:/admin/contacto-mensajes";
     }
 }
