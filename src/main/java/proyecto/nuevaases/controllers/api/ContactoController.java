@@ -1,26 +1,37 @@
 package proyecto.nuevaases.controllers.api;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import proyecto.nuevaases.services.IContactoMensajeService;
 
 @Controller
+@RequiredArgsConstructor
 public class ContactoController {
+
+    private final IContactoMensajeService contactoMensajeService;
 
     @GetMapping("/contacto")
     public String mostrarContacto(Model model) {
         model.addAttribute("exito", null);
-        return "contacto"; 
+        return "contacto";
     }
 
     @PostMapping("/contacto")
     public String enviarMensaje(
-            @RequestParam(name = "nombre", required = false) String nombre, 
+            @RequestParam String nombre,
+            @RequestParam String correo,
+            @RequestParam(required = false) String telefono,
+            @RequestParam String mensaje,
             Model model) {
-        
-        model.addAttribute("exito", "¡Gracias " + (nombre != null ? nombre : "cliente") + "! Hemos recibido tu mensaje correctamente.");
+
+        contactoMensajeService.guardar(nombre, correo, telefono, mensaje);
+
+        model.addAttribute("exito",
+                "¡Gracias " + nombre + "! Hemos recibido tu mensaje correctamente. Te responderemos pronto.");
         return "contacto";
     }
 }

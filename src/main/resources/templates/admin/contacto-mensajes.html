@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout :: head('Mensajes de Contacto - Nueva Ases Express')}"></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <section class="py-4" style="background: #f0f2f5; min-height: calc(100vh - 130px);">
+      <div class="container">
+
+        <div th:if="${mensajeExito}" class="alert alert-success d-flex align-items-center gap-2 py-2" style="border-radius: 16px;">
+          <i class="bi bi-check-circle-fill"></i><span th:text="${mensajeExito}"></span>
+        </div>
+        <div th:if="${mensajeError}" class="alert alert-danger d-flex align-items-center gap-2 py-2" style="border-radius: 16px;">
+          <i class="bi bi-exclamation-triangle-fill"></i><span th:text="${mensajeError}"></span>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <h4 class="fw-bold" style="color: #0d1b3e;"><i class="bi bi-chat-dots me-2"></i>Mensajes de Contacto</h4>
+            <p class="text-muted small mb-0">Bandeja de mensajes enviados por los clientes desde el formulario de contacto.</p>
+          </div>
+          <div>
+            <span class="badge fs-6 px-3 py-2" th:classappend="${noLeidos > 0} ? 'bg-warning text-dark' : 'bg-success'">
+              <i class="bi bi-envelope me-1"></i><span th:text="${noLeidos}"></span> no leídos
+            </span>
+          </div>
+        </div>
+
+        <div th:if="${#lists.size(mensajes) == 0}" class="text-center py-5">
+          <i class="bi bi-inbox display-1 text-muted"></i>
+          <p class="text-muted mt-3">No hay mensajes de contacto aún.</p>
+        </div>
+
+        <div th:if="${#lists.size(mensajes) > 0}" class="row g-3">
+          <div th:each="msg : ${mensajes}" class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px; border-left: 4px solid ${msg.leido} ? #94a3b8 : #f5a623 !important;">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <h6 class="fw-bold mb-1" style="color: #0d1b3e;">
+                      <span th:text="${msg.nombre}"></span>
+                      <span th:if="${!msg.leido}" class="badge bg-warning text-dark ms-2" style="font-size: 0.65rem;">NUEVO</span>
+                    </h6>
+                    <div class="small text-muted">
+                      <span><i class="bi bi-envelope me-1"></i><span th:text="${msg.correo}"></span></span>
+                      <span th:if="${msg.telefono}" class="ms-3"><i class="bi bi-telephone me-1"></i><span th:text="${msg.telefono}"></span></span>
+                      <span class="ms-3"><i class="bi bi-clock me-1"></i><span th:text="${#temporals.format(msg.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></span></span>
+                    </div>
+                  </div>
+                  <form th:if="${!msg.leido}" th:action="@{'/admin/contacto-mensajes/leido/' + ${msg.id}}" method="post" style="display:inline">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="btn btn-sm btn-outline-secondary" title="Marcar como leído">
+                      <i class="bi bi-check2-circle"></i>
+                    </button>
+                  </form>
+                  <span th:if="${msg.leido}" class="badge bg-light text-muted"><i class="bi bi-check2-all me-1"></i>Leído</span>
+                </div>
+                <div class="p-3 rounded-3" style="background: #f8f9fa;">
+                  <p class="mb-0" style="white-space: pre-wrap;" th:text="${msg.mensaje}"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <a href="/dashboard" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left me-1"></i>Volver al Dashboard</a>
+        </div>
+
+      </div>
+    </section>
+
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>

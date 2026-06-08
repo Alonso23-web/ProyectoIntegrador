@@ -24,17 +24,19 @@
           <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
               <thead class="table-dark">
-                <tr>
-                  <th>ID</th>
-                  <th>Ruta</th>
-                  <th>Fecha</th>
-                  <th>Hora</th>
-                  <th>Tipo</th>
-                  <th>Asientos</th>
-                  <th>Precio</th>
-                  <th>Creado por</th>
-                  <th>Acciones</th>
-                </tr>
+                  <tr>
+                    <th>ID</th>
+                    <th>Ruta</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Tipo</th>
+                    <th>Asientos</th>
+                    <th>Precio</th>
+                    <th>Conductor</th>
+                    <th>Vehículo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
               </thead>
               <tbody>
                 <tr th:each="v : ${viajes}">
@@ -55,7 +57,18 @@
                   </td>
                   <td th:text="${v.totalAsientos}"></td>
                   <td class="fw-bold text-primario" th:text="'S/ ' + ${v.precio}"></td>
-                  <td class="small text-muted" th:text="${v.creadoPorEmail}"></td>
+                  <td class="small" th:text="${v.conductorEmail != null ? v.conductorEmail : '—'}"></td>
+                  <td class="small text-muted" th:text="${v.vehiculoInfo != null ? v.vehiculoInfo : '—'}"></td>
+                  <td>
+                    <span th:if="${v.estadoViaje == 'PROGRAMADO'}"
+                          class="badge bg-info text-white">PROGRAMADO</span>
+                    <span th:if="${v.estadoViaje == 'EN_CURSO'}"
+                          class="badge bg-warning text-dark">EN CURSO</span>
+                    <span th:if="${v.estadoViaje == 'FINALIZADO'}"
+                          class="badge bg-success">FINALIZADO</span>
+                    <span th:if="${v.estadoViaje == null}"
+                          class="badge bg-light text-muted">—</span>
+                  </td>
                   <td>
                     <div class="d-flex gap-1">
                       <a
