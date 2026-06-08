@@ -36,11 +36,11 @@ http
                                 .headers(headers -> headers
                                                 .frameOptions(frame -> frame.sameOrigin()))
                                 .authorizeHttpRequests(auth -> auth
-                                                .requestMatchers(
-                                                                "/", "/index.html", "/inicio", "/nosotros",
-                                                                "/registro", "/css/**", "/js/**",
-                                                                "/images/**", "/img/**", "/node_modules/**",
-                                                                "/webjars/**",  "/alquiler/**")
+                .requestMatchers(
+                                "/", "/index.html", "/inicio", "/nosotros",
+                                "/registro", "/css/**", "/js/**",
+                                "/images/**", "/img/**", "/node_modules/**",
+                                "/webjars/**",  "/alquiler/**")
                                                 .permitAll()
                                                 .requestMatchers("/h2-console/**").permitAll()
                                                 .anyRequest().authenticated())
