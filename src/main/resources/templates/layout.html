@@ -452,23 +452,22 @@
               >
             </li>
 
-            <li class="nav-item dropdown" sec:authorize="hasRole('ADMINISTRADOR')"
-                th:with="nav=${adminNavData}">
+            <li class="nav-item dropdown" sec:authorize="hasRole('ADMINISTRADOR')">
               <a class="nav-link dropdown-toggle d-flex align-items-center" href="#"
                  role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-gear me-1"></i>Operaciones
-                <span th:if="${nav.totalAlertas() > 0}"
+                <span th:if="${adminNavData != null && adminNavData.totalAlertas() > 0}"
                       class="badge ms-1"
                       style="background: #dc3545; color: #fff; font-size: 0.6rem; padding: 0.2em 0.5em;"
-                      th:text="${nav.totalAlertas()}"></span>
+                      th:text="${adminNavData.totalAlertas()}"></span>
               </a>
               <ul class="dropdown-menu">
                 <li>
                   <a class="dropdown-item d-flex align-items-center justify-content-between" href="/viajes">
                     <span><i class="bi bi-signpost-2 me-2"></i>Viajes</span>
-                    <span th:if="${nav.viajesEnCurso > 0}"
+                    <span th:if="${adminNavData != null && adminNavData.viajesEnCurso > 0}"
                           class="badge" style="background: #f5a623; color: #fff; font-size: 0.6rem;"
-                          th:text="${nav.viajesEnCurso} + ' en curso'"></span>
+                          th:text="${adminNavData.viajesEnCurso} + ' en curso'"></span>
                   </a>
                 </li>
                 <li>
@@ -479,9 +478,9 @@
                 <li>
                   <a class="dropdown-item d-flex align-items-center justify-content-between" href="/dashboard#conductores">
                     <span><i class="bi bi-person-badge me-2"></i>Conductores</span>
-                    <span th:if="${nav.conductoresPendientes > 0}"
+                    <span th:if="${adminNavData != null && adminNavData.conductoresPendientes > 0}"
                           class="badge" style="background: #dc3545; color: #fff; font-size: 0.6rem;"
-                          th:text="${nav.conductoresPendientes}"></span>
+                          th:text="${adminNavData.conductoresPendientes}"></span>
                   </a>
                 </li>
                 <li>
@@ -515,11 +514,11 @@
                 </li>
                 <li>
                   <a class="dropdown-item d-flex align-items-center justify-content-between"
-                     th:with="nav=${adminNavData}" href="/admin/contacto-mensajes">
+                     href="/admin/contacto-mensajes">
                     <span><i class="bi bi-chat-dots me-2"></i>Mensajes</span>
-                    <span th:if="${nav.mensajesNoLeidos > 0}"
+                    <span th:if="${adminNavData != null && adminNavData.mensajesNoLeidos > 0}"
                           class="badge" style="background: #dc3545; color: #fff; font-size: 0.6rem;"
-                          th:text="${nav.mensajesNoLeidos}"></span>
+                          th:text="${adminNavData.mensajesNoLeidos}"></span>
                   </a>
                 </li>
               </ul>
@@ -617,8 +616,7 @@
             </li>
 
             <!-- ==================== PERFIL (todos los roles autenticados) ==================== -->
-            <li class="nav-item dropdown" sec:authorize="isAuthenticated()"
-                th:with="nav=${adminNavData}">
+            <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
               <a
                 class="nav-link dropdown-toggle d-flex align-items-center gap-1"
                 href="#"
@@ -627,14 +625,14 @@
                 aria-expanded="false"
               >
                 <i class="bi bi-person-circle fs-5"></i>
-                <span class="d-none d-lg-inline small" th:if="${nav.esAdmin}"
-                      th:text="${nav.nombreCompleto}"></span>
+                <span class="d-none d-lg-inline small" th:if="${adminNavData != null && adminNavData.esAdmin}"
+                      th:text="${adminNavData.nombreCompleto}"></span>
               </a>
               <ul class="dropdown-menu dropdown-menu-end" style="min-width: 220px;">
-                <li th:if="${nav.esAdmin}">
+                <li th:if="${adminNavData != null && adminNavData.esAdmin}">
                   <div class="px-3 py-2 text-muted small border-bottom">
-                    <div class="fw-semibold text-dark" th:text="${nav.nombreCompleto}"></div>
-                    <div th:text="${nav.email}"></div>
+                    <div class="fw-semibold text-dark" th:text="${adminNavData.nombreCompleto}"></div>
+                    <div th:text="${adminNavData.email}"></div>
                   </div>
                 </li>
                 <li>
