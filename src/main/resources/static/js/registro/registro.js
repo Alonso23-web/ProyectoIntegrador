@@ -114,6 +114,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function validarLicencia() {
     if (!numeroLicencia) return true;
 
+    const esConductor = rolSeleccionado() === "CONDUCTOR";
+    if (!esConductor) return true;
+
     numeroLicencia.value = numeroLicencia.value.toUpperCase().replace(/\s/g, "");
 
     const valido = licenciaPeruRegex.test(numeroLicencia.value);
@@ -229,19 +232,45 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   form.addEventListener("submit", (e) => {
+    const rNombre = validarNombre();
+    const rDni = validarDni();
+    const rEmail = validarEmail();
+    const rTelefono = validarTelefono();
+    const rPassword = validarPassword();
+    const rConfirmarPassword = validarConfirmarPassword();
+    const rLicencia = validarLicencia();
+    const rExperiencia = validarExperiencia();
+    const rTipoVehiculo = validarTipoVehiculo();
+    const rDocumento = validarDocumento();
+
     const todoValido =
-      validarNombre() &&
-      validarDni() &&
-      validarEmail() &&
-      validarTelefono() &&
-      validarPassword() &&
-      validarConfirmarPassword() &&
-      validarLicencia() &&
-      validarExperiencia() &&
-      validarTipoVehiculo() &&
-      validarDocumento();
+      rNombre &&
+      rDni &&
+      rEmail &&
+      rTelefono &&
+      rPassword &&
+      rConfirmarPassword &&
+      rLicencia &&
+      rExperiencia &&
+      rTipoVehiculo &&
+      rDocumento;
 
     if (!todoValido) {
+      // Evita el “no pasa nada”: muestra por consola qué validación falla
+      console.log("Registro - validaciones fallidas", {
+        rolSeleccionado: rolSeleccionado(),
+        nombre: rNombre,
+        dni: rDni,
+        email: rEmail,
+        telefono: rTelefono,
+        password: rPassword,
+        confirmarPassword: rConfirmarPassword,
+        licencia: rLicencia,
+        experiencia: rExperiencia,
+        tipoVehiculo: rTipoVehiculo,
+        documento: rDocumento
+      });
+
       e.preventDefault();
     }
   });
