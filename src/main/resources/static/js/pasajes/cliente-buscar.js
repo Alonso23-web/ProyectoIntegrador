@@ -754,7 +754,6 @@ const pasajesUI = {
 
             let html = `<div class="row g-3">`;
             misViajes.forEach(reserva => {
-                const v = reserva.viaje;
                 const estado = reserva.estado;
                 const e = {
                     'RESERVADO': { color: 'bg-info', icono: 'bi-ticket', texto: 'Reservado' },
@@ -769,13 +768,13 @@ const pasajesUI = {
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <div>
                                         <span class="badge ${e.color} text-white mb-1"><i class="bi ${e.icono} me-1"></i>${e.texto}</span>
-                                        <h6 class="fw-bold mt-1 mb-0" style="color: #0d1b3e;">${v.origen} → ${v.destino}</h6>
+                                        <h6 class="fw-bold mt-1 mb-0" style="color: #0d1b3e;">${reserva.origen} → ${reserva.destino}</h6>
                                     </div>
                                     <code class="small">${reserva.codigoBoleto}</code>
                                 </div>
                                 <div class="d-flex gap-3 text-muted small mb-3 flex-wrap">
-                                    <span><i class="bi bi-calendar me-1"></i>${v.fecha}</span>
-                                    <span><i class="bi bi-clock me-1"></i>${v.horaSalida}</span>
+                                    <span><i class="bi bi-calendar me-1"></i>${reserva.fechaViaje}</span>
+                                    <span><i class="bi bi-clock me-1"></i>${reserva.horaViaje}</span>
                                     <span><i class="bi bi-person me-1"></i>${reserva.nombrePasajero}</span>
                                     <span><i class="bi bi-seat me-1"></i>Asiento ${reserva.asiento}</span>
                                 </div>

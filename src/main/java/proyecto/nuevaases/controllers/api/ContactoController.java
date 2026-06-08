@@ -11,7 +11,6 @@ public class ContactoController {
 
     @GetMapping("/contacto")
     public String mostrarContacto(Model model) {
-        // Inicializamos variables para evitar errores en el template
         model.addAttribute("exito", null);
         return "contacto"; 
     }
@@ -21,7 +20,6 @@ public class ContactoController {
             @RequestParam(name = "nombre", required = false) String nombre, 
             Model model) {
         
-        // Lógica de éxito para el formulario
         model.addAttribute("exito", "¡Gracias " + (nombre != null ? nombre : "cliente") + "! Hemos recibido tu mensaje correctamente.");
         return "contacto";
     }
