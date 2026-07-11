@@ -12,7 +12,6 @@ import proyecto.nuevaases.repositories.PasajeRepository;
 import proyecto.nuevaases.repositories.ViajeRepository;
 import proyecto.nuevaases.services.IPasajeService;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -120,34 +119,24 @@ public class PasajeServiceImpl implements IPasajeService {
             throw new IllegalArgumentException("Debes indicar pasajeros");
         }
 
-        var asientosSolicitados = pasajeros.stream().map(PasajeroReservaDTO::asiento).toList();
+        // Contar ocupados actuales (RESERVADO o PAGADO)
+        long ocupados = pasajeRepository.countByViajeAndEstadoIn(viaje, List.of(EstadoPasaje.RESERVADO, EstadoPasaje.PAGADO));
+        int disponibles = viaje.getTotalAsientos() - (int) ocupados;
 
-        if (asientosSolicitados.size() != new HashSet<>(asientosSolicitados).size()) {
-            throw new IllegalArgumentException("Hay asientos duplicados en la solicitud");
+        if (pasajeros.size() > disponibles) {
+            throw new IllegalArgumentException(
+                "No hay suficientes cupos disponibles. Solo quedan " + disponibles + " cupo(s)."
+            );
         }
 
-        List<Integer> ocupados = pasajeRepository.findByViajeAndEstadoIn(viaje, List.of(EstadoPasaje.RESERVADO, EstadoPasaje.PAGADO))
-                .stream()
-                .map(Pasaje::getAsiento)
-                .toList();
-
-        var ocupadosSet = new HashSet<>(ocupados);
-        for (var p : pasajeros) {
-            if (ocupadosSet.contains(p.asiento())) {
-                throw new IllegalArgumentException("El asiento " + p.asiento() + " ya se encuentra ocupado");
-            }
-            if (p.asiento() < 1 || p.asiento() > viaje.getTotalAsientos()) {
-                throw new IllegalArgumentException("El asiento " + p.asiento() + " no es válido para este viaje");
-            }
-        }
-
+        // Crear pasajes SIN asignar asiento (asiento = 0)
         return pasajeros.stream().map(p -> {
             String codigo = "B" + UUID.randomUUID().toString().substring(0, 10).toUpperCase();
 
             Pasaje pasaje = Pasaje.builder()
                     .usuarioEmail(usuarioEmail)
                     .viaje(viaje)
-                    .asiento(p.asiento())
+                    .asiento(0)  // Sin asiento asignado — se sientan donde haya espacio
                     .estado(EstadoPasaje.RESERVADO)
                     .codigoBoleto(codigo)
                     .precio(precioViaje)
