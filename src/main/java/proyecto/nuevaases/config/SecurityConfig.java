@@ -50,7 +50,9 @@ public class SecurityConfig {
                         // Rutas públicas: páginas principales, recursos estáticos, alquiler
                         .requestMatchers(
                             "/", "/index.html", "/inicio", "/nosotros",
-                            "/contacto", "/registro", "/css/**", "/js/**",
+                            "/contacto", "/registro", "/postular-conductor",
+                            "/postulacion-enviada",
+                            "/css/**", "/js/**",
                             "/images/**", "/img/**", "/node_modules/**",
                             "/webjars/**", "/alquiler/**")
                             .permitAll()

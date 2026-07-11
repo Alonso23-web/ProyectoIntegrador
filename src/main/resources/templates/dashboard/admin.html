@@ -631,7 +631,7 @@
               <div class="pc-actions">
                 <!-- Ver CV / Documento -->
                 <a th:if="${cond.documentoUrl != null and !cond.documentoUrl.isEmpty()}"
-                   th:href="@{'/uploads/' + ${cond.documentoUrl}}"
+                   th:href="@{${cond.documentoUrl}}"
                    target="_blank"
                    class="btn-pc btn-pc-cv">
                   <i class="bi bi-file-earmark-text"></i> Ver CV

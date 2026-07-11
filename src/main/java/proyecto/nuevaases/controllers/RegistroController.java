@@ -23,6 +23,10 @@ public class RegistroController {
 
     private final IUsuarioService usuarioService;
 
+    // ========================================================================
+    // REGISTRO DE CLIENTES
+    // ========================================================================
+
     @GetMapping("/registro")
     public String mostrarFormularioRegistro(Model model) {
         model.addAttribute("usuario", new UsuarioDTO());
@@ -37,100 +41,154 @@ public class RegistroController {
             @RequestParam String nombreCompleto,
             @RequestParam String dni,
             @RequestParam String telefono,
-            @RequestParam String rol,
-            @RequestParam(required = false) String numeroLicencia,
-            @RequestParam(required = false) Integer aniosExperiencia,
-            @RequestParam(required = false) String tipoVehiculo,
-            @RequestParam(required = false) MultipartFile documento,
             Model model
     ) {
         // Validaciones
         if (!password.equals(confirmarPassword)) {
             model.addAttribute("error", "Las contraseñas no coinciden.");
-            model.addAttribute("usuario", construirUsuarioTemporal(email, nombreCompleto, dni, telefono, rol,
-                    numeroLicencia, aniosExperiencia, tipoVehiculo));
+            model.addAttribute("usuario", construirUsuarioTemporal(email, nombreCompleto, dni, telefono));
             return "registro";
         }
 
-        if (password.length() < 6) {
-            model.addAttribute("error", "La contraseña debe tener al menos 6 caracteres.");
-            model.addAttribute("usuario", construirUsuarioTemporal(email, nombreCompleto, dni, telefono, rol,
-                    numeroLicencia, aniosExperiencia, tipoVehiculo));
+        if (password.length() < 8 || !password.matches(".*[A-Z].*") || !password.matches(".*[a-z].*") || !password.matches(".*\\d.*")) {
+            model.addAttribute("error", "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.");
+            model.addAttribute("usuario", construirUsuarioTemporal(email, nombreCompleto, dni, telefono));
             return "registro";
         }
 
         if (usuarioService.existeEmail(email)) {
             model.addAttribute("error", "El correo electrónico ya está registrado.");
-            model.addAttribute("usuario", construirUsuarioTemporal(email, nombreCompleto, dni, telefono, rol,
-                    numeroLicencia, aniosExperiencia, tipoVehiculo));
+            model.addAttribute("usuario", construirUsuarioTemporal(email, nombreCompleto, dni, telefono));
             return "registro";
         }
 
         if (usuarioService.existeDni(dni)) {
             model.addAttribute("error", "El DNI ya está registrado.");
-            model.addAttribute("usuario", construirUsuarioTemporal(email, nombreCompleto, dni, telefono, rol,
-                    numeroLicencia, aniosExperiencia, tipoVehiculo));
+            model.addAttribute("usuario", construirUsuarioTemporal(email, nombreCompleto, dni, telefono));
             return "registro";
         }
 
-        // Si es conductor, validar campos requeridos
-        if ("CONDUCTOR".equals(rol)) {
-            if (numeroLicencia == null || numeroLicencia.isEmpty()) {
-                model.addAttribute("error", "El número de licencia es obligatorio.");
-                model.addAttribute("usuario", construirUsuarioTemporal(email, nombreCompleto, dni, telefono, rol,
-                        numeroLicencia, aniosExperiencia, tipoVehiculo));
-                return "registro";
-            }
-            if (aniosExperiencia == null) {
-                model.addAttribute("error", "Los años de experiencia son obligatorios.");
-                model.addAttribute("usuario", construirUsuarioTemporal(email, nombreCompleto, dni, telefono, rol,
-                        numeroLicencia, aniosExperiencia, tipoVehiculo));
-                return "registro";
-            }
-            if (tipoVehiculo == null || tipoVehiculo.isEmpty()) {
-                model.addAttribute("error", "El tipo de vehículo es obligatorio.");
-                model.addAttribute("usuario", construirUsuarioTemporal(email, nombreCompleto, dni, telefono, rol,
-                        numeroLicencia, aniosExperiencia, tipoVehiculo));
-                return "registro";
-            }
-        }
-
-        UsuarioDTO.UsuarioDTOBuilder builder = UsuarioDTO.builder()
+        UsuarioDTO usuario = UsuarioDTO.builder()
                 .email(email)
                 .nombreCompleto(nombreCompleto)
                 .dni(dni)
                 .telefono(telefono)
-                .rol(rol)
-                .activo(!"CONDUCTOR".equals(rol)); // Conductores inician inactivos
+                .rol("CLIENTE")
+                .activo(true)
+                .build();
 
-        if ("CONDUCTOR".equals(rol)) {
-            String documentoUrl = null;
-            if (documento != null && !documento.isEmpty()) {
-                documentoUrl = guardarArchivo(documento);
-            }
-            builder
-                .numeroLicencia(numeroLicencia)
-                .aniosExperiencia(aniosExperiencia)
-                .tipoVehiculo(tipoVehiculo)
-                .estadoPostulacion("PENDIENTE")
-                .documentoUrl(documentoUrl);
-        }
-
-        UsuarioDTO usuario = builder.build();
         usuarioService.registrar(usuario, password);
-
-        // Si es conductor, redirigir a pantalla de postulación exitosa
-        if ("CONDUCTOR".equals(rol)) {
-            return "redirect:/postulacion-enviada";
-        }
 
         model.addAttribute("exito", "¡Registro exitoso! Ahora puedes iniciar sesión.");
         return "login";
     }
 
+    // ========================================================================
+    // POSTULACIÓN DE CONDUCTORES
+    // ========================================================================
+
+    @GetMapping("/postular-conductor")
+    public String mostrarFormularioPostulacion(Model model) {
+        model.addAttribute("postulacion", new UsuarioDTO());
+        return "postulacion-conductor";
+    }
+
+    @PostMapping("/postular-conductor")
+    public String postular(
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String confirmarPassword,
+            @RequestParam String nombreCompleto,
+            @RequestParam String dni,
+            @RequestParam String telefono,
+            @RequestParam String numeroLicencia,
+            @RequestParam Integer aniosExperiencia,
+            @RequestParam String tipoVehiculo,
+            @RequestParam(required = false) MultipartFile documento,
+            Model model
+    ) {
+        // Validaciones generales
+        if (!password.equals(confirmarPassword)) {
+            model.addAttribute("error", "Las contraseñas no coinciden.");
+            model.addAttribute("postulacion", construirPostulacionTemporal(email, nombreCompleto, dni, telefono,
+                    numeroLicencia, aniosExperiencia, tipoVehiculo));
+            return "postulacion-conductor";
+        }
+
+        if (password.length() < 8 || !password.matches(".*[A-Z].*") || !password.matches(".*[a-z].*") || !password.matches(".*\\d.*")) {
+            model.addAttribute("error", "La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número.");
+            model.addAttribute("postulacion", construirPostulacionTemporal(email, nombreCompleto, dni, telefono,
+                    numeroLicencia, aniosExperiencia, tipoVehiculo));
+            return "postulacion-conductor";
+        }
+
+        if (usuarioService.existeEmail(email)) {
+            model.addAttribute("error", "El correo electrónico ya está registrado.");
+            model.addAttribute("postulacion", construirPostulacionTemporal(email, nombreCompleto, dni, telefono,
+                    numeroLicencia, aniosExperiencia, tipoVehiculo));
+            return "postulacion-conductor";
+        }
+
+        if (usuarioService.existeDni(dni)) {
+            model.addAttribute("error", "El DNI ya está registrado.");
+            model.addAttribute("postulacion", construirPostulacionTemporal(email, nombreCompleto, dni, telefono,
+                    numeroLicencia, aniosExperiencia, tipoVehiculo));
+            return "postulacion-conductor";
+        }
+
+        // Validaciones de conductor
+        if (numeroLicencia == null || numeroLicencia.isEmpty()) {
+            model.addAttribute("error", "El número de licencia es obligatorio.");
+            model.addAttribute("postulacion", construirPostulacionTemporal(email, nombreCompleto, dni, telefono,
+                    numeroLicencia, aniosExperiencia, tipoVehiculo));
+            return "postulacion-conductor";
+        }
+
+        if (aniosExperiencia == null) {
+            model.addAttribute("error", "Los años de experiencia son obligatorios.");
+            model.addAttribute("postulacion", construirPostulacionTemporal(email, nombreCompleto, dni, telefono,
+                    numeroLicencia, aniosExperiencia, tipoVehiculo));
+            return "postulacion-conductor";
+        }
+
+        if (tipoVehiculo == null || tipoVehiculo.isEmpty()) {
+            model.addAttribute("error", "El tipo de vehículo es obligatorio.");
+            model.addAttribute("postulacion", construirPostulacionTemporal(email, nombreCompleto, dni, telefono,
+                    numeroLicencia, aniosExperiencia, tipoVehiculo));
+            return "postulacion-conductor";
+        }
+
+        String documentoUrl = null;
+        if (documento != null && !documento.isEmpty()) {
+            documentoUrl = guardarArchivo(documento);
+        }
+
+        UsuarioDTO postulacion = UsuarioDTO.builder()
+                .email(email)
+                .nombreCompleto(nombreCompleto)
+                .dni(dni)
+                .telefono(telefono)
+                .rol("CONDUCTOR")
+                .activo(false)
+                .numeroLicencia(numeroLicencia)
+                .aniosExperiencia(aniosExperiencia)
+                .tipoVehiculo(tipoVehiculo)
+                .estadoPostulacion("PENDIENTE")
+                .documentoUrl(documentoUrl)
+                .build();
+
+        usuarioService.registrar(postulacion, password);
+
+        return "redirect:/postulacion-enviada";
+    }
+
+    // ========================================================================
+    // MÉTODOS PRIVADOS
+    // ========================================================================
+
     private String guardarArchivo(MultipartFile archivo) {
         try {
-            String uploadDir = "uploads/documentos/";
+            String uploadDir = "src/main/resources/static/uploads/documentos/";
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
@@ -151,20 +209,27 @@ public class RegistroController {
         return "postulacion-enviada";
     }
 
-    private UsuarioDTO construirUsuarioTemporal(String email, String nombreCompleto, String dni, String telefono, String rol,
-            String numeroLicencia, Integer aniosExperiencia, String tipoVehiculo) {
-        UsuarioDTO.UsuarioDTOBuilder builder = UsuarioDTO.builder()
+    private UsuarioDTO construirUsuarioTemporal(String email, String nombreCompleto, String dni, String telefono) {
+        return UsuarioDTO.builder()
                 .email(email)
                 .nombreCompleto(nombreCompleto)
                 .dni(dni)
                 .telefono(telefono)
-                .rol(rol);
-        if ("CONDUCTOR".equals(rol)) {
-            builder
+                .rol("CLIENTE")
+                .build();
+    }
+
+    private UsuarioDTO construirPostulacionTemporal(String email, String nombreCompleto, String dni, String telefono,
+            String numeroLicencia, Integer aniosExperiencia, String tipoVehiculo) {
+        return UsuarioDTO.builder()
+                .email(email)
+                .nombreCompleto(nombreCompleto)
+                .dni(dni)
+                .telefono(telefono)
+                .rol("CONDUCTOR")
                 .numeroLicencia(numeroLicencia)
                 .aniosExperiencia(aniosExperiencia)
-                .tipoVehiculo(tipoVehiculo);
-        }
-        return builder.build();
+                .tipoVehiculo(tipoVehiculo)
+                .build();
     }
 }

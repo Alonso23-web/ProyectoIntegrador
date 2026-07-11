@@ -26,7 +26,7 @@
               />
               <h4 class="mb-0 fw-bold">Crear Cuenta</h4>
               <small class="text-white-50"
-                >Regístrate como cliente o postula como conductor</small
+                >Regístrate como cliente para comprar pasajes y enviar encomiendas</small
               >
             </div>
             <div class="card-body p-4">
@@ -117,143 +117,7 @@
                   </div>
                 </div>
 
-                <div class="mb-3">
-                  <label class="form-label fw-bold">Tipo de Cuenta</label>
-                  <div class="row g-2">
-                    <div class="col-md-4">
-                      <div
-                        class="form-check card p-3 text-center"
-                        style="border-radius: 12px; cursor: pointer"
-                      >
-                        <input
-                          class="form-check-input mx-auto d-block mb-2"
-                          type="radio"
-                          name="rol"
-                          id="rolCliente"
-                          value="CLIENTE"
-                          th:checked="${usuario == null or usuario.rol == 'CLIENTE'}"
-                        />
-                        <label
-                          class="form-check-label fw-bold"
-                          for="rolCliente"
-                        >
-                          <i
-                            class="bi bi-person-badge fs-3 text-primario d-block mb-1"
-                          ></i>
-                          Cliente
-                        </label>
-                        <small class="text-muted d-block"
-                          >Compra pasajes y envía encomiendas</small
-                        >
-                      </div>
-                    </div>
-                    <div class="col-md-4">
-                      <div
-                        class="form-check card p-3 text-center"
-                        style="border-radius: 12px; cursor: pointer"
-                      >
-                        <input
-                          class="form-check-input mx-auto d-block mb-2"
-                          type="radio"
-                          name="rol"
-                          id="rolConductor"
-                          value="CONDUCTOR"
-                          th:checked="${usuario != null and usuario.rol == 'CONDUCTOR'}"
-                        />
-                        <label
-                          class="form-check-label fw-bold"
-                          for="rolConductor"
-                        >
-                          <i
-                            class="bi bi-truck-front fs-3 text-primario d-block mb-1"
-                          ></i>
-                          Conductor
-                        </label>
-                        <small class="text-muted d-block"
-                          >Postula para trabajar como conductor</small
-                        >
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- ==================== CAMPOS DE CONDUCTOR (dinámicos) ==================== -->
-                <div id="conductorFields" style="display: none;">
-                  <hr class="my-4" />
-                  <h5 class="fw-bold text-primario mb-3">
-                    <i class="bi bi-truck-front me-2"></i>Información del Conductor
-                  </h5>
-                  <div class="row">
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label fw-bold">Número de Licencia</label>
-                      <div class="input-group">
-                        <span class="input-group-text bg-light"
-                          ><i class="bi bi-card-text"></i
-                        ></span>
-                        <input
-                          type="text"
-                          name="numeroLicencia"
-                          class="form-control"
-                          maxlength="9"
-                          placeholder="Ej: T12345678"
-                          id="numeroLicencia"
-                        />
-                      </div>
-                      <div class="invalid-feedback d-block" id="numeroLicenciaError"></div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label fw-bold">Años de Experiencia</label>
-                      <div class="input-group">
-                        <span class="input-group-text bg-light"
-                          ><i class="bi bi-clock-history"></i
-                        ></span>
-                        <input
-                          type="number"
-                          name="aniosExperiencia"
-                          class="form-control"
-                          placeholder="Ej: 5"
-                          min="0"
-                          max="60"
-                          id="aniosExperiencia"
-                        />
-                        <div class="invalid-feedback d-block" id="aniosExperienciaError"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">Tipo de Vehículo</label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light"
-                        ><i class="bi bi-truck"></i
-                      ></span>
-                      <select name="tipoVehiculo" class="form-select" id="tipoVehiculo">
-                        <option value="">Selecciona un tipo...</option>
-                        <option value="Minivan">Minivan</option>
-                        <option value="Bus">Bus</option>
-                        <option value="Camión">Camión</option>
-                        <option value="Automóvil">Automóvil</option>
-                      </select>
-                      <div class="invalid-feedback d-block" id="tipoVehiculoError"></div>
-                    </div>
-                  </div>
-                  <div class="mb-3">
-                    <label class="form-label fw-bold">Subida de Documentos</label>
-                    <div class="input-group">
-                      <span class="input-group-text bg-light"
-                        ><i class="bi bi-file-earmark-pdf"></i
-                      ></span>
-                      <input
-                        type="file"
-                        name="documento"
-                        class="form-control"
-                        accept=".pdf,.jpg,.png"
-                        id="documento"
-                      />
-                      <div class="invalid-feedback d-block" id="documentoError"></div>
-                    </div>
-                    <small class="text-muted">PDF, JPG o PNG (máx. 5MB)</small>
-                  </div>
-                </div>
+                <input type="hidden" name="rol" value="CLIENTE" />
 
                 <div class="row">
                   <div class="col-md-6 mb-3">
@@ -295,7 +159,7 @@
                 </div>
                 <div class="d-grid">
                   <button type="submit" class="btn btn-amarillo fw-bold" id="btnSubmit">
-                    <i class="bi bi-person-plus me-2"></i><span id="btnTexto">Crear Cuenta</span>
+                    <i class="bi bi-person-plus me-2"></i>Crear Cuenta
                   </button>
                 </div>
               </form>
@@ -316,7 +180,6 @@
     <div th:replace="~{layout :: footer}"></div>
     <div th:replace="~{layout :: scripts}"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="/js/registro/registro.js"></script>
 
   </body>

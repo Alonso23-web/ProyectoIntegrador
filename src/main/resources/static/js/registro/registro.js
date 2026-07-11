@@ -7,12 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const telefono = document.getElementById("telefono");
   const password = document.getElementById("password");
   const confirmarPassword = document.getElementById("confirmarPassword");
-  const numeroLicencia = document.getElementById("numeroLicencia");
-  const radiosRol = document.querySelectorAll('input[name="rol"]');
-  const conductorFields = document.getElementById("conductorFields");
-  const aniosExperiencia = document.getElementById("aniosExperiencia");
-  const tipoVehiculo = document.getElementById("tipoVehiculo");
-  const documento = document.getElementById("documento");
 
   if (!form) return;
 
@@ -22,9 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const dniRegex = /^\d{8}$/;
   const telefonoRegex = /^9\d{8}$/;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  // La Libertad / Trujillo: T + 8 dígitos
-  const licenciaPeruRegex = /^T\d{8}$/;
 
   function setEstado(input, valido, mensaje) {
     if (!input) return;
@@ -111,109 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return valido;
   }
 
-  function validarLicencia() {
-    if (!numeroLicencia) return true;
-
-    const esConductor = rolSeleccionado() === "CONDUCTOR";
-    if (!esConductor) return true;
-
-    numeroLicencia.value = numeroLicencia.value.toUpperCase().replace(/\s/g, "");
-
-    const valido = licenciaPeruRegex.test(numeroLicencia.value);
-
-    setEstado(
-      numeroLicencia,
-      valido,
-      "Formato inválido. Para La Libertad usa T + 8 dígitos. Ejemplo: T12345678."
-    );
-
-    return valido;
-  }
-
-  function validarTipoVehiculo() {
-  if (!tipoVehiculo) return true;
-
-  const esConductor = rolSeleccionado() === "CONDUCTOR";
-  if (!esConductor) return true;
-
-  const valido = tipoVehiculo.value !== "";
-  setEstado(tipoVehiculo, valido, "Selecciona el tipo de vehículo que manejas.");
-
-  return valido;
-  }
-
-    function validarDocumento() {
-    if (!documento) return true;
-
-    const esConductor = rolSeleccionado() === "CONDUCTOR";
-    if (!esConductor) return true;
-
-    const archivo = documento.files[0];
-
-    if (!archivo) {
-        setEstado(documento, false, "Debes subir tu documento o licencia.");
-        return false;
-    }
-
-    const tiposPermitidos = ["application/pdf", "image/jpeg", "image/png"];
-    const maxSize = 5 * 1024 * 1024;
-
-    if (!tiposPermitidos.includes(archivo.type)) {
-        setEstado(documento, false, "Solo se permite PDF, JPG o PNG.");
-        return false;
-    }
-
-    if (archivo.size > maxSize) {
-        setEstado(documento, false, "El archivo no debe superar los 5MB.");
-        return false;
-    }
-
-    setEstado(documento, true, "");
-    return true;
-    }
-
-  function validarExperiencia() {
-  if (!aniosExperiencia) return true;
-
-  const esConductor = rolSeleccionado() === "CONDUCTOR";
-  if (!esConductor) return true;
-
-  const valor = parseInt(aniosExperiencia.value);
-
-  const valido =
-    !isNaN(valor) &&
-    valor >= 1 &&
-    valor <= 60;
-
-  setEstado(
-    aniosExperiencia,
-    valido,
-    "Ingresa años de experiencia entre 1 y 60."
-  );
-
-  return valido;
-  }
-
-  function rolSeleccionado() {
-  const seleccionado = document.querySelector('input[name="rol"]:checked');
-  return seleccionado ? seleccionado.value : null;
-  }
-
-  function toggleConductorFields() {
-  const esConductor = rolSeleccionado() === "CONDUCTOR";
-
-    if (conductorFields) {
-        conductorFields.style.display = esConductor ? "block" : "none";
-    }
-  }
-
-  radiosRol.forEach((radio) => {
-  radio.addEventListener("change", toggleConductorFields);
-  });
-
-  toggleConductorFields();
-
-
   nombreCompleto.addEventListener("input", validarNombre);
   dni.addEventListener("input", validarDni);
   email.addEventListener("input", validarEmail);
@@ -223,13 +111,6 @@ document.addEventListener("DOMContentLoaded", () => {
     validarConfirmarPassword();
   });
   confirmarPassword.addEventListener("input", validarConfirmarPassword);
-  tipoVehiculo.addEventListener("change", validarTipoVehiculo);
-  aniosExperiencia.addEventListener("input", validarExperiencia);
-  documento.addEventListener("change", validarDocumento);
-
-  if (numeroLicencia) {
-    numeroLicencia.addEventListener("input", validarLicencia);
-  }
 
   form.addEventListener("submit", (e) => {
     const rNombre = validarNombre();
@@ -238,10 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const rTelefono = validarTelefono();
     const rPassword = validarPassword();
     const rConfirmarPassword = validarConfirmarPassword();
-    const rLicencia = validarLicencia();
-    const rExperiencia = validarExperiencia();
-    const rTipoVehiculo = validarTipoVehiculo();
-    const rDocumento = validarDocumento();
 
     const todoValido =
       rNombre &&
@@ -249,26 +126,16 @@ document.addEventListener("DOMContentLoaded", () => {
       rEmail &&
       rTelefono &&
       rPassword &&
-      rConfirmarPassword &&
-      rLicencia &&
-      rExperiencia &&
-      rTipoVehiculo &&
-      rDocumento;
+      rConfirmarPassword;
 
     if (!todoValido) {
-      // Evita el “no pasa nada”: muestra por consola qué validación falla
       console.log("Registro - validaciones fallidas", {
-        rolSeleccionado: rolSeleccionado(),
         nombre: rNombre,
         dni: rDni,
         email: rEmail,
         telefono: rTelefono,
         password: rPassword,
-        confirmarPassword: rConfirmarPassword,
-        licencia: rLicencia,
-        experiencia: rExperiencia,
-        tipoVehiculo: rTipoVehiculo,
-        documento: rDocumento
+        confirmarPassword: rConfirmarPassword
       });
 
       e.preventDefault();
