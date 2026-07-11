@@ -3,20 +3,21 @@
   <head
     th:replace="~{layout :: head('Pasajes - Nueva Ases Express')}"
   ></head>
-  <body th:attr="data-current-user-name=${usuario.nombreCompleto},data-current-user-dni=${usuario.dni}">
+  <body th:attr="data-current-user-name=${usuario?.nombreCompleto},data-current-user-dni=${usuario?.dni}">
     <div th:replace="~{layout :: navbar}"></div>
 
+    <!-- HERO -->
     <section class="py-4 bg-primario text-white text-center">
       <div class="container">
         <i class="bi bi-ticket-perforated display-6 mb-2"></i>
         <h1 class="fw-bold fs-2">Compra de Pasajes</h1>
         <p class="text-white-50">
-          Busca tu viaje, selecciona tus asientos y compra tus boletos
+          Ruta Trujillo – Chepén • Precio fijo S/ 12.00 x pasajero
         </p>
       </div>
     </section>
 
-    <!-- Tabs -->
+    <!-- CONTENIDO PRINCIPAL -->
     <section class="py-4" style="background: #eef0f4;">
       <div class="container">
         <div class="mb-3">
@@ -39,22 +40,23 @@
           </ul>
         </div>
 
-        <!-- TAB: BUSCAR VIAJE -->
+        <!-- ============ TAB: BUSCAR VIAJE ============ -->
         <div id="tab-buscar" class="tab-panel" th:classappend="${activeTab == 'buscar' ? '' : 'd-none'}">
-
-          <!-- ===== DOS COLUMNAS ===== -->
           <div class="row g-4">
 
-            <!-- COLUMNA IZQUIERDA: Formulario -->
+            <!-- COLUMNA IZQUIERDA: Pasos 1 a 5 -->
             <div class="col-lg-8">
 
-              <!-- PASO 1: Búsqueda de ruta y fecha -->
+              <!-- PASO 1: Ruta y fecha -->
               <div class="card shadow-sm border-0 mb-3" style="border-radius: 16px;">
                 <div class="card-body p-4">
                   <div class="d-flex align-items-center gap-2 mb-3">
                     <span class="step-circle">1</span>
                     <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Ruta y fecha</h5>
                   </div>
+                  <p class="text-muted small mb-3">
+                    Selecciona el origen, destino y la fecha de tu viaje. El precio es fijo: <strong>S/ 12.00</strong> por pasajero.
+                  </p>
 
                   <form id="buscarForm" class="row g-3">
                     <div class="col-md-4">
@@ -70,17 +72,12 @@
                       </select>
                     </div>
                     <div class="col-md-4">
-                      <label class="form-label fw-semibold small">Fecha</label>
+                      <label class="form-label fw-semibold small">Fecha del viaje</label>
                       <input id="fecha" name="fecha" type="date" class="form-control form-control-sm" required />
                     </div>
-                    <div class="col-md-4">
-                      <label class="form-label fw-semibold small">Pasajeros (1-13)</label>
-                      <input id="cantidad" name="cantidadPasajeros" type="number" class="form-control form-control-sm"
-                        min="1" max="13" step="1" value="1" required />
-                    </div>
-                    <div class="col-md-8 d-flex align-items-end">
-                      <button type="submit" class="btn btn-amarillo fw-bold w-100 btn-sm">
-                        <i class="bi bi-search me-2"></i>Buscar viajes
+                    <div class="col-12">
+                      <button type="submit" class="btn btn-amarillo fw-bold w-100">
+                        <i class="bi bi-search me-2"></i>Buscar disponibilidad
                       </button>
                     </div>
                   </form>
@@ -95,44 +92,47 @@
                 </div>
               </div>
 
-              <!-- ===== ÁREA DE RESULTADOS (se muestra tras buscar) ===== -->
+              <!-- ======== RESULTADOS (se muestra tras buscar) ======== -->
               <div id="resultados-area" class="d-none">
 
-                <!-- PASO 2: Cantidad de pasajeros (INDEPENDIENTE, antes del mapa) -->
-                <div class="card shadow-sm border-0 mb-3" style="border-radius: 16px;">
+                <!-- PASO 2: Cantidad de pasajeros -->
+                <div id="step2-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
                   <div class="card-body p-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
                       <span class="step-circle">2</span>
                       <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Cantidad de pasajeros</h5>
                     </div>
-                    <p class="text-muted small mb-3">Define cuántas personas viajarán. Luego selecciona esa misma cantidad de asientos en el mapa.</p>
+                    <p class="text-muted small mb-3">
+                      Define cuántas personas viajarán. Precio fijo: <strong>S/ 12.00</strong> por pasajero.
+                    </p>
                     <div class="d-flex align-items-center justify-content-between bg-light rounded-3 p-3">
                       <div>
                         <span class="fw-semibold small">Pasajeros</span>
                         <span class="text-muted small ms-2">S/ 12.00 c/u</span>
                       </div>
                       <div class="d-flex align-items-center gap-2">
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="pasajesUI.cambiarCantidad(-1)" id="btn-restar">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="pasajesUI.cambiarCantidad(-1)" id="btn-restar" disabled>
                           <i class="bi bi-dash-lg"></i>
                         </button>
                         <span class="fs-5 fw-bold mx-2" id="cantidadDisplay" style="min-width: 32px; text-align: center; color: #0d1b3e;">1</span>
-                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="pasajesUI.cambiarCantidad(1)" id="btn-sumar">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" onclick="pasajesUI.cambiarCantidad(1)" id="btn-sumar" disabled>
                           <i class="bi bi-plus-lg"></i>
                         </button>
                       </div>
                     </div>
+                    <input type="hidden" id="cantidad" name="cantidadPasajeros" value="1" />
                   </div>
                 </div>
 
-                <!-- PASO 3: Mapa de asientos + Selector de horario -->
-                <div class="card shadow-sm border-0 mb-3" style="border-radius: 16px;">
+                <!-- PASO 3: Medidor de cupos -->
+                <div id="step3-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
                   <div class="card-body p-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
                       <span class="step-circle">3</span>
-                      <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Selecciona tus asientos</h5>
+                      <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Disponibilidad del viaje</h5>
                     </div>
 
-                    <!-- Resumen del viaje actual -->
+                    <!-- Resumen del viaje asignado -->
                     <div class="card border-0 shadow-sm mb-3" style="border-radius: 12px; background: linear-gradient(135deg, #0d1b3e 0%, #1a2d6b 100%);">
                       <div class="card-body p-3 text-white">
                         <div class="d-flex justify-content-between align-items-center">
@@ -140,38 +140,28 @@
                             <div class="fw-bold" id="resumen-ruta">—</div>
                             <div class="d-flex gap-3 small text-white-50 mt-1">
                               <span><i class="bi bi-calendar me-1"></i><span id="resumen-fecha">—</span></span>
-                              <span><i class="bi bi-clock me-1"></i><span id="resumen-hora">—</span></span>
+                              <span><i class="bi bi-clock me-1"></i><span id="resumen-hora">Sale al completar aforo</span></span>
                             </div>
                           </div>
                           <div class="text-end">
-                            <div class="small text-white-50">S/ 12.00</div>
-                            <div class="small">por pasajero</div>
+                            <div class="small fw-bold" style="color: #f5a623;">S/ 12.00</div>
+                            <div class="small text-white-50">por pasajero</div>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    <!-- Mapa de asientos (JS lo llena) -->
-                    <div id="seat-map"></div>
-
-                    <div class="alert alert-warning mt-2 mb-0 d-none py-2 small" id="seat-warning">
-                      <i class="bi bi-hand-index-thumb me-1"></i>Selecciona todos los asientos para continuar.
-                    </div>
-
-                    <hr class="my-3" />
-
-                    <!-- Selector de horario (dentro del mapa) -->
-                    <h6 class="fw-bold mb-2 small" style="color: #0d1b3e;"><i class="bi bi-clock me-1"></i>Elige horario</h6>
-                    <p class="text-muted small mb-2">Cada botón muestra los asientos libres disponibles.</p>
-                    <div id="time-selector" class="d-flex gap-2 flex-wrap"></div>
-                    <div id="found-badge" class="mt-2 small d-none">
-                        <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i><span id="found-count">0</span> viaje(s) encontrados</span>
+                    <!-- Medidor de cupos (progress bar) -->
+                    <div id="ocupacion-area">
+                      <div class="text-muted small text-center py-3">
+                        <i class="bi bi-info-circle me-1"></i>Selecciona una ruta y fecha para ver la disponibilidad
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <!-- PASO 4: Datos de pasajeros -->
-                <div class="card shadow-sm border-0 mb-3" style="border-radius: 16px;">
+                <!-- PASO 4: Datos de cada pasajero -->
+                <div id="step4-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
                   <div class="card-body p-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
                       <span class="step-circle">4</span>
@@ -182,24 +172,69 @@
 
                     <div id="pasajerosContainer">
                       <div class="text-muted small text-center py-3">
-                        <i class="bi bi-hand-index-thumb me-1"></i>Elige asientos en el mapa para registrar cada pasajero
+                        <i class="bi bi-hand-index-thumb me-1"></i>Elige la cantidad de pasajeros para registrar sus datos
                       </div>
                     </div>
 
                     <div id="compra-alert" class="mt-2"></div>
+                  </div>
+                </div>
 
-                    <div class="d-grid gap-2 mt-3">
+                <!-- PASO 5: Resumen y confirmación -->
+                <div id="step5-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
+                  <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                      <span class="step-circle">5</span>
+                      <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Resumen y confirmación</h5>
+                    </div>
+
+                    <div id="resumen-detalle" class="bg-light rounded-3 p-3 mb-3">
+                      <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Ruta</span>
+                        <span class="fw-semibold" id="resumen-ruta-final" style="color: #0d1b3e;">—</span>
+                      </div>
+                      <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Fecha</span>
+                        <span class="fw-semibold" id="resumen-fecha-final">—</span>
+                      </div>
+                      <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Cantidad de pasajes</span>
+                        <span class="fw-semibold" id="resumen-cantidad-final">—</span>
+                      </div>
+                      <hr class="my-2" />
+                      <div class="d-flex justify-content-between">
+                        <span class="fw-bold" style="color: #0d1b3e;">Total a pagar</span>
+                        <span class="fw-bold fs-5" id="resumen-total-final" style="color: #0d1b3e;">—</span>
+                      </div>
+                    </div>
+
+                    <div class="text-muted small mb-3">
+                      <i class="bi bi-shield-check me-1" style="color: #f5a623;"></i>
+                      Precio fijo de <strong>S/ 12.00</strong> por pasajero.
+                      Los asientos se asignan al subir a la combi. No hay selección de asientos.
+                    </div>
+
+                    <div class="d-grid gap-2">
                       <button class="btn btn-amarillo fw-bold btn-lg" id="btn-confirmar-compra" disabled>
-                        <i class="bi bi-credit-card me-2"></i>Confirmar compra
+                        <i class="bi bi-credit-card me-2"></i>Confirmar y pagar
                       </button>
                     </div>
 
+                    <!-- Área de éxito -->
                     <div id="boleto-area" class="mt-3 d-none">
                       <div class="card border-success bg-success bg-opacity-10" style="border-radius: 12px;">
-                        <div class="card-body text-center p-3">
+                        <div class="card-body text-center p-4">
                           <i class="bi bi-check-circle-fill text-success fs-1 mb-2"></i>
-                          <h6 class="fw-bold text-success mb-1">¡Compra exitosa!</h6>
-                          <div class="text-muted small">Redirigiendo a tu historial...</div>
+                          <h5 class="fw-bold text-success mb-2">¡Compra exitosa!</h5>
+                          <p class="small text-muted mb-2">Tus pasajes han sido reservados correctamente.</p>
+                          <div id="codigos-result">
+                            <div class="small text-muted mb-2">Código(s) de boleto:</div>
+                          </div>
+                          <div class="mt-3">
+                            <a href="/pasajes/cliente?tab=mis-viajes" class="btn btn-outline-success btn-sm fw-bold">
+                              <i class="bi bi-journal-text me-1"></i>Ver mis viajes
+                            </a>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -226,26 +261,10 @@
 
                   <hr class="my-2" />
 
-                  <!-- Fecha y hora -->
-                  <div class="row g-2 mb-3">
-                    <div class="col-6">
-                      <div class="text-muted small text-uppercase fw-semibold">Fecha</div>
-                      <div class="fw-semibold small" id="panel-fecha">—</div>
-                    </div>
-                    <div class="col-6">
-                      <div class="text-muted small text-uppercase fw-semibold">Hora</div>
-                      <div class="fw-semibold small" id="panel-hora">—</div>
-                    </div>
-                  </div>
-
-                  <hr class="my-2" />
-
-                  <!-- Asientos seleccionados -->
+                  <!-- Fecha -->
                   <div class="mb-3">
-                    <div class="text-muted small text-uppercase fw-semibold">Asientos</div>
-                    <div id="panel-asientos" class="mt-1">
-                      <span class="text-muted small">Ninguno</span>
-                    </div>
+                    <div class="text-muted small text-uppercase fw-semibold">Fecha</div>
+                    <div class="fw-semibold small" id="panel-fecha">—</div>
                   </div>
 
                   <hr class="my-2" />
@@ -280,7 +299,7 @@
                     <p class="small mb-0" style="color: #0d1b3e;">
                       <i class="bi bi-shield-check me-1" style="color: #f5a623;"></i>
                       Precio fijo de <strong>S/ 12.00</strong> por pasajero.
-                      La disponibilidad se confirma al reservar.
+                      Sin selección de asientos. El viaje sale al completar aforo.
                     </p>
                   </div>
                 </div>
@@ -290,29 +309,24 @@
           </div><!-- /row -->
         </div>
 
-        <!-- TAB: MIS VIAJES -->
+        <!-- ============ TAB: MIS VIAJES ============ -->
         <div id="tab-mis-viajes" class="tab-panel" th:classappend="${activeTab == 'mis-viajes' ? '' : 'd-none'}">
           <div class="card shadow-sm mx-auto" style="max-width: 900px">
             <div class="card-body p-4">
               <h5 class="fw-bold text-primario mb-4">
                 <i class="bi bi-journal-text text-amarillo me-2"></i>Mis Viajes
               </h5>
-              <button
-                class="btn btn-amarillo mb-3"
-                onclick="pasajesUI.cargarMisViajes()"
-              >
+              <button class="btn btn-amarillo mb-3" onclick="pasajesUI.cargarMisViajes()">
                 <i class="bi bi-arrow-clockwise me-2"></i>Actualizar
               </button>
               <div id="mis-viajes-result" class="mt-3">
-                <p class="text-muted">
-                  Haz clic en "Actualizar" para cargar tus viajes.
-                </p>
+                <p class="text-muted">Haz clic en "Actualizar" para cargar tus viajes.</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- TAB: ESTADO DE VIAJE -->
+        <!-- ============ TAB: ESTADO DE VIAJE ============ -->
         <div id="tab-estado-viaje" class="tab-panel" th:classappend="${activeTab == 'estado-viaje' ? '' : 'd-none'}">
           <div class="card shadow-sm mx-auto" style="max-width: 700px">
             <div class="card-body p-4">
@@ -334,81 +348,55 @@
       </div>
     </section>
 
-    <!-- Modal de confirmación de compra -->
-    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0" style="border-radius: 20px;">
-          <div class="modal-header bg-primario text-white border-0" style="border-radius: 20px 20px 0 0;">
-            <h6 class="modal-title fw-bold" id="confirmModalLabel">
-              <i class="bi bi-shield-check me-2"></i>Confirmar compra
-            </h6>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body p-4">
-            <div class="text-center mb-3">
-              <i class="bi bi-ticket-perforated text-primario display-5 mb-2"></i>
-              <h5 class="fw-bold" id="modal-ruta">—</h5>
-              <div class="d-flex justify-content-center gap-3 text-muted small">
-                <span><i class="bi bi-calendar me-1"></i><span id="modal-fecha">—</span></span>
-                <span><i class="bi bi-clock me-1"></i><span id="modal-hora">—</span></span>
-              </div>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-              <span class="text-muted">Precio unitario</span>
-              <span id="modal-precio-unitario" class="fw-semibold">—</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-              <span class="text-muted">Asientos</span>
-              <span id="modal-asientos" class="fw-semibold">—</span>
-            </div>
-            <div class="d-flex justify-content-between mb-2">
-              <span class="text-muted">Cantidad de pasajes</span>
-              <span id="modal-cantidad" class="fw-semibold">1</span>
-            </div>
-            <hr />
-            <div class="d-flex justify-content-between">
-              <span class="fw-bold text-primario fs-5">Total a pagar</span>
-              <span id="modal-total" class="fw-bold text-primario fs-5">—</span>
-            </div>
-          </div>
-          <div class="modal-footer border-0 justify-content-center gap-2 pb-4">
-            <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
-              <i class="bi bi-x-circle me-1"></i>Cancelar
-            </button>
-            <button type="button" class="btn btn-amarillo fw-bold px-4" id="confirmarReservaBtn">
-              <i class="bi bi-check-circle me-1"></i>Sí, confirmar compra
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div th:replace="~{layout :: footer}"></div>
     <div th:replace="~{layout :: scripts}"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
-    <script src="/js/pasajes/cliente-buscar.js?v=4"></script>
+    <script src="/js/pasajes/cliente-buscar.js?v=6"></script>
     <script>
-      // Tab switching logic
+      // ─── Tab switching logic ───────────────────────────────
       document.querySelectorAll(".btn-tab").forEach((btn) => {
         btn.addEventListener("click", () => {
-          document
-            .querySelectorAll(".btn-tab")
-            .forEach((b) => b.classList.remove("active"));
-          document
-            .querySelectorAll(".tab-panel")
-            .forEach((p) => p.classList.add("d-none"));
+          document.querySelectorAll(".btn-tab").forEach((b) => b.classList.remove("active"));
+          document.querySelectorAll(".tab-panel").forEach((p) => p.classList.add("d-none"));
           btn.classList.add("active");
-          document
-            .getElementById("tab-" + btn.dataset.tab)
-            .classList.remove("d-none");
+          document.getElementById("tab-" + btn.dataset.tab).classList.remove("d-none");
         });
       });
 
       document.addEventListener("DOMContentLoaded", () => {
-        if (document.querySelector('.btn-tab[data-tab="mis-viajes"]')?.classList.contains('active')) {
+        // Cargar rutas
+        pasajesUI.cargarRutas();
+
+        // Fecha mínima = hoy
+        const fechaInput = document.getElementById("fecha");
+        if (fechaInput) {
+          fechaInput.setAttribute("min", getTodayStr());
+        }
+
+        // Tab mis-viajes: cargar automáticamente
+        if (document.querySelector('.btn-tab[data-tab="mis-viajes"]')?.classList.contains("active")) {
           pasajesUI.cargarMisViajes();
         }
+
+        // ─── Submit del formulario de búsqueda ──────────────
+        document.getElementById("buscarForm")?.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const origen = document.getElementById("origen").value;
+          const destino = document.getElementById("destino").value;
+          const fecha = document.getElementById("fecha").value;
+
+          if (!origen || !destino || !fecha) {
+            pasajesUI.setAlerta("buscar-alert", "warning", "Completa todos los campos: origen, destino y fecha.");
+            return;
+          }
+          if (origen === destino) {
+            pasajesUI.setAlerta("buscar-alert", "warning", "El origen y destino no pueden ser iguales.");
+            return;
+          }
+
+          pasajesUI.buscarViajes(origen, destino, fecha);
+        });
       });
     </script>
 
@@ -430,182 +418,10 @@
         background: #1b2a5e;
         color: white;
       }
-      /* ===== MINIVAN SEAT MAP ===== */
+
       :root {
-        --color-disponible: #2ecc71;
-        --color-ocupado: #e74c3c;
-        --color-azul: #0d1b3e;
         --color-amarillo: #f5a623;
         --color-fondo: #eef0f4;
-      }
-
-      .minivan-front {
-        text-align: center;
-        font-size: 10px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: var(--color-azul);
-        opacity: 0.5;
-        margin-bottom: 4px;
-        padding: 4px;
-        border-bottom: 2px solid var(--color-amarillo);
-      }
-
-      .minivan-grid {
-        background: rgba(13, 27, 62, 0.03);
-        border-radius: 14px;
-        border: 1px dashed rgba(13, 27, 62, 0.18);
-        padding: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-
-      .minivan-seats-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr 16px 1fr;
-        gap: 6px;
-        align-items: center;
-      }
-
-      .minivan-seat {
-        height: 40px;
-        border-radius: 10px 10px 4px 4px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        font-weight: 700;
-        font-size: 11px;
-        color: #fff;
-        user-select: none;
-        transition: all 0.15s ease;
-        cursor: pointer;
-        position: relative;
-        min-width: 0;
-        border: 2px solid transparent;
-      }
-
-      .minivan-seat:hover:not(.occupied):not(.driver-seat) {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
-      }
-
-      .minivan-seat:active:not(.occupied):not(.driver-seat) {
-        transform: scale(0.96);
-      }
-
-      .minivan-seat .seat-label {
-        font-size: 11px;
-        font-weight: 700;
-        line-height: 1;
-      }
-
-      .minivan-seat .passenger-badge {
-        position: absolute;
-        top: -6px;
-        right: -6px;
-        background: var(--color-azul);
-        color: #fff;
-        font-size: 8px;
-        font-weight: 700;
-        padding: 1px 5px;
-        border-radius: 8px;
-        line-height: 1.4;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      }
-
-      .minivan-seat.available {
-        background: var(--color-disponible);
-        border-color: #27ae60;
-      }
-
-      .minivan-seat.neutral {
-        background: #e9ecef;
-        border-color: #dee2e6;
-        cursor: default;
-        color: #6c757d;
-      }
-
-      .minivan-seat.occupied {
-        background: #adb5bd;
-        border-color: #8e9297;
-        cursor: not-allowed;
-        opacity: 0.85;
-        color: #fff;
-      }
-
-      .minivan-seat.selected-first {
-        background: #f5a623 !important;
-        color: #fff !important;
-      }
-
-      .minivan-seat.selected-other {
-        background: #fce4a8 !important;
-        border-color: #f5a623;
-        color: #8b6914 !important;
-      }
-
-      .minivan-seat.selected {
-        border-color: #fff !important;
-        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6), 0 4px 12px rgba(0,0,0,0.15) !important;
-      }
-
-      .minivan-seat.driver-seat {
-        background: #2c3e50;
-        border-color: #1a252f;
-        cursor: default;
-        grid-column: span 2;
-        flex-direction: row;
-        gap: 4px;
-        font-size: 10px;
-      }
-
-      .minivan-seat.empty-cell {
-        visibility: hidden;
-      }
-
-      .minivan-seats-row.row-5 {
-        grid-template-columns: 1fr 1fr 1fr 0;
-      }
-      .minivan-seats-row.row-6 {
-        grid-template-columns: 1fr 1fr 16px 0;
-      }
-
-      .minivan-aisle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: rgba(13, 27, 62, 0.12);
-        font-size: 14px;
-        height: 40px;
-      }
-
-      .minivan-aisle i {
-        transform: rotate(90deg);
-      }
-
-      .legend-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        display: inline-block;
-        flex-shrink: 0;
-      }
-
-      .seat-badge {
-        font-weight: 600;
-        font-size: 11px;
-        padding: 3px 8px;
-        border-radius: 6px;
-      }
-
-      .seat-dot {
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        display: inline-block;
       }
 
       /* Passenger card styles */
@@ -619,67 +435,25 @@
         box-shadow: 0 2px 8px rgba(245, 166, 35, 0.1);
       }
 
+      .pasajero-numero {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #0d1b3e;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+
       .form-label-xs {
         font-size: 11px;
         font-weight: 600;
         color: #6c757d;
         margin-bottom: 2px;
-      }
-
-      /* Timeline */
-      .timeline {
-        display: flex;
-        flex-direction: column;
-        gap: 0;
-        position: relative;
-        padding-left: 24px;
-      }
-      .timeline::before {
-        content: '';
-        position: absolute;
-        left: 10px;
-        top: 8px;
-        bottom: 8px;
-        width: 2px;
-        background: #dee2e6;
-      }
-      .timeline-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 10px;
-        padding-bottom: 12px;
-        position: relative;
-      }
-      .timeline-item:last-child {
-        padding-bottom: 0;
-      }
-      .timeline-marker {
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-        color: white;
-        flex-shrink: 0;
-        position: absolute;
-        left: -24px;
-        z-index: 1;
-      }
-      .timeline-content {
-        flex: 1;
-        padding-top: 2px;
-      }
-      .btn-outline-primario {
-        border: 2px solid #1b2a5e;
-        color: #1b2a5e;
-        border-radius: 50px;
-        font-weight: 600;
-      }
-      .btn-outline-primario:hover {
-        background: #1b2a5e;
-        color: white;
       }
 
       /* Step circles */
@@ -697,43 +471,32 @@
         flex-shrink: 0;
       }
 
-      /* Time selector buttons */
-      .time-btn {
-        border: 2px solid #dee2e6;
-        background: #fff;
-        border-radius: 12px;
-        padding: 10px 16px;
-        font-weight: 700;
-        font-size: 14px;
-        color: #0d1b3e;
-        transition: all 0.2s ease;
-        text-align: center;
-        min-width: 120px;
-        flex: 1;
+      /* Occupancy progress bar */
+      .ocupacion-bar {
+        height: 20px;
+        border-radius: 10px;
+        overflow: hidden;
+        background: #e9ecef;
       }
-      .time-btn:hover:not(.disabled) {
-        border-color: #f5a623;
-        background: #fff8e7;
+      .ocupacion-fill {
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.5s ease, background-color 0.3s ease;
       }
-      .time-btn.active {
-        border-color: #f5a623;
-        background: #f5a623;
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(245, 166, 35, 0.3);
+
+      /* Card entrance animation */
+      .card {
+        animation: fadeInUp 0.4s ease forwards;
       }
-      .time-btn.active .time-avail {
-        color: rgba(255,255,255,0.85);
-      }
-      .time-btn.disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-      .time-avail {
-        display: block;
-        font-size: 11px;
-        font-weight: 400;
-        color: #6c757d;
-        margin-top: 2px;
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
     </style>
   </body>

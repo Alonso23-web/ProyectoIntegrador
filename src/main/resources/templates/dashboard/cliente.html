@@ -30,10 +30,19 @@
         font-size: 120px;
         opacity: 0.1;
       }
-      .welcome-card h1 { font-weight: 800; font-size: 1.8rem; margin-bottom: 0.5rem; }
-      .welcome-card p { opacity: 0.85; font-size: 1.05rem; margin-bottom: 0; max-width: 500px; }
+      .welcome-card h1 {
+        font-weight: 800;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+      }
+      .welcome-card p {
+        opacity: 0.85;
+        font-size: 1.05rem;
+        margin-bottom: 0;
+        max-width: 500px;
+      }
       .welcome-card .badge-rol {
-        background: rgba(255,255,255,0.15);
+        background: rgba(255, 255, 255, 0.15);
         color: white;
         padding: 0.5rem 1.2rem;
         border-radius: 50px;
@@ -58,7 +67,7 @@
         text-decoration: none;
         color: #0d1b4c;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
         border: 2px solid transparent;
         cursor: pointer;
         display: flex;
@@ -68,7 +77,7 @@
       }
       .accion-card:hover {
         transform: translateY(-6px);
-        box-shadow: 0 12px 30px rgba(13,27,76,0.15);
+        box-shadow: 0 12px 30px rgba(13, 27, 76, 0.15);
         border-color: #f5a623;
         color: #0d1b4c;
         text-decoration: none;
@@ -82,8 +91,15 @@
         justify-content: center;
         font-size: 2.2rem;
       }
-      .accion-card .ac-nombre { font-weight: 700; font-size: 1.1rem; }
-      .accion-card .ac-desc { font-size: 0.82rem; color: #6c757d; margin: 0; }
+      .accion-card .ac-nombre {
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .accion-card .ac-desc {
+        font-size: 0.82rem;
+        color: #6c757d;
+        margin: 0;
+      }
       .accion-card .btn-ac {
         background: #f5a623;
         color: #1a1a1a;
@@ -100,10 +116,22 @@
         transform: scale(1.05);
       }
 
-      .ac-icono-comprar { background: #d4edda; color: #155724; }
-      .ac-icono-viajes { background: #e8f4fd; color: #0d6efd; }
-      .ac-icono-encomienda { background: #fff3cd; color: #856404; }
-      .ac-icono-rastrear-c { background: #f8d7da; color: #721c24; }
+      .ac-icono-comprar {
+        background: #d4edda;
+        color: #155724;
+      }
+      .ac-icono-viajes {
+        background: #e8f4fd;
+        color: #0d6efd;
+      }
+      .ac-icono-encomienda {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .ac-icono-rastrear-c {
+        background: #f8d7da;
+        color: #721c24;
+      }
 
       /* Módulos pequeños */
       .mod-grid {
@@ -120,18 +148,19 @@
         text-decoration: none;
         color: #0d1b4c;
         transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
         border: 2px solid transparent;
       }
       .mod-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 10px 25px rgba(13,27,76,0.12);
+        box-shadow: 0 10px 25px rgba(13, 27, 76, 0.12);
         border-color: #f5a623;
         color: #0d1b4c;
         text-decoration: none;
       }
       .mod-card .m-icono {
-        width: 50px; height: 50px;
+        width: 50px;
+        height: 50px;
         border-radius: 14px;
         display: flex;
         align-items: center;
@@ -139,13 +168,32 @@
         font-size: 1.3rem;
         margin: 0 auto 0.5rem;
       }
-      .mod-card .m-nombre { font-weight: 700; font-size: 0.85rem; display: block; }
-      .mod-card .m-desc { font-size: 0.72rem; color: #6c757d; }
+      .mod-card .m-nombre {
+        font-weight: 700;
+        font-size: 0.85rem;
+        display: block;
+      }
+      .mod-card .m-desc {
+        font-size: 0.72rem;
+        color: #6c757d;
+      }
 
-      .m-icono-pasajes { background: #e8f4fd; color: #0d6efd; }
-      .m-icono-encomiendas { background: #fff3cd; color: #856404; }
-      .m-icono-contacto { background: #d4edda; color: #155724; }
-      .m-icono-perfil-c { background: #f8d7da; color: #721c24; }
+      .m-icono-pasajes {
+        background: #e8f4fd;
+        color: #0d6efd;
+      }
+      .m-icono-encomiendas {
+        background: #fff3cd;
+        color: #856404;
+      }
+      .m-icono-contacto {
+        background: #d4edda;
+        color: #155724;
+      }
+      .m-icono-perfil-c {
+        background: #f8d7da;
+        color: #721c24;
+      }
 
       /* Estadísticas */
       .stats-grid {
@@ -158,100 +206,181 @@
         background: white;
         border-radius: 18px;
         padding: 1.5rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
         text-align: center;
         transition: transform 0.2s ease;
       }
-      .stat-card:hover { transform: translateY(-3px); }
-      .stat-card .stat-num { font-size: 2.5rem; font-weight: 800; color: #0d1b4c; line-height: 1.2; }
-      .stat-card .stat-label { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; color: #6c757d; margin-top: 0.3rem; }
-      .stat-card .stat-icon { font-size: 1.8rem; margin-bottom: 0.3rem; display: block; }
+      .stat-card:hover {
+        transform: translateY(-3px);
+      }
+      .stat-card .stat-num {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #0d1b4c;
+        line-height: 1.2;
+      }
+      .stat-card .stat-label {
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 600;
+        color: #6c757d;
+        margin-top: 0.3rem;
+      }
+      .stat-card .stat-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.3rem;
+        display: block;
+      }
 
       /* Tablas */
       .activity-section {
         background: white;
         border-radius: 20px;
         padding: 1.5rem;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
       }
-      .activity-section h5 { font-weight: 700; color: #0d1b4c; margin-bottom: 1rem; }
+      .activity-section h5 {
+        font-weight: 700;
+        color: #0d1b4c;
+        margin-bottom: 1rem;
+      }
       .activity-section .table th {
-        font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;
-        color: #6c757d; border-bottom: 2px solid #f0f2f5; padding: 0.7rem 0.5rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6c757d;
+        border-bottom: 2px solid #f0f2f5;
+        padding: 0.7rem 0.5rem;
       }
-      .activity-section .table td { padding: 0.7rem 0.5rem; vertical-align: middle; font-size: 0.9rem; }
+      .activity-section .table td {
+        padding: 0.7rem 0.5rem;
+        vertical-align: middle;
+        font-size: 0.9rem;
+      }
     </style>
 
     <section class="cliente-dashboard">
       <div class="container">
-
         <!-- Bienvenida -->
         <div class="welcome-card">
-          <h1>👋 ¡Bienvenido, <span th:text="${usuario != null ? usuario.nombreCompleto : nombreUsuario}"></span>!</h1>
-          <p>Tu panel de cliente. Compra pasajes, envía encomiendas y rastrea tus envíos de forma rápida y sencilla.</p>
+          <h1>
+            👋 ¡Bienvenido,
+            <span
+              th:text="${usuario != null ? usuario.nombreCompleto : nombreUsuario}"
+            ></span
+            >!
+          </h1>
+          <p>
+            Tu panel de cliente. Compra pasajes, envía encomiendas y rastrea tus
+            envíos de forma rápida y sencilla.
+          </p>
           <span class="badge-rol">👤 Cliente</span>
         </div>
 
         <!-- ACCIONES RÁPIDAS -->
-        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
+        <h5
+          class="fw-bold text-muted mb-3"
+          style="
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          "
+        >
           <i class="bi bi-lightning-fill me-2"></i>¿Qué deseas hacer hoy?
         </h5>
         <div class="acciones-cliente">
           <a href="/pasajes/cliente" class="accion-card">
-            <div class="ac-icono ac-icono-comprar"><i class="bi bi-ticket-perforated"></i></div>
+            <div class="ac-icono ac-icono-comprar">
+              <i class="bi bi-ticket-perforated"></i>
+            </div>
             <span class="ac-nombre">🎫 Comprar pasaje</span>
-            <p class="ac-desc">Viaja de Trujillo a Chepén o viceversa. Elige tu asiento.</p>
+            <p class="ac-desc">
+              Viaja de Trujillo a cualquier destino. Compra rápida y sencilla.
+            </p>
             <span class="btn-ac">Comprar ahora</span>
           </a>
           <a href="/pasajes/cliente?tab=mis-viajes" class="accion-card">
-            <div class="ac-icono ac-icono-viajes"><i class="bi bi-bus-front"></i></div>
+            <div class="ac-icono ac-icono-viajes">
+              <i class="bi bi-bus-front"></i>
+            </div>
             <span class="ac-nombre">🚌 Mis viajes</span>
             <p class="ac-desc">Revisa tus pasajes comprados y sus detalles.</p>
             <span class="btn-ac">Ver mis viajes</span>
           </a>
           <a href="/encomiendas?tab=registrar" class="accion-card">
-            <div class="ac-icono ac-icono-encomienda"><i class="bi bi-box-seam"></i></div>
+            <div class="ac-icono ac-icono-encomienda">
+              <i class="bi bi-box-seam"></i>
+            </div>
             <span class="ac-nombre">📦 Enviar encomienda</span>
-            <p class="ac-desc">Envía paquetes de forma segura con rastreo incluido.</p>
+            <p class="ac-desc">
+              Envía paquetes de forma segura con rastreo incluido.
+            </p>
             <span class="btn-ac">Enviar ahora</span>
           </a>
           <a href="/rastrear" class="accion-card">
-            <div class="ac-icono ac-icono-rastrear-c"><i class="bi bi-search"></i></div>
+            <div class="ac-icono ac-icono-rastrear-c">
+              <i class="bi bi-search"></i>
+            </div>
             <span class="ac-nombre">🔍 Rastrear envío</span>
-            <p class="ac-desc">Ingresa tu código y sigue tu encomienda en tiempo real.</p>
+            <p class="ac-desc">
+              Ingresa tu código y sigue tu encomienda en tiempo real.
+            </p>
             <span class="btn-ac">Rastrear</span>
           </a>
         </div>
 
         <!-- MÓDULOS -->
-        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
+        <h5
+          class="fw-bold text-muted mb-3"
+          style="
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          "
+        >
           <i class="bi bi-grid-3x3-gap-fill me-2"></i>Más opciones
         </h5>
         <div class="mod-grid">
           <a href="/pasajes/cliente" class="mod-card">
-            <div class="m-icono m-icono-pasajes"><i class="bi bi-ticket"></i></div>
+            <div class="m-icono m-icono-pasajes">
+              <i class="bi bi-ticket"></i>
+            </div>
             <span class="m-nombre">Pasajes</span>
             <span class="m-desc">Todos mis boletos</span>
           </a>
           <a href="/encomiendas" class="mod-card">
-            <div class="m-icono m-icono-encomiendas"><i class="bi bi-box"></i></div>
+            <div class="m-icono m-icono-encomiendas">
+              <i class="bi bi-box"></i>
+            </div>
             <span class="m-nombre">Encomiendas</span>
             <span class="m-desc">Mis envíos</span>
           </a>
           <a href="/contacto" class="mod-card">
-            <div class="m-icono m-icono-contacto"><i class="bi bi-envelope"></i></div>
+            <div class="m-icono m-icono-contacto">
+              <i class="bi bi-envelope"></i>
+            </div>
             <span class="m-nombre">Contacto</span>
             <span class="m-desc">Atención al cliente</span>
           </a>
           <a href="/perfil" class="mod-card">
-            <div class="m-icono m-icono-perfil-c"><i class="bi bi-person-circle"></i></div>
+            <div class="m-icono m-icono-perfil-c">
+              <i class="bi bi-person-circle"></i>
+            </div>
             <span class="m-nombre">Mi Perfil</span>
             <span class="m-desc">Mis datos</span>
           </a>
         </div>
 
         <!-- ESTADÍSTICAS -->
-        <h5 class="fw-bold text-muted mb-3" style="font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px">
+        <h5
+          class="fw-bold text-muted mb-3"
+          style="
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+          "
+        >
           <i class="bi bi-bar-chart-fill me-2"></i>Mi actividad
         </h5>
         <div class="stats-grid">
@@ -271,15 +400,27 @@
         <div class="row g-4">
           <div class="col-lg-6">
             <div class="activity-section">
-              <h5><i class="bi bi-bus-front me-2 text-amarillo"></i>Últimos viajes</h5>
+              <h5>
+                <i class="bi bi-bus-front me-2 text-amarillo"></i>Últimos viajes
+              </h5>
               <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                   <thead>
-                    <tr><th>Pasajero</th><th>Origen</th><th>Destino</th><th>Fecha</th></tr>
+                    <tr>
+                      <th>Pasajero</th>
+                      <th>Origen</th>
+                      <th>Destino</th>
+                      <th>Fecha</th>
+                    </tr>
                   </thead>
                   <tbody>
                     <tr th:each="pasaje : ${ultimosPasajes}">
-                      <td class="fw-semibold" th:text="${pasaje.nombrePasajero}">—</td>
+                      <td
+                        class="fw-semibold"
+                        th:text="${pasaje.nombrePasajero}"
+                      >
+                        —
+                      </td>
                       <td th:text="${pasaje.viaje.origen}">—</td>
                       <td th:text="${pasaje.viaje.destino}">—</td>
                       <td th:text="${pasaje.viaje.fecha}">—</td>
@@ -296,22 +437,41 @@
           </div>
           <div class="col-lg-6">
             <div class="activity-section">
-              <h5><i class="bi bi-boxes me-2 text-amarillo"></i>Últimas encomiendas</h5>
+              <h5>
+                <i class="bi bi-boxes me-2 text-amarillo"></i>Últimas
+                encomiendas
+              </h5>
               <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                   <thead>
-                    <tr><th>Código</th><th>Destino</th><th>Estado</th><th>Envío</th></tr>
+                    <tr>
+                      <th>Código</th>
+                      <th>Destino</th>
+                      <th>Estado</th>
+                      <th>Envío</th>
+                    </tr>
                   </thead>
                   <tbody>
                     <tr th:each="enc : ${ultimasEncomiendas}">
-                      <td><code class="fw-semibold" th:text="${enc.codigoRastreo}">—</code></td>
+                      <td>
+                        <code class="fw-semibold" th:text="${enc.codigoRastreo}"
+                          >—</code
+                        >
+                      </td>
                       <td th:text="${enc.destino}">—</td>
-                      <td><span class="badge bg-primario text-white" th:text="${enc.estado}">—</span></td>
+                      <td>
+                        <span
+                          class="badge bg-primario text-white"
+                          th:text="${enc.estado}"
+                          >—</span
+                        >
+                      </td>
                       <td th:text="${enc.fechaEnvio}">—</td>
                     </tr>
                     <tr th:if="${ultimasEncomiendas.empty}">
                       <td colspan="4" class="text-center text-muted py-4">
-                        <i class="bi bi-inbox me-2"></i>Aún no tienes encomiendas.
+                        <i class="bi bi-inbox me-2"></i>Aún no tienes
+                        encomiendas.
                       </td>
                     </tr>
                   </tbody>
@@ -320,7 +480,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </section>
     <div th:replace="~{layout :: scripts}"></div>
