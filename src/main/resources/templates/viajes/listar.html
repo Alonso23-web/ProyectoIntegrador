@@ -5,6 +5,18 @@
     <div th:replace="~{layout :: navbar}"></div>
 
     <div class="container my-4">
+      <!-- Mensajes flash -->
+      <div th:if="${success}" class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+        <i class="bi bi-check-circle-fill fs-5"></i>
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      <div th:if="${error}" class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
           <h2 class="fw-bold text-primario mb-1">
@@ -104,11 +116,14 @@
                            class="btn btn-sm btn-outline-primary" title="Editar">
                           <i class="bi bi-pencil"></i>
                         </a>
-                        <a th:href="@{'/viajes/eliminar/' + ${v.id}}"
-                           class="btn btn-sm btn-outline-danger" title="Eliminar"
-                           onclick="return confirm('¿Estás seguro de eliminar este viaje?');">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger" title="Eliminar"
+                                th:attr="data-id=${v.id},
+                                  data-ruta=${v.origen + ' → ' + v.destino},
+                                  data-fecha=${v.fecha}"
+                                onclick="abrirModalIndividual(this)">
                           <i class="bi bi-trash"></i>
-                        </a>
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -130,28 +145,111 @@
         </div>
       </div>
 
-      <!-- Modal de confirmación batch -->
-      <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-hidden="true">
+      <!-- Modal: confirmar eliminación individual -->
+      <div class="modal fade" id="confirmIndividualModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content border-0 shadow" style="border-radius: 16px;">
-            <div class="modal-header border-0" style="background: #dc3545; color: white; border-radius: 16px 16px 0 0;">
-              <h5 class="modal-title fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Confirmar eliminación</h5>
-              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          <div class="modal-content border-0 shadow" style="border-radius: 20px; overflow: hidden;">
+
+            <!-- Header color según estado (rojo si se puede eliminar, naranja si está bloqueado) -->
+            <div class="p-4 text-white text-center" id="individual-modal-header"
+                 style="background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);">
+              <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                <i class="bi bi-trash3 fs-2"></i>
+              </div>
+              <h5 class="fw-bold mb-1">Eliminar viaje</h5>
+              <p class="small mb-0" style="opacity: 0.85;">Esta acción no se puede deshacer</p>
             </div>
-            <div class="modal-body p-4 text-center">
-              <i class="bi bi-trash3 display-4 text-danger mb-3"></i>
-              <p class="fw-semibold mb-1">¿Estás seguro de eliminar <strong id="delete-count-modal">0</strong> viaje(s)?</p>
-              <p class="small text-muted mb-0">Los viajes con reservas serán omitidos automáticamente.</p>
+
+            <div class="p-4">
+
+              <!-- Tarjeta del viaje -->
+              <div class="bg-light rounded-3 p-3 mb-3" style="border: 1px solid #e9ecef;">
+                <div class="d-flex align-items-center gap-3">
+                  <div style="width: 40px; height: 40px; border-radius: 10px; background: #0d1b3e; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="bi bi-bus-front text-white"></i>
+                  </div>
+                  <div class="flex-grow-1">
+                    <div class="fw-bold" style="color: #0d1b3e;" id="individual-modal-ruta">—</div>
+                    <div class="small text-muted mt-1">
+                      <i class="bi bi-calendar3 me-1"></i><span id="individual-modal-fecha">—</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pregunta -->
+              <p class="fw-semibold text-center mb-3" style="color: #0d1b3e;">
+                ¿Estás seguro de eliminar este viaje?
+              </p>
+
+              <!-- Alerta de reservas (bloqueado) -->
+              <div id="individual-modal-reservas"
+                   class="d-none d-flex align-items-center gap-2 p-3 rounded-3 mb-0"
+                   style="background: #fff8e6; border: 1px solid #fce5b6;">
+                <i class="bi bi-shield-lock-fill fs-5" style="color: #e37400;"></i>
+                <div>
+                  <span class="fw-semibold small" style="color: #e37400;">Viaje protegido</span>
+                  <p class="small text-muted mb-0" id="individual-modal-reservas-texto">Este viaje tiene reservas</p>
+                </div>
+              </div>
+
             </div>
-            <div class="modal-footer border-0 justify-content-center pb-4">
-              <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
-                <i class="bi bi-x me-1"></i>Cancelar
+
+            <!-- Footer -->
+            <div class="px-4 pb-4 d-flex gap-2 justify-content-center">
+              <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold" data-bs-dismiss="modal">
+                Cancelar
               </button>
-              <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold"
-                      onclick="confirmarEliminacion()">
-                <i class="bi bi-trash me-1"></i>Sí, eliminar
+              <a id="individual-modal-confirmar" href="#"
+                 class="btn rounded-pill px-4 fw-bold d-flex align-items-center gap-2">
+                <i class="bi bi-trash"></i> Sí, eliminar
+              </a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal: confirmar eliminación batch -->
+      <div class="modal fade" id="confirmBatchModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content border-0 shadow" style="border-radius: 20px; overflow: hidden;">
+
+            <div class="p-4 text-white text-center" id="batch-modal-header"
+                 style="background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);">
+              <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px;">
+                <i class="bi bi-trash3 fs-2"></i>
+              </div>
+              <h5 class="fw-bold mb-1">Eliminar viajes</h5>
+              <p class="small mb-0" style="opacity: 0.85;">Esta acción no se puede deshacer</p>
+            </div>
+
+            <div class="p-4">
+              <p class="fw-semibold text-center mb-3" style="color: #0d1b3e;">
+                ¿Estás seguro de eliminar <strong id="batch-count-modal">0</strong> viaje(s)?
+              </p>
+
+              <div id="batch-modal-reservas"
+                   class="d-none d-flex align-items-center gap-2 p-3 rounded-3 mb-0"
+                   style="background: #fff8e6; border: 1px solid #fce5b6;">
+                <i class="bi bi-shield-lock-fill fs-5" style="color: #e37400;"></i>
+                <div>
+                  <span class="fw-semibold small" style="color: #e37400;">Viaje(s) con reservas</span>
+                  <p class="small text-muted mb-0" id="batch-modal-reservas-texto">Algunos viajes tienen reservas</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="px-4 pb-4 d-flex gap-2 justify-content-center">
+              <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-semibold" data-bs-dismiss="modal">
+                Cancelar
+              </button>
+              <button type="button" class="btn btn-danger rounded-pill px-4 fw-bold d-flex align-items-center gap-2"
+                      id="batch-modal-confirmar" onclick="confirmarEliminacionBatch()">
+                <i class="bi bi-trash"></i> Sí, eliminar
               </button>
             </div>
+
           </div>
         </div>
       </div>
@@ -227,20 +325,120 @@
         }
       }
 
+      // ─── Eliminación individual (modal con detección de reservas) ─
+
+      function abrirModalIndividual(btn) {
+        var id = btn.getAttribute('data-id');
+        var ruta = btn.getAttribute('data-ruta');
+        var fecha = btn.getAttribute('data-fecha');
+
+        console.log('🔍 Verificando reservas para viaje ID:', id);
+        fetch('/viajes/api/verificar-reservas/' + id)
+          .then(function(r) {
+            console.log('📡 Respuesta del servidor:', r.status, r.statusText);
+            return r.json();
+          })
+          .then(function(data) {
+            console.log('📊 Datos recibidos:', JSON.stringify(data));
+            // Mostrar datos del viaje
+            document.getElementById('individual-modal-ruta').textContent = ruta;
+            document.getElementById('individual-modal-fecha').textContent = fecha;
+
+            var header = document.getElementById('individual-modal-header');
+            var alerta = document.getElementById('individual-modal-reservas');
+            var texto = document.getElementById('individual-modal-reservas-texto');
+            var btnConfirmar = document.getElementById('individual-modal-confirmar');
+
+            if (data.tieneReservas) {
+              console.log('🚫 Viaje con reservas — bloqueando botón');
+              header.style.background = 'linear-gradient(135deg, #e37400 0%, #b85e00 100%)';
+              alerta.classList.remove('d-none');
+              texto.textContent = 'Este viaje tiene reservas';
+              btnConfirmar.style.background = '#adb5bd';
+              btnConfirmar.style.borderColor = '#adb5bd';
+              btnConfirmar.style.color = '#fff';
+              btnConfirmar.style.pointerEvents = 'none';
+              btnConfirmar.removeAttribute('href');
+            } else {
+              console.log('✅ Viaje sin reservas — permiso para eliminar');
+              header.style.background = 'linear-gradient(135deg, #dc3545 0%, #b02a37 100%)';
+              alerta.classList.add('d-none');
+              btnConfirmar.style.background = '#dc3545';
+              btnConfirmar.style.borderColor = '#dc3545';
+              btnConfirmar.style.color = '#fff';
+              btnConfirmar.style.pointerEvents = 'auto';
+              btnConfirmar.setAttribute('href', '/viajes/eliminar/' + id);
+            }
+
+            var modal = new bootstrap.Modal(document.getElementById('confirmIndividualModal'));
+            modal.show();
+          })
+          .catch(function(err) {
+            console.error('❌ Error en la consulta de reservas:', err);
+            // En caso de error, permitir eliminar igual
+            var btnConfirmar = document.getElementById('individual-modal-confirmar');
+            btnConfirmar.style.background = '#dc3545';
+            btnConfirmar.style.borderColor = '#dc3545';
+            btnConfirmar.style.pointerEvents = 'auto';
+            btnConfirmar.setAttribute('href', '/viajes/eliminar/' + id);
+
+            var modal = new bootstrap.Modal(document.getElementById('confirmIndividualModal'));
+            modal.show();
+          });
+      }
+
       // ─── Eliminación masiva ────────────────────────────────────
 
       function eliminarSeleccionados() {
         if (seleccionados.size === 0) return;
-        document.getElementById('delete-count-modal').textContent = seleccionados.size;
-        var modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
-        modal.show();
+
+        var ids = Array.from(seleccionados).join(',');
+        document.getElementById('batch-count-modal').textContent = seleccionados.size;
+
+        var header = document.getElementById('batch-modal-header');
+        var alerta = document.getElementById('batch-modal-reservas');
+        var texto = document.getElementById('batch-modal-reservas-texto');
+        var btnConfirmar = document.getElementById('batch-modal-confirmar');
+
+        fetch('/viajes/api/verificar-reservas-masivo?ids=' + ids)
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.totalConReservas > 0) {
+              header.style.background = 'linear-gradient(135deg, #e37400 0%, #b85e00 100%)';
+              alerta.classList.remove('d-none');
+              texto.textContent = data.totalConReservas + ' viaje(s) tienen reservas y no pueden eliminarse';
+              btnConfirmar.style.background = '#adb5bd';
+              btnConfirmar.style.borderColor = '#adb5bd';
+              btnConfirmar.style.color = '#fff';
+              btnConfirmar.style.pointerEvents = 'none';
+            } else {
+              header.style.background = 'linear-gradient(135deg, #dc3545 0%, #b02a37 100%)';
+              alerta.classList.add('d-none');
+              btnConfirmar.style.background = '#dc3545';
+              btnConfirmar.style.borderColor = '#dc3545';
+              btnConfirmar.style.color = '#fff';
+              btnConfirmar.style.pointerEvents = 'auto';
+            }
+
+            var modal = new bootstrap.Modal(document.getElementById('confirmBatchModal'));
+            modal.show();
+          })
+          .catch(function() {
+            header.style.background = 'linear-gradient(135deg, #dc3545 0%, #b02a37 100%)';
+            alerta.classList.add('d-none');
+            btnConfirmar.style.background = '#dc3545';
+            btnConfirmar.style.borderColor = '#dc3545';
+            btnConfirmar.style.pointerEvents = 'auto';
+
+            var modal = new bootstrap.Modal(document.getElementById('confirmBatchModal'));
+            modal.show();
+          });
       }
 
-      function confirmarEliminacion() {
+      function confirmarEliminacionBatch() {
         var form = document.getElementById('batch-form');
         if (!form) return;
 
-        // Marcar solo los checkboxes seleccionados
         var checks = document.querySelectorAll('.viaje-check');
         checks.forEach(function(cb) {
           if (!seleccionados.has(cb.value)) {
@@ -251,11 +449,11 @@
         form.submit();
       }
 
-      // Cerrar modal al recargar
+      // Restaurar checkboxes al cerrar modal batch
       document.addEventListener('DOMContentLoaded', function() {
-        var deleteModal = document.getElementById('confirmDeleteModal');
-        if (deleteModal) {
-          deleteModal.addEventListener('hidden.bs.modal', function() {
+        var batchModal = document.getElementById('confirmBatchModal');
+        if (batchModal) {
+          batchModal.addEventListener('hidden.bs.modal', function() {
             document.querySelectorAll('.viaje-check').forEach(function(cb) {
               cb.disabled = false;
             });

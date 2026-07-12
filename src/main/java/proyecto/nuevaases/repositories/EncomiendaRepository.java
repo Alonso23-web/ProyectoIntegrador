@@ -1,7 +1,9 @@
 package proyecto.nuevaases.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import proyecto.nuevaases.models.Encomienda;
 import proyecto.nuevaases.models.enums.EstadoEncomienda;
 
@@ -36,4 +38,8 @@ public interface EncomiendaRepository extends JpaRepository<Encomienda, Long> {
 
         @Query("SELECT e.estado as estado, COUNT(e) as total FROM Encomienda e GROUP BY e.estado")
         List<Object[]> countGroupByEstado();
+
+        @Modifying(clearAutomatically = true, flushAutomatically = true)
+        @Query("UPDATE Encomienda e SET e.viajeAsignado = NULL WHERE e.viajeAsignado.id = :viajeId")
+        int desvincularEncomiendas(@Param("viajeId") Long viajeId);
 }

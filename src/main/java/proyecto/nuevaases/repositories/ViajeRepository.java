@@ -1,7 +1,10 @@
 package proyecto.nuevaases.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.query.Param;
 import proyecto.nuevaases.models.Viaje;
 import proyecto.nuevaases.models.enums.EstadoViaje;
 
@@ -24,6 +27,10 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
     long countByConductorEmailAndEstadoViaje(String conductorEmail, EstadoViaje estadoViaje);
 
     long countByEstadoViajeAndFecha(EstadoViaje estado, LocalDate fecha);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = "DELETE FROM reservas WHERE viaje_id = :viajeId", nativeQuery = true)
+    int eliminarReservasAsociadas(@Param("viajeId") Long viajeId);
 
 }
 

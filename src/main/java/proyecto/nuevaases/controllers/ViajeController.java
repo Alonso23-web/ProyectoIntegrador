@@ -12,12 +12,14 @@ import proyecto.nuevaases.dto.ViajeDTO;
 import proyecto.nuevaases.models.enums.EstadoPostulacion;
 import proyecto.nuevaases.models.enums.EstadoViaje;
 import proyecto.nuevaases.models.enums.Rol;
+import proyecto.nuevaases.repositories.PasajeRepository;
 import proyecto.nuevaases.repositories.UsuarioRepository;
 import proyecto.nuevaases.repositories.VehiculoRepository;
 import proyecto.nuevaases.services.IViajeService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/viajes")
@@ -28,6 +30,7 @@ public class ViajeController {
     private final IViajeService viajeService;
     private final UsuarioRepository usuarioRepository;
     private final VehiculoRepository vehiculoRepository;
+    private final PasajeRepository pasajeRepository;
 
     @GetMapping
     public String listar(Model model) {
@@ -187,5 +190,28 @@ public class ViajeController {
                     "No se pudo eliminar el viaje: " + e.getMessage());
         }
         return "redirect:/viajes";
+    }
+
+    // ========================================================================
+    // API: VERIFICAR RESERVAS (para el modal individual)
+    // ========================================================================
+
+    @GetMapping("/api/verificar-reservas/{id}")
+    @ResponseBody
+    public Map<String, Object> verificarReservas(@PathVariable Long id) {
+        long count = pasajeRepository.countByViajeId(id);
+        return Map.of("tieneReservas", count > 0, "cantidad", count);
+    }
+
+    @GetMapping("/api/verificar-reservas-masivo")
+    @ResponseBody
+    public Map<String, Object> verificarReservasMasivo(@RequestParam List<Long> ids) {
+        long totalConReservas = 0;
+        for (Long id : ids) {
+            if (pasajeRepository.countByViajeId(id) > 0) {
+                totalConReservas++;
+            }
+        }
+        return Map.of("totalConReservas", totalConReservas, "totalSeleccionados", ids.size());
     }
 }

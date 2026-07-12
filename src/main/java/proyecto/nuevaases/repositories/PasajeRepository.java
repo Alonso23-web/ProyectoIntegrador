@@ -65,7 +65,8 @@ public interface PasajeRepository extends JpaRepository<Pasaje, Long> {
     @Query("SELECT COUNT(DISTINCT p.viaje.fecha) FROM Pasaje p WHERE p.viaje IS NOT NULL")
     long countDistinctViajeFecha();
 
-    long countByViajeId(Long viajeId);
+    @Query("SELECT COUNT(p) FROM Pasaje p WHERE p.viaje.id = :viajeId")
+    long countByViajeId(@Param("viajeId") Long viajeId);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Pasaje p SET p.viaje = NULL WHERE p.viaje.id = :viajeId")

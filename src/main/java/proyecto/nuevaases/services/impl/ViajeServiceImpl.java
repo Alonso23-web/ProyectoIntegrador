@@ -3,12 +3,13 @@ package proyecto.nuevaases.services.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import proyecto.nuevaases.dto.ViajeDTO;
 import proyecto.nuevaases.exception.ResourceNotFoundException;
 import proyecto.nuevaases.models.Vehiculo;
 import proyecto.nuevaases.models.Viaje;
 import proyecto.nuevaases.models.enums.EstadoViaje;
-import proyecto.nuevaases.repositories.PasajeRepository;
+import proyecto.nuevaases.repositories.EncomiendaRepository;
 import proyecto.nuevaases.repositories.VehiculoRepository;
 import proyecto.nuevaases.repositories.ViajeRepository;
 import proyecto.nuevaases.services.IViajeService;
@@ -26,7 +27,7 @@ public class ViajeServiceImpl implements ViajeService, IViajeService {
 
     private final ViajeRepository viajeRepository;
     private final VehiculoRepository vehiculoRepository;
-    private final PasajeRepository pasajeRepository;
+    private final EncomiendaRepository encomiendaRepository;
 
     // ========================================================================
     // Implementación de ViajeService (entity-based)
@@ -83,9 +84,20 @@ public class ViajeServiceImpl implements ViajeService, IViajeService {
     }
 
     @Override
+    @Transactional
     public void eliminarDTO(Long id) {
         if (!viajeRepository.existsById(id)) {
             throw new ResourceNotFoundException("Viaje no encontrado con ID: " + id);
+        }
+        // Desvincular encomiendas que referencian este viaje antes de eliminar
+        int encomiendasDesvinculadas = encomiendaRepository.desvincularEncomiendas(id);
+        if (encomiendasDesvinculadas > 0) {
+            log.info("Se desvincularon {} encomienda(s) del viaje {}", encomiendasDesvinculadas, id);
+        }
+        // Eliminar registros de la tabla reservas que referencian este viaje
+        int reservasEliminadas = viajeRepository.eliminarReservasAsociadas(id);
+        if (reservasEliminadas > 0) {
+            log.warn("Se eliminaron {} reserva(s) asociadas al viaje {}", reservasEliminadas, id);
         }
         viajeRepository.deleteById(id);
     }
