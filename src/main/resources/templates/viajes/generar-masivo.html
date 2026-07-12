@@ -1,0 +1,386 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head
+    th:replace="~{layout :: head('Generacion Masiva de Viajes - Nueva Ases Express')}"
+  ></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <div class="container my-4">
+      <!-- Encabezado -->
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <a href="/viajes" class="btn btn-outline-secondary btn-sm rounded-pill">
+          <i class="bi bi-arrow-left me-1"></i>Volver
+        </a>
+        <div>
+          <h2 class="fw-bold text-primario mb-1">
+            <i class="bi bi-rocket-takeoff me-2 text-amarillo"></i>Generacion Masiva
+          </h2>
+          <p class="text-muted mb-0">
+            Crea decenas de viajes en un solo paso. Todos se crearan con la misma configuracion.
+          </p>
+        </div>
+      </div>
+
+      <!-- Alertas flash -->
+      <div th:if="${success}" class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 rounded-4 shadow-sm border-0 py-3" role="alert">
+        <i class="bi bi-check-circle-fill fs-5"></i>
+        <span th:text="${success}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+      <div th:if="${error}" class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 rounded-4 shadow-sm border-0 py-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+
+      <div class="row g-4">
+        <!-- Formulario -->
+        <div class="col-lg-8">
+          <div class="card shadow-sm border-0" style="border-radius: 20px;">
+            <div class="card-body p-4">
+              <form th:action="@{/viajes/generar-masivo}" method="post">
+
+                <!-- SECCION 1: Fechas y Rutas -->
+                <div class="mb-4">
+                  <h5 class="fw-bold mb-3" style="color: #0d1b3e;">
+                    <span class="badge me-2 rounded-pill" style="background:#f5a623; color:#1a0f00;">1</span>
+                    Fechas y rutas
+                  </h5>
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold small">Fecha inicio</label>
+                      <input type="date" name="fechaInicio" class="form-control" required />
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold small">Fecha fin</label>
+                      <input type="date" name="fechaFin" class="form-control" required />
+                    </div>
+                  </div>
+
+                  <div class="row g-3 mt-2">
+                    <div class="col-md-5">
+                      <label class="form-label fw-semibold small">Origen</label>
+                      <input type="text" name="origen" class="form-control" placeholder="Ej: Trujillo" required />
+                    </div>
+                    <div class="col-md-2 d-flex align-items-center justify-content-center pt-4">
+                      <i class="bi bi-arrow-right fs-4 text-muted"></i>
+                    </div>
+                    <div class="col-md-5">
+                      <label class="form-label fw-semibold small">Destino</label>
+                      <input type="text" name="destino" class="form-control" placeholder="Ej: Chepen" required />
+                    </div>
+                  </div>
+
+                  <div class="mt-3">
+                    <div class="form-check">
+                      <input type="checkbox" name="generarInverso" value="true" class="form-check-input" id="generarInverso" />
+                      <label class="form-check-label fw-semibold small" for="generarInverso">
+                        <i class="bi bi-arrow-left-right me-1 text-amarillo"></i>
+                        Tambien generar viajes inversos (<span id="ruta-inversa-preview">Destino > Origen</span>)
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <!-- SECCION 2: Horarios -->
+                <div class="mb-4">
+                  <h5 class="fw-bold mb-3" style="color: #0d1b3e;">
+                    <span class="badge me-2 rounded-pill" style="background:#f5a623; color:#1a0f00;">2</span>
+                    Horarios
+                  </h5>
+                  <p class="text-muted small mb-3">Selecciona los horarios de salida.</p>
+
+                  <div class="d-flex flex-wrap gap-3" id="horarios-container">
+                    <div th:each="h : ${horarios}" class="form-check">
+                      <input type="checkbox" name="horarios" th:value="${h}" class="form-check-input horario-check"
+                             th:id="'hora-' + ${h}" checked />
+                      <label class="form-check-label fw-semibold" th:for="'hora-' + ${h}" th:text="${h}"></label>
+                    </div>
+                  </div>
+
+                  <div id="horarios-alert" class="mt-2 d-none">
+                    <div class="alert alert-warning small py-2 mb-0">Selecciona al menos un horario.</div>
+                  </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <!-- SECCION 3: Configuracion del vehiculo -->
+                <div class="mb-4">
+                  <h5 class="fw-bold mb-3" style="color: #0d1b3e;">
+                    <span class="badge me-2 rounded-pill" style="background:#f5a623; color:#1a0f00;">3</span>
+                    Configuracion del vehiculo
+                  </h5>
+
+                  <div class="row g-3">
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold small">Tipo de bus</label>
+                      <select name="tipoBus" class="form-select" required>
+                        <option value="MINIVAN" selected>Minivan</option>
+                        <option value="BUS">Bus</option>
+                        <option value="CAMIONETA">Camioneta</option>
+                      </select>
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold small">Asientos</label>
+                      <input type="number" name="totalAsientos" class="form-control" value="15" min="1" max="60" required />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold small">Precio (S/)</label>
+                      <input type="number" step="0.01" name="precio" class="form-control" value="12.00" min="0" required />
+                    </div>
+                  </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <!-- SECCION 4: Asignacion (opcional) -->
+                <div class="mb-4">
+                  <h5 class="fw-bold mb-3" style="color: #0d1b3e;">
+                    <span class="badge me-2 rounded-pill" style="background:#f5a623; color:#1a0f00;">4</span>
+                    Asignacion <small class="text-muted fw-normal">(opcional - se puede cambiar despues)</small>
+                  </h5>
+
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold small">Conductor</label>
+                      <select name="conductorEmail" class="form-select">
+                        <option value="">Sin asignar (se asigna despues)</option>
+                        <option th:each="c : ${conductores}"
+                                th:value="${c.email}"
+                                th:text="${c.nombreCompleto} + ' (' + ${c.email} + ')'"></option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label fw-semibold small">Vehiculo</label>
+                      <select name="vehiculoId" class="form-select">
+                        <option value="">Sin asignar (se asigna despues)</option>
+                        <option th:each="v : ${vehiculos}"
+                                th:value="${v.id}"
+                                th:text="${v.marca} + ' ' + ${v.modelo} + ' - ' + ${v.placa}"></option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="row g-3 mt-2">
+                    <div class="col-md-4">
+                      <label class="form-label fw-semibold small">Estado del viaje</label>
+                      <select name="estadoViaje" class="form-select">
+                        <option th:each="est : ${estadosViaje}"
+                                th:value="${est.name()}"
+                                th:text="${est.name()}"
+                                th:selected="${est.name() == 'PROGRAMADO'}"></option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Resumen y boton -->
+                <div class="bg-light rounded-4 p-4 mb-4">
+                  <div class="row g-3 align-items-center">
+                    <div class="col-md-8">
+                      <div class="d-flex align-items-center gap-2 mb-2">
+                        <i class="bi bi-calculator fs-5 text-amarillo"></i>
+                        <span class="fw-bold" style="color: #0d1b3e;">Resumen estimado</span>
+                      </div>
+                      <div id="resumen-generacion" class="small text-muted">
+                        <span>Completa los campos para ver el resumen.</span>
+                      </div>
+                    </div>
+                    <div class="col-md-4 text-md-end">
+                      <button type="submit" class="btn btn-lg fw-bold w-100" id="btn-generar"
+                              style="background: #f5a623; color: #1a0f00; border: none; border-radius: 12px; padding: 12px 24px;">
+                        <i class="bi bi-rocket-takeoff me-2"></i>Generar viajes
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel lateral de ayuda -->
+        <div class="col-lg-4">
+          <div class="card shadow-sm border-0" style="border-radius: 20px; position: sticky; top: 1rem;">
+            <div class="card-body p-4">
+              <h6 class="fw-bold mb-3" style="color: #0d1b3e;">
+                <i class="bi bi-info-circle me-2 text-amarillo"></i>Como funciona?
+              </h6>
+
+              <div class="d-flex flex-column gap-3 small">
+                <div class="d-flex gap-2">
+                  <span class="badge rounded-pill mt-1" style="background: #0d1b3e; min-width: 22px;">1</span>
+                  <div>
+                    <strong>Rango de fechas</strong>
+                    <p class="text-muted mb-0">Define desde que dia hasta que dia quieres generar viajes.</p>
+                  </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                  <span class="badge rounded-pill mt-1" style="background: #0d1b3e; min-width: 22px;">2</span>
+                  <div>
+                    <strong>Rutas</strong>
+                    <p class="text-muted mb-0">Indica origen y destino. Marca la opcion inversa para generar ambas direcciones.</p>
+                  </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                  <span class="badge rounded-pill mt-1" style="background: #0d1b3e; min-width: 22px;">3</span>
+                  <div>
+                    <strong>Horarios</strong>
+                    <p class="text-muted mb-0">Selecciona las horas de salida. Se creara un viaje por cada hora elegida.</p>
+                  </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                  <span class="badge rounded-pill mt-1" style="background: #0d1b3e; min-width: 22px;">4</span>
+                  <div>
+                    <strong>Asignacion opcional</strong>
+                    <p class="text-muted mb-0">Puedes asignar conductor y vehiculo ahora o hacerlo despues editando cada viaje.</p>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-3" />
+
+              <div class="alert alert-info border-0 small py-2 mb-0" style="background: #e8f0fe; border-radius: 12px;">
+                <i class="bi bi-lightbulb me-1" style="color: #f5a623;"></i>
+                Si ya existen viajes para una fecha, ruta y horario, no se duplicaran.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        function actualizarResumen() {
+          const fechaInicio = document.querySelector('input[name="fechaInicio"]').value;
+          const fechaFin = document.querySelector('input[name="fechaFin"]').value;
+          const origen = document.querySelector('input[name="origen"]').value.trim();
+          const destino = document.querySelector('input[name="destino"]').value.trim();
+          const generarInverso = document.querySelector('#generarInverso').checked;
+          const horariosSel = document.querySelectorAll('.horario-check:checked');
+          const totalAsientos = parseInt(document.querySelector('input[name="totalAsientos"]').value) || 0;
+          const precio = parseFloat(document.querySelector('input[name="precio"]').value) || 0;
+
+          const container = document.getElementById('resumen-generacion');
+
+          if (!fechaInicio || !fechaFin || !origen || !destino || horariosSel.length === 0) {
+            container.innerHTML = '<span class="text-muted">Completa todos los campos para ver el resumen.</span>';
+            return;
+          }
+
+          const start = new Date(fechaInicio);
+          const end = new Date(fechaFin);
+          const diffTime = Math.abs(end - start);
+          const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+          if (diffDays < 0 || isNaN(diffDays)) {
+            container.innerHTML = '<span class="text-muted">Rango de fechas invalido.</span>';
+            return;
+          }
+
+          const rutasPorDia = generarInverso ? 2 : 1;
+          const totalViajes = diffDays * horariosSel.length * rutasPorDia;
+          const ingresoPotencial = totalViajes * totalAsientos * precio;
+
+          let html = `
+            <div class="d-flex justify-content-between mb-1">
+              <span>Dias:</span>
+              <strong>${diffDays} dia(s)</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+              <span>Horarios por dia:</span>
+              <strong>${horariosSel.length}</strong>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+              <span>Rutas por dia:</span>
+              <strong>${generarInverso ? origen + ' > ' + destino + ' y ' + destino + ' > ' + origen : origen + ' > ' + destino}</strong>
+            </div>
+            <hr class="my-2" />
+            <div class="d-flex justify-content-between mb-1">
+              <span class="fw-bold" style="color: #0d1b3e;">Total viajes a crear:</span>
+              <span class="fw-bold fs-5" style="color: #f5a623;">${totalViajes}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-muted small">Capacidad total:</span>
+              <span class="small">${totalViajes * totalAsientos} asientos</span>
+            </div>
+            <div class="d-flex justify-content-between">
+              <span class="text-muted small">Ingreso potencial por viaje lleno:</span>
+              <span class="small fw-semibold">S/ ${(totalViajes * totalAsientos * precio).toFixed(2)}</span>
+            </div>
+          `;
+
+          container.innerHTML = html;
+        }
+
+        document.querySelectorAll('input, select').forEach(el => {
+          el.addEventListener('change', actualizarResumen);
+          el.addEventListener('input', actualizarResumen);
+        });
+
+        document.querySelectorAll('input[name="origen"], input[name="destino"]').forEach(el => {
+          el.addEventListener('input', function() {
+            const origen = document.querySelector('input[name="origen"]').value.trim() || 'Origen';
+            const destino = document.querySelector('input[name="destino"]').value.trim() || 'Destino';
+            document.getElementById('ruta-inversa-preview').textContent = destino + ' > ' + origen;
+          });
+        });
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+          const checked = document.querySelectorAll('.horario-check:checked');
+          if (checked.length === 0) {
+            e.preventDefault();
+            document.getElementById('horarios-alert').classList.remove('d-none');
+          }
+        });
+
+        document.querySelectorAll('.horario-check').forEach(cb => {
+          cb.addEventListener('change', function() {
+            const checked = document.querySelectorAll('.horario-check:checked');
+            if (checked.length > 0) {
+              document.getElementById('horarios-alert').classList.add('d-none');
+            }
+          });
+        });
+
+        actualizarResumen();
+
+        const hoy = new Date().toISOString().split('T')[0];
+        document.querySelectorAll('input[type="date"]').forEach(el => {
+          el.setAttribute('min', hoy);
+        });
+      });
+    </script>
+
+    <style>
+      .form-control:focus, .form-select:focus {
+        border-color: #f5a623;
+        box-shadow: 0 0 0 0.2rem rgba(245, 166, 35, 0.25);
+      }
+      .form-check-input:checked {
+        background-color: #f5a623;
+        border-color: #f5a623;
+      }
+      .card {
+        animation: fadeInUp 0.4s ease forwards;
+      }
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+  </body>
+</html>

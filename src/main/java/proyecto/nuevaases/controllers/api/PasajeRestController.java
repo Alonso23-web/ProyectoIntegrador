@@ -66,9 +66,9 @@ public class PasajeRestController {
                 .orElse(null);
 
         if (viajeConCupos == null) {
-            // No hay viaje disponible ese día: el frontend debe mostrar
-            // "no hay disponibilidad, prueba otra fecha".
-            return ResponseEntity.ok(null);
+            // No hay viaje disponible ese día: devolvemos un Map vacío
+            // para que el frontend pueda parsear la respuesta JSON correctamente.
+            return ResponseEntity.ok(new HashMap<>());
         }
 
         int ocupados = pasajeService.asientosOcupados(viajeConCupos).size();

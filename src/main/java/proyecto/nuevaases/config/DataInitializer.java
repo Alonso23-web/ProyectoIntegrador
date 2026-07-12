@@ -9,15 +9,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import proyecto.nuevaases.models.Usuario;
 import proyecto.nuevaases.models.Vehiculo;
-import proyecto.nuevaases.models.Viaje;
 import proyecto.nuevaases.models.enums.EstadoVehiculo;
 import proyecto.nuevaases.models.enums.Rol;
 import proyecto.nuevaases.models.enums.TipoVehiculo;
 import proyecto.nuevaases.repositories.UsuarioRepository;
 import proyecto.nuevaases.repositories.VehiculoRepository;
-import proyecto.nuevaases.repositories.ViajeRepository;
-
-import java.time.LocalDate;
 
 @Component
 @RequiredArgsConstructor
@@ -26,7 +22,6 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UsuarioRepository usuarioRepository;
     private final VehiculoRepository vehiculoRepository;
-    private final ViajeRepository viajeRepository;
     private final PasswordEncoder passwordEncoder;
     private final JdbcTemplate jdbcTemplate;
 
@@ -132,66 +127,11 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // ==================== VIAJES ====================
-        long count = viajeRepository.count();
-
-        // Si hay viajes viejos (precio != 12.0 o asientos != 15), reemplazarlos
-        boolean hayViajesViejos = false;
-        if (count > 0) {
-            for (Viaje v : viajeRepository.findAll()) {
-                if (v.getPrecio() != 12.0 || v.getTotalAsientos() != 15) {
-                    hayViajesViejos = true;
-                    break;
-                }
-            }
-        }
-
-        if (count == 0 || hayViajesViejos) {
-            // Eliminar viajes viejos si existen (en orden inverso por posibles FK)
-            if (hayViajesViejos) {
-                viajeRepository.deleteAll();
-                log.info("🗑️ Viajes viejos eliminados");
-            }
-
-            LocalDate hoy = LocalDate.now();
-            // Horarios del negocio: 08:00, 10:00, 13:00, 16:00
-            String[] horas = {"08:00", "10:00", "13:00", "16:00"};
-            // Precio fijo: S/ 12.00 por pasaje | Minivan de 15 asientos de pasajeros
-            double precioMinivan = 12.0;
-            int asientosMinivan = 15;
-
-            // Crear viajes para los próximos 30 días
-            for (int dia = 0; dia < 30; dia++) {
-                LocalDate fecha = hoy.plusDays(dia);
-                for (String hora : horas) {
-                    viajeRepository.save(Viaje.builder()
-                            .origen("Trujillo")
-                            .destino("Chepén")
-                            .fecha(fecha)
-                            .horaSalida(hora)
-                            .tipoBus("MINIVAN")
-                            .totalAsientos(asientosMinivan)
-                            .precio(precioMinivan)
-                            .creadoPorEmail("admin@empresa.com")
-                            .build());
-
-                    viajeRepository.save(Viaje.builder()
-                            .origen("Chepén")
-                            .destino("Trujillo")
-                            .fecha(fecha)
-                            .horaSalida(hora)
-                            .tipoBus("MINIVAN")
-                            .totalAsientos(asientosMinivan)
-                            .precio(precioMinivan)
-                            .creadoPorEmail("admin@empresa.com")
-                            .build());
-                }
-            }
-
-            long totalViajes = viajeRepository.count();
-            log.info("✅ {} viajes de ejemplo creados (MINIVAN Trujillo ↔ Chepén, 30 días, S/12.00)", totalViajes);
-        } else {
-            log.info("ℹ️ Viajes ya existen y son correctos ({} viajes)", count);
-        }
+        // Los viajes ahora se gestionan desde la página web.
+        // El administrador puede crear viajes desde:
+        //   - /viajes/nuevo (individual)
+        //   - /viajes/generar-masivo (generación masiva)
+        log.info("ℹ️ Viajes: la gestión se realiza desde la interfaz web (/viajes)");
     }
 
     private void limpiarEnumsInvalidos() {

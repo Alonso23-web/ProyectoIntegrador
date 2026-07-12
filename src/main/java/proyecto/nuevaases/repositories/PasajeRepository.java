@@ -1,6 +1,7 @@
 package proyecto.nuevaases.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -63,4 +64,10 @@ public interface PasajeRepository extends JpaRepository<Pasaje, Long> {
 
     @Query("SELECT COUNT(DISTINCT p.viaje.fecha) FROM Pasaje p WHERE p.viaje IS NOT NULL")
     long countDistinctViajeFecha();
+
+    long countByViajeId(Long viajeId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE Pasaje p SET p.viaje = NULL WHERE p.viaje.id = :viajeId")
+    int desvincularPasajes(@Param("viajeId") Long viajeId);
 }

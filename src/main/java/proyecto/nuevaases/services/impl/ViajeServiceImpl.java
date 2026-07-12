@@ -1,12 +1,14 @@
 package proyecto.nuevaases.services.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import proyecto.nuevaases.dto.ViajeDTO;
 import proyecto.nuevaases.exception.ResourceNotFoundException;
 import proyecto.nuevaases.models.Vehiculo;
 import proyecto.nuevaases.models.Viaje;
 import proyecto.nuevaases.models.enums.EstadoViaje;
+import proyecto.nuevaases.repositories.PasajeRepository;
 import proyecto.nuevaases.repositories.VehiculoRepository;
 import proyecto.nuevaases.repositories.ViajeRepository;
 import proyecto.nuevaases.services.IViajeService;
@@ -19,10 +21,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ViajeServiceImpl implements ViajeService, IViajeService {
 
     private final ViajeRepository viajeRepository;
     private final VehiculoRepository vehiculoRepository;
+    private final PasajeRepository pasajeRepository;
 
     // ========================================================================
     // Implementación de ViajeService (entity-based)
@@ -91,6 +95,93 @@ public class ViajeServiceImpl implements ViajeService, IViajeService {
         return buscar(origen, destino, fecha, cantidadPasajeros).stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public int generarMasivo(
+            LocalDate fechaInicio,
+            LocalDate fechaFin,
+            String origen,
+            String destino,
+            boolean generarInverso,
+            List<String> horarios,
+            String tipoBus,
+            int totalAsientos,
+            double precio,
+            String creadoPorEmail,
+            String conductorEmail,
+            Long vehiculoId,
+            String estadoViaje
+    ) {
+        int creados = 0;
+
+        EstadoViaje estado = estadoViaje != null ? EstadoViaje.valueOf(estadoViaje) : EstadoViaje.PROGRAMADO;
+
+        // Recorrer cada día del rango
+        LocalDate fecha = fechaInicio;
+        while (!fecha.isAfter(fechaFin)) {
+            for (String hora : horarios) {
+                // Crear viaje ida (origen → destino)
+                if (crearSiNoExiste(fecha, hora, origen, destino, tipoBus, totalAsientos, precio,
+                        creadoPorEmail, conductorEmail, vehiculoId, estado)) {
+                    creados++;
+                }
+
+                // Crear viaje vuelta (destino → origen) si se solicitó
+                if (generarInverso) {
+                    if (crearSiNoExiste(fecha, hora, destino, origen, tipoBus, totalAsientos, precio,
+                            creadoPorEmail, conductorEmail, vehiculoId, estado)) {
+                        creados++;
+                    }
+                }
+            }
+            fecha = fecha.plusDays(1);
+        }
+
+        return creados;
+    }
+
+    /**
+     * Crea un viaje solo si no existe ya uno con la misma ruta, fecha y hora.
+     */
+    private boolean crearSiNoExiste(
+            LocalDate fecha, String hora, String origen, String destino,
+            String tipoBus, int totalAsientos, double precio,
+            String creadoPorEmail, String conductorEmail, Long vehiculoId,
+            EstadoViaje estado) {
+
+        // Verificar si ya existe un viaje con esa ruta + fecha + hora
+        boolean existe = viajeRepository.findByOrigenAndDestinoAndFecha(origen, destino, fecha)
+                .stream()
+                .anyMatch(v -> v.getHoraSalida().equals(hora));
+
+        if (existe) {
+            return false;
+        }
+
+        Viaje.ViajeBuilder builder = Viaje.builder()
+                .origen(origen)
+                .destino(destino)
+                .fecha(fecha)
+                .horaSalida(hora)
+                .tipoBus(tipoBus)
+                .totalAsientos(totalAsientos)
+                .precio(precio)
+                .creadoPorEmail(creadoPorEmail)
+                .estadoViaje(estado);
+
+        // Asignar conductor si se especificó
+        if (conductorEmail != null && !conductorEmail.isBlank()) {
+            builder.conductorEmail(conductorEmail);
+        }
+
+        // Asignar vehículo si se especificó
+        if (vehiculoId != null) {
+            vehiculoRepository.findById(vehiculoId).ifPresent(builder::vehiculo);
+        }
+
+        viajeRepository.save(builder.build());
+        return true;
     }
 
     private ViajeDTO convertToDTO(Viaje entity) {
