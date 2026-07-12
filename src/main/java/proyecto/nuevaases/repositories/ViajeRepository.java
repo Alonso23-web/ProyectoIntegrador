@@ -29,7 +29,7 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
     long countByEstadoViajeAndFecha(EstadoViaje estado, LocalDate fecha);
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query(value = "DELETE FROM reservas WHERE viaje_id = :viajeId", nativeQuery = true)
+    @Query("DELETE FROM Pasaje p WHERE p.viaje.id = :viajeId")
     int eliminarReservasAsociadas(@Param("viajeId") Long viajeId);
 
 }
