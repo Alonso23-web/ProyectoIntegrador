@@ -132,63 +132,72 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // ==================== VIAJES ====================
-        long count = viajeRepository.count();
+        Long count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM viajes", Long.class);
+        if (count == null) count = 0L;
 
-        // Si hay viajes viejos (precio != 12.0 o asientos != 15), reemplazarlos
-        boolean hayViajesViejos = false;
-        if (count > 0) {
-            for (Viaje v : viajeRepository.findAll()) {
-                if (v.getPrecio() != 12.0 || v.getTotalAsientos() != 15) {
-                    hayViajesViejos = true;
-                    break;
-                }
-            }
-        }
+        // Verificar si faltan rutas: esperamos 5 rutas × 2 direcciones = 10 pares distintos
+        Long rutasExistentes = jdbcTemplate.queryForObject(
+                "SELECT COUNT(DISTINCT CONCAT(origen, '->', destino)) FROM viajes", Long.class);
+        if (rutasExistentes == null) rutasExistentes = 0L;
 
-        if (count == 0 || hayViajesViejos) {
-            // Eliminar viajes viejos si existen (en orden inverso por posibles FK)
-            if (hayViajesViejos) {
-                viajeRepository.deleteAll();
-                log.info("🗑️ Viajes viejos eliminados");
+        boolean incompleto = rutasExistentes < 10;
+
+        if (count == 0 || incompleto) {
+            // Limpiar todo
+            jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
+            jdbcTemplate.execute("DELETE FROM historial_encomiendas");
+            jdbcTemplate.execute("DELETE FROM pasajes");
+            jdbcTemplate.execute("DELETE FROM encomiendas");
+            jdbcTemplate.execute("DELETE FROM viajes");
+            jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
+            if (count > 0) {
+                log.info("🗑️ Viajes viejos eliminados (solo {} rutas, se necesitan 10)", rutasExistentes);
             }
 
             LocalDate hoy = LocalDate.now();
-            // Horarios del negocio: 08:00, 10:00, 13:00, 16:00
             String[] horas = {"08:00", "10:00", "13:00", "16:00"};
-            // Precio fijo: S/ 12.00 por pasaje | Minivan de 15 asientos de pasajeros
             double precioMinivan = 12.0;
             int asientosMinivan = 15;
 
-            // Crear viajes para los próximos 30 días
+            String[][] rutas = {
+                {"Trujillo", "Chepén"},
+                {"Trujillo", "San Pedro de Lloc"},
+                {"Trujillo", "Pacasmayo"},
+                {"Trujillo", "Ciudad de Dios"},
+                {"Trujillo", "Guadalupe"}
+            };
+
             for (int dia = 0; dia < 30; dia++) {
                 LocalDate fecha = hoy.plusDays(dia);
-                for (String hora : horas) {
-                    viajeRepository.save(Viaje.builder()
-                            .origen("Trujillo")
-                            .destino("Chepén")
-                            .fecha(fecha)
-                            .horaSalida(hora)
-                            .tipoBus("MINIVAN")
-                            .totalAsientos(asientosMinivan)
-                            .precio(precioMinivan)
-                            .creadoPorEmail("admin@empresa.com")
-                            .build());
+                for (String[] ruta : rutas) {
+                    for (String hora : horas) {
+                        viajeRepository.save(Viaje.builder()
+                                .origen(ruta[0])
+                                .destino(ruta[1])
+                                .fecha(fecha)
+                                .horaSalida(hora)
+                                .tipoBus("MINIVAN")
+                                .totalAsientos(asientosMinivan)
+                                .precio(precioMinivan)
+                                .creadoPorEmail("admin@empresa.com")
+                                .build());
 
-                    viajeRepository.save(Viaje.builder()
-                            .origen("Chepén")
-                            .destino("Trujillo")
-                            .fecha(fecha)
-                            .horaSalida(hora)
-                            .tipoBus("MINIVAN")
-                            .totalAsientos(asientosMinivan)
-                            .precio(precioMinivan)
-                            .creadoPorEmail("admin@empresa.com")
-                            .build());
+                        viajeRepository.save(Viaje.builder()
+                                .origen(ruta[1])
+                                .destino(ruta[0])
+                                .fecha(fecha)
+                                .horaSalida(hora)
+                                .tipoBus("MINIVAN")
+                                .totalAsientos(asientosMinivan)
+                                .precio(precioMinivan)
+                                .creadoPorEmail("admin@empresa.com")
+                                .build());
+                    }
                 }
             }
 
-            long totalViajes = viajeRepository.count();
-            log.info("✅ {} viajes de ejemplo creados (MINIVAN Trujillo ↔ Chepén, 30 días, S/12.00)", totalViajes);
+            long totalViajes = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM viajes", Long.class);
+            log.info("✅ {} viajes de ejemplo creados (5 rutas, 30 días, 4 horarios, S/12.00)", totalViajes);
         } else {
             log.info("ℹ️ Viajes ya existen y son correctos ({} viajes)", count);
         }

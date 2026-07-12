@@ -4,12 +4,12 @@
    Flujo simplificado:
    1. Ruta y fecha (origen, destino, fecha)
    2. Cantidad de pasajeros (+/- botones)
-   3. Medidor de cupos (progress bar)
-   4. Datos de cada pasajero (nombre + DNI)
-   5. Resumen y confirmación
+   3. Datos de cada pasajero (nombre + DNI)
+   4. Resumen y confirmación
    
    NO hay mapa de asientos.
    NO hay selector de horarios.
+   NO hay medidor de disponibilidad.
    El viaje se asigna automáticamente.
    ============================================================ */
 
@@ -150,12 +150,9 @@ const pasajesUI = {
             if (!viaje) {
                 this.setAlerta("buscar-alert", "warning",
                     `No hay viajes disponibles para <strong>${escapeHtml(origen)} → ${escapeHtml(destino)}</strong> el <strong>${escapeHtml(fecha)}</strong>. Prueba con otra fecha.`);
-                document.getElementById("ocupacion-area").innerHTML =
-                    '<div class="text-muted small text-center py-3"><i class="bi bi-exclamation-circle me-1"></i>No hay viajes disponibles para esta ruta y fecha.</div>';
                 document.getElementById("pasajerosContainer").innerHTML =
                     '<div class="text-muted small text-center py-3"><i class="bi bi-info-circle me-1"></i>No hay viajes disponibles.</div>';
                 this.actualizarPanelResumen();
-                document.getElementById("step5-card")?.classList.add("d-none");
                 document.getElementById("step4-card")?.classList.add("d-none");
                 document.getElementById("step3-card")?.classList.add("d-none");
                 document.getElementById("step2-card")?.classList.add("d-none");
@@ -171,11 +168,10 @@ const pasajesUI = {
                 horaEstimada: viaje.horaEstimada,
             };
 
-            // Mostrar las cards de pasos 2-5
+            // Mostrar las cards de pasos 2-4
             document.getElementById("step2-card")?.classList.remove("d-none");
             document.getElementById("step3-card")?.classList.remove("d-none");
             document.getElementById("step4-card")?.classList.remove("d-none");
-            document.getElementById("step5-card")?.classList.remove("d-none");
 
             // Actualizar cantidad máxima según disponibilidad
             const disponibles = viaje.disponibles;
@@ -186,7 +182,6 @@ const pasajesUI = {
             // Deshabilitar botón + si no hay suficientes disponibles
             document.getElementById("btn-sumar").disabled = disponibles <= 1;
 
-            this.renderOcupacion(viaje.ocupados, viaje.totalAsientos);
             this.renderPasajerosInputs(1);
             this.actualizarPanelResumen();
 
@@ -227,57 +222,6 @@ const pasajesUI = {
         this.renderPasajerosInputs(nueva);
         this.actualizarPanelResumen();
         this.clearAlerta("compra-alert");
-    },
-
-    // ─── Medidor de cupos (progress bar) ───────────────────
-
-    renderOcupacion(ocupados, total) {
-        const container = document.getElementById("ocupacion-area");
-        if (!container) return;
-
-        const porcentaje = total > 0 ? Math.round((ocupados / total) * 100) : 0;
-        const disponibles = total - ocupados;
-
-        // Color según nivel de ocupación
-        let colorClass, mensaje, mensajeIcon;
-        if (porcentaje < 60) {
-            colorClass = "bg-success";
-            mensaje = "Todavía hay bastante disponibilidad.";
-            mensajeIcon = "bi-emoji-smile";
-        } else if (porcentaje < 90) {
-            colorClass = "bg-warning";
-            mensaje = "Quedan pocos cupos, el viaje sale pronto.";
-            mensajeIcon = "bi-exclamation-triangle";
-        } else {
-            colorClass = "bg-danger";
-            mensaje = "¡Casi no quedan cupos! Apresúrate.";
-            mensajeIcon = "bi-bell-fill";
-        }
-
-        container.innerHTML = `
-            <div class="mb-2 d-flex justify-content-between align-items-center">
-                <span class="fw-semibold small" style="color: #0d1b3e;">
-                    <i class="bi bi-people-fill me-1" style="color: #f5a623;"></i>
-                    ${ocupados} / ${total} cupos ocupados
-                </span>
-                <span class="badge rounded-pill fw-bold ${colorClass}">
-                    ${disponibles} libre(s)
-                </span>
-            </div>
-            <div class="progress ocupacion-bar mb-2">
-                <div class="progress-bar ocupacion-fill ${colorClass}"
-                     role="progressbar"
-                     style="width: ${porcentaje}%;"
-                     aria-valuenow="${porcentaje}"
-                     aria-valuemin="0"
-                     aria-valuemax="100">
-                </div>
-            </div>
-            <div class="d-flex align-items-center gap-1 small ${porcentaje >= 90 ? 'text-danger fw-semibold' : porcentaje >= 60 ? 'text-warning fw-semibold' : 'text-success'}">
-                <i class="bi ${mensajeIcon}"></i>
-                <span>${mensaje}</span>
-            </div>
-        `;
     },
 
     // ─── Datos de cada pasajero ─────────────────────────────
@@ -365,9 +309,9 @@ const pasajesUI = {
         if (btn) {
             btn.disabled = !tieneViaje || cantidad < 1;
             if (tieneViaje && cantidad > 0) {
-                btn.innerHTML = `<i class="bi bi-credit-card me-2"></i>Pagar ${formatearPrecio(total)} — ${cantidad} pasaje(s)`;
+                btn.innerHTML = `<i class="bi bi-cart-check me-2"></i>Comprar pasaje — ${formatearPrecio(total)}`;
             } else {
-                btn.innerHTML = `<i class="bi bi-credit-card me-2"></i>Confirmar y pagar`;
+                btn.innerHTML = `<i class="bi bi-cart-check me-2"></i>Comprar pasaje`;
             }
         }
     },
