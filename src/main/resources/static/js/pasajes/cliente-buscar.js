@@ -147,7 +147,7 @@ const pasajesUI = {
 
             document.getElementById("resultados-area")?.classList.remove("d-none");
 
-            if (!viaje) {
+            if (!viaje || !viaje.viajeId) {
                 this.setAlerta("buscar-alert", "warning",
                     `No hay viajes disponibles para <strong>${escapeHtml(origen)} → ${escapeHtml(destino)}</strong> el <strong>${escapeHtml(fecha)}</strong>. Prueba con otra fecha.`);
                 document.getElementById("pasajerosContainer").innerHTML =

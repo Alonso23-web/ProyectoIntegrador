@@ -9,15 +9,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import proyecto.nuevaases.models.Usuario;
 import proyecto.nuevaases.models.Vehiculo;
-import proyecto.nuevaases.models.Viaje;
 import proyecto.nuevaases.models.enums.EstadoVehiculo;
 import proyecto.nuevaases.models.enums.Rol;
 import proyecto.nuevaases.models.enums.TipoVehiculo;
 import proyecto.nuevaases.repositories.UsuarioRepository;
 import proyecto.nuevaases.repositories.VehiculoRepository;
-import proyecto.nuevaases.repositories.ViajeRepository;
-
-import java.time.LocalDate;
 
 @Component
 @RequiredArgsConstructor
@@ -26,7 +22,6 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UsuarioRepository usuarioRepository;
     private final VehiculoRepository vehiculoRepository;
-    private final ViajeRepository viajeRepository;
     private final PasswordEncoder passwordEncoder;
     private final JdbcTemplate jdbcTemplate;
 
@@ -201,6 +196,11 @@ public class DataInitializer implements CommandLineRunner {
         } else {
             log.info("ℹ️ Viajes ya existen y son correctos ({} viajes)", count);
         }
+        // Los viajes ahora se gestionan desde la página web.
+        // El administrador puede crear viajes desde:
+        //   - /viajes/nuevo (individual)
+        //   - /viajes/generar-masivo (generación masiva)
+        log.info("ℹ️ Viajes: la gestión se realiza desde la interfaz web (/viajes)");
     }
 
     private void limpiarEnumsInvalidos() {
