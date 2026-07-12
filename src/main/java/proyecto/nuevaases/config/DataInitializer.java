@@ -127,6 +127,75 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         // ==================== VIAJES ====================
+        Long count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM viajes", Long.class);
+        if (count == null) count = 0L;
+
+        // Verificar si faltan rutas: esperamos 5 rutas × 2 direcciones = 10 pares distintos
+        Long rutasExistentes = jdbcTemplate.queryForObject(
+                "SELECT COUNT(DISTINCT CONCAT(origen, '->', destino)) FROM viajes", Long.class);
+        if (rutasExistentes == null) rutasExistentes = 0L;
+
+        boolean incompleto = rutasExistentes < 10;
+
+        if (count == 0 || incompleto) {
+            // Limpiar todo
+            jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
+            jdbcTemplate.execute("DELETE FROM historial_encomiendas");
+            jdbcTemplate.execute("DELETE FROM pasajes");
+            jdbcTemplate.execute("DELETE FROM encomiendas");
+            jdbcTemplate.execute("DELETE FROM viajes");
+            jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 1");
+            if (count > 0) {
+                log.info("🗑️ Viajes viejos eliminados (solo {} rutas, se necesitan 10)", rutasExistentes);
+            }
+
+            LocalDate hoy = LocalDate.now();
+            String[] horas = {"08:00", "10:00", "13:00", "16:00"};
+            double precioMinivan = 12.0;
+            int asientosMinivan = 15;
+
+            String[][] rutas = {
+                {"Trujillo", "Chepén"},
+                {"Trujillo", "San Pedro de Lloc"},
+                {"Trujillo", "Pacasmayo"},
+                {"Trujillo", "Ciudad de Dios"},
+                {"Trujillo", "Guadalupe"}
+            };
+
+            for (int dia = 0; dia < 30; dia++) {
+                LocalDate fecha = hoy.plusDays(dia);
+                for (String[] ruta : rutas) {
+                    for (String hora : horas) {
+                        viajeRepository.save(Viaje.builder()
+                                .origen(ruta[0])
+                                .destino(ruta[1])
+                                .fecha(fecha)
+                                .horaSalida(hora)
+                                .tipoBus("MINIVAN")
+                                .totalAsientos(asientosMinivan)
+                                .precio(precioMinivan)
+                                .creadoPorEmail("admin@empresa.com")
+                                .build());
+
+                        viajeRepository.save(Viaje.builder()
+                                .origen(ruta[1])
+                                .destino(ruta[0])
+                                .fecha(fecha)
+                                .horaSalida(hora)
+                                .tipoBus("MINIVAN")
+                                .totalAsientos(asientosMinivan)
+                                .precio(precioMinivan)
+                                .creadoPorEmail("admin@empresa.com")
+                                .build());
+                    }
+                }
+            }
+
+            long totalViajes = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM viajes", Long.class);
+            log.info("✅ {} viajes de ejemplo creados (5 rutas, 30 días, 4 horarios, S/12.00)", totalViajes);
+        } else {
+            log.info("ℹ️ Viajes ya existen y son correctos ({} viajes)", count);
+        }
         // Los viajes ahora se gestionan desde la página web.
         // El administrador puede crear viajes desde:
         //   - /viajes/nuevo (individual)

@@ -44,7 +44,7 @@
         <div id="tab-buscar" class="tab-panel" th:classappend="${activeTab == 'buscar' ? '' : 'd-none'}">
           <div class="row g-4">
 
-            <!-- COLUMNA IZQUIERDA: Pasos 1 a 5 -->
+            <!-- COLUMNA IZQUIERDA: Pasos 1 a 4 -->
             <div class="col-lg-8">
 
               <!-- PASO 1: Ruta y fecha -->
@@ -55,7 +55,7 @@
                     <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Ruta y fecha</h5>
                   </div>
                   <p class="text-muted small mb-3">
-                    Selecciona el origen, destino y la fecha de tu viaje. El precio es fijo: <strong>S/ 12.00</strong> por pasajero.
+                    Selecciona el origen, destino y la fecha de tu viaje.
                   </p>
 
                   <form id="buscarForm" class="row g-3">
@@ -124,47 +124,11 @@
                   </div>
                 </div>
 
-                <!-- PASO 3: Medidor de cupos -->
+                <!-- PASO 3: Datos de cada pasajero -->
                 <div id="step3-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
                   <div class="card-body p-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
                       <span class="step-circle">3</span>
-                      <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Disponibilidad del viaje</h5>
-                    </div>
-
-                    <!-- Resumen del viaje asignado -->
-                    <div class="card border-0 shadow-sm mb-3" style="border-radius: 12px; background: linear-gradient(135deg, #0d1b3e 0%, #1a2d6b 100%);">
-                      <div class="card-body p-3 text-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                          <div>
-                            <div class="fw-bold" id="resumen-ruta">—</div>
-                            <div class="d-flex gap-3 small text-white-50 mt-1">
-                              <span><i class="bi bi-calendar me-1"></i><span id="resumen-fecha">—</span></span>
-                              <span><i class="bi bi-clock me-1"></i><span id="resumen-hora">Sale al completar aforo</span></span>
-                            </div>
-                          </div>
-                          <div class="text-end">
-                            <div class="small fw-bold" style="color: #f5a623;">S/ 12.00</div>
-                            <div class="small text-white-50">por pasajero</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Medidor de cupos (progress bar) -->
-                    <div id="ocupacion-area">
-                      <div class="text-muted small text-center py-3">
-                        <i class="bi bi-info-circle me-1"></i>Selecciona una ruta y fecha para ver la disponibilidad
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- PASO 4: Datos de cada pasajero -->
-                <div id="step4-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
-                  <div class="card-body p-4">
-                    <div class="d-flex align-items-center gap-2 mb-3">
-                      <span class="step-circle">4</span>
                       <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Datos de cada pasajero</h5>
                     </div>
 
@@ -180,11 +144,11 @@
                   </div>
                 </div>
 
-                <!-- PASO 5: Resumen y confirmación -->
-                <div id="step5-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
+                <!-- PASO 4: Resumen y confirmación -->
+                <div id="step4-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
                   <div class="card-body p-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                      <span class="step-circle">5</span>
+                      <span class="step-circle">4</span>
                       <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Resumen y confirmación</h5>
                     </div>
 
@@ -215,8 +179,8 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                      <button class="btn btn-amarillo fw-bold btn-lg" id="btn-confirmar-compra" disabled>
-                        <i class="bi bi-credit-card me-2"></i>Confirmar y pagar
+                      <button class="btn btn-amarillo fw-bold btn-lg" id="btn-confirmar-compra" onclick="pasajesUI.confirmarCompra()" disabled>
+                        <i class="bi bi-cart-check me-2"></i>Comprar pasaje
                       </button>
                     </div>
 
@@ -469,19 +433,6 @@
         font-size: 13px;
         font-weight: 700;
         flex-shrink: 0;
-      }
-
-      /* Occupancy progress bar */
-      .ocupacion-bar {
-        height: 20px;
-        border-radius: 10px;
-        overflow: hidden;
-        background: #e9ecef;
-      }
-      .ocupacion-fill {
-        height: 100%;
-        border-radius: 10px;
-        transition: width 0.5s ease, background-color 0.3s ease;
       }
 
       /* Card entrance animation */
