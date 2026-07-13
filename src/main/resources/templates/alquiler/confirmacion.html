@@ -35,7 +35,7 @@
                     <h1 class="fw-bold text-primario mt-3">Solicitud enviada</h1>
                     <p class="text-muted fs-5 mb-0">
                       Gracias por tu interés. Nuestro equipo se comunicará
-                      contigo.
+                      contigo pronto.
                     </p>
                   </div>
 
@@ -73,6 +73,20 @@
                           <small class="text-muted d-block">Estado</small>
                           <span class="badge bg-amarillo text-dark fw-bold" th:text="${solicitud.estado}"></span>
                         </div>
+                        <!-- Precio referencial -->
+                        <div class="col-12" th:if="${solicitud.precioReferencial != null}">
+                          <hr class="my-2" />
+                          <div class="d-flex align-items-center justify-content-between p-3 rounded-3" style="background: rgba(13,27,76,0.06);">
+                            <div>
+                              <small class="text-muted d-block">Precio referencial estimado</small>
+                              <span class="fw-bold text-primario fs-5" th:text="${'S/ ' + #numbers.formatDecimal(solicitud.precioReferencial, 1, 2)}"></span>
+                            </div>
+                            <div class="text-end">
+                              <small class="text-muted d-block">Rango de confianza</small>
+                              <span class="fw-semibold text-muted" th:text="${'S/ ' + #numbers.formatDecimal(solicitud.precioReferencial * 0.95, 1, 2) + ' – S/ ' + #numbers.formatDecimal(solicitud.precioReferencial * 1.05, 1, 2)}"></span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -100,12 +114,20 @@
                       >
                         <div class="d-flex align-items-center mb-2">
                           <i class="bi bi-telephone-fill me-2 text-amarillo"></i>
-                          <h5 class="mb-0">Contacto</h5>
+                          <h5 class="mb-0">Contacto directo</h5>
                         </div>
-                        <p class="mb-0 text-muted">
-                          Si lo deseas, contáctanos también desde la sección
-                          <strong>Contacto</strong>.
+                        <p class="mb-2 text-muted">
+                          ¿Tienes dudas? Escríbenos por WhatsApp o correo.
                         </p>
+                        <a href="https://wa.me/51983229656?text=Hola,%20me%20interesa%20el%20servicio%20de%20alquiler%20de%20veh%C3%ADculos."
+                           target="_blank"
+                           class="btn btn-sm btn-success fw-bold" style="border-radius:20px;">
+                          <i class="bi bi-whatsapp me-1"></i>WhatsApp
+                        </a>
+                        <a href="mailto:contacto@nuevaasesexpress.pe?subject=Consulta%20-%20Alquiler%20de%20veh%C3%ADculos"
+                           class="btn btn-sm btn-outline-primary fw-bold" style="border-radius:20px;">
+                          <i class="bi bi-envelope me-1"></i>Correo
+                        </a>
                       </div>
                     </div>
                   </div>

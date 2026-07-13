@@ -10,6 +10,7 @@ import proyecto.nuevaases.models.enums.EstadoPostulacion;
 import proyecto.nuevaases.models.enums.EstadoViaje;
 import proyecto.nuevaases.models.enums.Rol;
 import proyecto.nuevaases.repositories.ContactoMensajeRepository;
+import proyecto.nuevaases.repositories.SolicitudAlquilerRepository;
 import proyecto.nuevaases.repositories.UsuarioRepository;
 import proyecto.nuevaases.repositories.ViajeRepository;
 
@@ -24,13 +25,14 @@ public class GlobalControllerAdvice {
     private final ViajeRepository viajeRepository;
     private final UsuarioRepository usuarioRepository;
     private final ContactoMensajeRepository contactoMensajeRepository;
+    private final SolicitudAlquilerRepository solicitudAlquilerRepository;
 
     // Este método se ejecuta en cada request y agrega "adminNavData" al modelo
     @ModelAttribute("adminNavData")
     public AdminNavData addAdminNavData(Authentication authentication) {
         // Si el usuario no está autenticado, devuelve datos vacíos (no admin)
         if (authentication == null || !authentication.isAuthenticated()) {
-            return new AdminNavData(0, 0, 0, null, null, false);
+            return new AdminNavData(0, 0, 0, 0, null, null, false);
         }
 
         String email = authentication.getName();
@@ -42,17 +44,18 @@ public class GlobalControllerAdvice {
         // Si NO es admin, solo pasa su email y nombre (sin alertas de admin)
         if (!isAdmin) {
             String name = usuarioOpt.map(Usuario::getNombreCompleto).orElse(email);
-            return new AdminNavData(0, 0, 0, email, name, false);
+            return new AdminNavData(0, 0, 0, 0, email, name, false);
         }
 
-        // Si ES admin: cuenta viajes en curso, conductores pendientes y mensajes no leídos
+        // Si ES admin: cuenta viajes en curso, conductores pendientes, mensajes no leídos y solicitudes de alquiler pendientes
         long viajesEnCurso = viajeRepository.countByEstadoViajeAndFecha(EstadoViaje.EN_CURSO, LocalDate.now());
         long conductoresPendientes = usuarioRepository.countByRolAndEstadoPostulacion(Rol.CONDUCTOR, EstadoPostulacion.PENDIENTE);
         long mensajesNoLeidos = contactoMensajeRepository.countByLeido(false);
+        long solicitudesPendientes = solicitudAlquilerRepository.findByEstadoOrderByFechaSolicitudDesc("PENDIENTE").size();
 
         String nombre = usuarioOpt.map(Usuario::getNombreCompleto).orElse(email);
 
-        return new AdminNavData((int) viajesEnCurso, (int) conductoresPendientes, (int) mensajesNoLeidos, email, nombre, true);
+        return new AdminNavData((int) viajesEnCurso, (int) conductoresPendientes, (int) mensajesNoLeidos, (int) solicitudesPendientes, email, nombre, true);
     }
 
     // Record (DTO inmutable) que se pasa al navbar de todas las vistas
@@ -60,13 +63,14 @@ public class GlobalControllerAdvice {
         int viajesEnCurso,
         int conductoresPendientes,
         int mensajesNoLeidos,
+        int solicitudesPendientes,
         String email,
         String nombreCompleto,
         boolean esAdmin
     ) {
         // Suma las alertas más importantes para mostrar un badge en el navbar
         public int totalAlertas() {
-            return viajesEnCurso + conductoresPendientes;
+            return viajesEnCurso + conductoresPendientes + solicitudesPendientes;
         }
     }
 }

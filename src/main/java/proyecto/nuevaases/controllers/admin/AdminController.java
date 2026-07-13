@@ -31,6 +31,7 @@ import proyecto.nuevaases.repositories.ContactoMensajeRepository;
 import proyecto.nuevaases.repositories.EncomiendaRepository;
 import proyecto.nuevaases.repositories.PasajeRepository;
 import proyecto.nuevaases.services.IContactoMensajeService;
+import proyecto.nuevaases.services.ISolicitudAlquilerService;
 import proyecto.nuevaases.services.IUsuarioService;
 
 @Controller
@@ -43,6 +44,7 @@ public class AdminController {
     private final EncomiendaRepository encomiendaRepository;
     private final IContactoMensajeService contactoMensajeService;
     private final ContactoMensajeRepository contactoMensajeRepository;
+    private final ISolicitudAlquilerService solicitudAlquilerService;
 
     // ==================== USUARIOS ====================
 
@@ -293,5 +295,52 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("mensajeError", "Error: " + e.getMessage());
         }
         return "redirect:/admin/contacto-mensajes";
+    }
+
+    // ==================== SOLICITUDES DE ALQUILER ====================
+
+    @GetMapping("/solicitudes-alquiler")
+    public String listarSolicitudesAlquiler(
+            @RequestParam(required = false) String estado,
+            Model model) {
+        if (estado != null && !estado.isBlank() && !"TODOS".equals(estado)) {
+            model.addAttribute("solicitudes", solicitudAlquilerService.listarPorEstado(estado));
+            model.addAttribute("filtroEstado", estado);
+        } else {
+            model.addAttribute("solicitudes", solicitudAlquilerService.listarTodos());
+            model.addAttribute("filtroEstado", "TODOS");
+        }
+        model.addAttribute("pendientes", solicitudAlquilerService.contarPorEstado("PENDIENTE"));
+        model.addAttribute("contactados", solicitudAlquilerService.contarPorEstado("CONTACTADO"));
+        model.addAttribute("confirmados", solicitudAlquilerService.contarPorEstado("CONFIRMADO"));
+        model.addAttribute("cancelados", solicitudAlquilerService.contarPorEstado("CANCELADO"));
+        return "admin/solicitudes-alquiler";
+    }
+
+    @PostMapping("/solicitudes-alquiler/estado/{id}")
+    public String cambiarEstadoSolicitud(
+            @PathVariable Long id,
+            @RequestParam String estado,
+            RedirectAttributes redirectAttributes) {
+        try {
+            solicitudAlquilerService.cambiarEstado(id, estado);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Estado de solicitud actualizado a " + estado);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error: " + e.getMessage());
+        }
+        return "redirect:/admin/solicitudes-alquiler";
+    }
+
+    @PostMapping("/solicitudes-alquiler/eliminar/{id}")
+    public String eliminarSolicitud(
+            @PathVariable Long id,
+            RedirectAttributes redirectAttributes) {
+        try {
+            solicitudAlquilerService.eliminar(id);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Solicitud eliminada correctamente.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error: " + e.getMessage());
+        }
+        return "redirect:/admin/solicitudes-alquiler";
     }
 }

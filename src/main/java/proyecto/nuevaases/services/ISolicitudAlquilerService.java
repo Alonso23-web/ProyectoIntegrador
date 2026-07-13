@@ -10,4 +10,7 @@ public interface ISolicitudAlquilerService {
     List<SolicitudAlquilerDTO> listarTodos();
     Optional<SolicitudAlquilerDTO> buscarPorId(Long id);
     void cambiarEstado(Long id, String nuevoEstado);
+    long contarPorEstado(String estado);
+    List<SolicitudAlquilerDTO> listarPorEstado(String estado);
+    void eliminar(Long id);
 }

@@ -25,4 +25,6 @@ public class SolicitudAlquilerDTO {
     private String vehiculoInfo; // Marca + Modelo + Placa para mostrar en vista
     private LocalDateTime fechaSolicitud;
     private String estado;
+    private Double precioReferencial;
+    private Integer horasPorDia;
 }

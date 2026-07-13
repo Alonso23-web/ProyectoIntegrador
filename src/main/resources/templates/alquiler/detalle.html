@@ -9,6 +9,7 @@
     <section class="py-5">
       <div class="container">
         <div class="row g-4">
+          <!-- Columna izquierda: info del vehículo -->
           <div class="col-lg-7">
             <div class="card shadow-sm border-0">
               <div class="position-relative">
@@ -21,47 +22,29 @@
               </div>
 
               <div class="card-body p-4">
-                <div
-                  class="d-flex align-items-start justify-content-between gap-3"
-                >
+                <div class="d-flex align-items-start justify-content-between gap-3">
                   <div>
-                    <h2
-                      class="fw-bold text-primario mb-1"
-                      th:text="${vehiculo.tipo != null ? vehiculo.tipo : 'Vehículo'}"
-                    ></h2>
+                    <h2 class="fw-bold text-primario mb-1" th:text="${vehiculo.tipo != null ? vehiculo.tipo : 'Vehículo'}"></h2>
                     <div class="text-muted">
                       <i class="bi bi-people me-1 text-amarillo"></i>
-                      <span
-                        th:text="${(vehiculo.capacidad != null ? vehiculo.capacidad : 'N/D') + ' personas'}"
-                      ></span>
+                      <span th:text="${(vehiculo.capacidad != null ? vehiculo.capacidad : 'N/D') + ' personas'}"></span>
                     </div>
                   </div>
                   <div class="text-end">
-                    <div class="text-muted small">Precio referencial</div>
-                    <div
-                      class="fw-bold fs-4 text-primario"
-                      th:text="${'S/ ' + (vehiculo.precioPorDia != null ? vehiculo.precioPorDia : 0) + ' /día'}"
-                    ></div>
+                    <div class="text-muted small">Precio base</div>
+                    <div class="fw-bold fs-4 text-primario" th:text="${'S/ ' + (vehiculo.precioPorDia != null ? vehiculo.precioPorDia : 0) + ' /día'}"></div>
                   </div>
                 </div>
 
                 <hr />
 
-                <h5 class="fw-bold mb-2">Características</h5><p
-                    class="text-muted mb-4"
-                    th:text="${vehiculo.marca != null ? vehiculo.marca + ' ' + vehiculo.modelo + ' - Placa: ' + vehiculo.placa : 'Características referenciales disponibles.'}"
-                  ></p>
+                <h5 class="fw-bold mb-2">Características</h5>
+                <p class="text-muted mb-4" th:text="${vehiculo.marca != null ? vehiculo.marca + ' ' + vehiculo.modelo + ' - Placa: ' + vehiculo.placa : 'Características referenciales disponibles.'}"></p>
 
                 <h5 class="fw-bold mb-3">Servicios incluidos</h5>
                 <ul class="list-unstyled mb-0">
-                  <li
-                    class="d-flex align-items-start mb-2"
-                    th:each="s : ${serviciosIncluidos}"
-                  >
-                    <i
-                      class="bi bi-check2-circle me-2 text-success fs-5"
-                      aria-hidden="true"
-                    ></i>
+                  <li class="d-flex align-items-start mb-2" th:each="s : ${serviciosIncluidos}">
+                    <i class="bi bi-check2-circle me-2 text-success fs-5" aria-hidden="true"></i>
                     <span class="text-muted" th:text="${s}"></span>
                   </li>
                 </ul>
@@ -69,130 +52,150 @@
             </div>
           </div>
 
+          <!-- Columna derecha: formulario de cotización -->
           <div class="col-lg-5">
-            <div class="card shadow-sm border-0">
+            <div class="card shadow-sm border-0 sticky-top" style="top: 90px;">
               <div class="card-body p-4">
-                <h4 class="fw-bold text-primario mb-3">Solicitar cotización</h4>
+                <h4 class="fw-bold text-primario mb-3"><i class="bi bi-calculator me-2"></i>Solicitar cotización</h4>
 
                 <div class="alert alert-info mb-4" style="border-radius: 16px">
                   <i class="bi bi-info-circle me-2"></i>
-                  Llena el formulario con tus datos y te contactamos con una
-                  propuesta.
+                  Completa los datos del viaje. El precio referencial se calcula automáticamente.
                 </div>
 
-                <form
-                  th:action="@{/alquiler/solicitud}"
-                  method="post"
-                  class="needs-validation"
-                  novalidate
-                >
-                  <input
-                    type="hidden"
-                    name="_csrf"
-                    th:value="${_csrf?.token}"
-                  />
+                <form th:action="@{/alquiler/solicitud}" method="post" novalidate id="cotizacionForm">
+                  <input type="hidden" name="_csrf" th:value="${_csrf?.token}" />
+                  <input type="hidden" name="vehiculoId" th:value="${vehiculo.id}" />
+                  <input type="hidden" name="tipo" th:value="${vehiculo.tipo}" />
+                  <input type="hidden" id="precioReferencialHidden" name="precioReferencial" value="" />
+                  <input type="hidden" id="diasCalculadosHidden" name="diasCalculados" value="1" />
 
-                  <input
-                    type="hidden"
-                    name="vehiculoId"
-                    th:value="${vehiculo.id}"
-                  />
+                  <!-- Datos personales -->
+                  <h6 class="fw-bold text-primario mb-2"><i class="bi bi-person me-2"></i>Tus datos</h6>
 
                   <div class="mb-3">
-                    <label class="form-label fw-semibold">Nombre</label>
-                    <input name="nombre" class="form-control" required />
+                    <label class="form-label fw-semibold">Nombre completo <span class="text-danger">*</span></label>
+                    <input name="nombre" class="form-control" required placeholder="Ej: Juan Pérez" />
                   </div>
 
                   <div class="mb-3">
-                    <label class="form-label fw-semibold"
-                      >Empresa (opcional)</label
-                    >
-                    <input name="empresa" class="form-control" />
+                    <label class="form-label fw-semibold">Empresa / Institución</label>
+                    <input name="empresa" class="form-control" placeholder="Ej: Colegio San Juan, Empresa SAC" />
+                  </div>
+
+                  <div class="row g-3 mb-3">
+                    <div class="col-6">
+                      <label class="form-label fw-semibold">Teléfono <span class="text-danger">*</span></label>
+                      <input name="telefono" class="form-control" required placeholder="999 888 777" />
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label fw-semibold">Correo <span class="text-danger">*</span></label>
+                      <input name="correo" type="email" class="form-control" required placeholder="correo@ejemplo.com" />
+                    </div>
+                  </div>
+
+                  <hr class="my-4" />
+
+                  <!-- Datos del viaje -->
+                  <h6 class="fw-bold text-primario mb-2"><i class="bi bi-geo-alt me-2"></i>Datos del viaje</h6>
+
+                  <div class="row g-3 mb-3">
+                    <div class="col-6">
+                      <label class="form-label fw-semibold">Origen <span class="text-danger">*</span></label>
+                      <select name="origen" id="origen" class="form-select" required>
+                        <option value="">Seleccionar...</option>
+                        <option value="Trujillo Centro">Trujillo Centro</option>
+                        <option value="Huanchaco">Huanchaco</option>
+                        <option value="El Golf">El Golf</option>
+                        <option value="Laredo">Laredo</option>
+                        <option value="Flores de la Victoria">Flores de la Victoria</option>
+                      </select>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label fw-semibold">Destino <span class="text-danger">*</span></label>
+                      <select name="destino" id="destino" class="form-select" required>
+                        <option value="">Seleccionar...</option>
+                        <optgroup label="Urbano Corto">
+                          <option value="Trujillo Centro">Trujillo Centro</option>
+                        </optgroup>
+                        <optgroup label="Urbano Largo (playas y distritos)">
+                          <option value="Huanchaco">Huanchaco</option>
+                          <option value="El Golf">El Golf</option>
+                          <option value="Laredo">Laredo</option>
+                          <option value="Flores de la Victoria">Flores de la Victoria</option>
+                          <option value="Porvenir">Porvenir</option>
+                          <option value="Loma">Loma</option>
+                        </optgroup>
+                        <optgroup label="Interprovincial Cercano">
+                          <option value="Virú">Virú</option>
+                          <option value="Santiago de Cao">Santiago de Cao</option>
+                          <option value="Magdalena de Cao">Magdalena de Cao</option>
+                          <option value="Pacasmayo">Pacasmayo</option>
+                          <option value="Chepén">Chepén</option>
+                        </optgroup>
+                        <optgroup label="Interprovincial Largo">
+                          <option value="Chiclayo">Chiclayo</option>
+                          <option value="Cajamarca">Cajamarca</option>
+                          <option value="Lima">Lima</option>
+                        </optgroup>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Info de zona detectada -->
+                  <div id="zonaInfo" class="mb-3 p-2 rounded-3 text-center" style="background:rgba(13,27,76,0.06); display:none;">
+                    <small class="text-muted">Zona detectada: <strong id="zonaNombre" class="text-primario"></strong> · <span id="zonaKm" class="text-primario"></span> km ida y vuelta</small>
+                  </div>
+
+                  <div class="row g-3 mb-3">
+                    <div class="col-5">
+                      <label class="form-label fw-semibold">Fecha inicio <span class="text-danger">*</span></label>
+                      <input name="fechaInicio" id="fechaInicio" type="date" class="form-control" required />
+                    </div>
+                    <div class="col-5">
+                      <label class="form-label fw-semibold">Fecha fin</label>
+                      <input name="fechaFin" id="fechaFin" type="date" class="form-control" />
+                    </div>
+                    <div class="col-2 d-flex align-items-end">
+                      <div class="w-100">
+                        <label class="form-label fw-semibold">Días</label>
+                        <input id="diasCalculados" type="text" class="form-control text-center fw-bold" value="1" readonly style="background:#f8f9fa; font-size:1.1rem;" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row g-3 mb-3">
+                    <div class="col-6">
+                      <label class="form-label fw-semibold">Personas <span class="text-danger">*</span></label>
+                      <input name="personas" id="personas" type="number" min="1" max="50" class="form-control" required placeholder="Ej: 10" />
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label fw-semibold">Horas por día</label>
+                      <input name="horasPorDia" id="horasPorDia" type="number" min="8" max="16" value="9" class="form-control" />
+                      <small class="text-muted">Más de 9h = extra</small>
+                    </div>
                   </div>
 
                   <div class="mb-3">
-                    <label class="form-label fw-semibold">Teléfono</label>
-                    <input name="telefono" class="form-control" required />
+                    <label class="form-label fw-semibold">Mensaje adicional</label>
+                    <textarea name="mensaje" class="form-control" rows="2" placeholder="Detalles del servicio, horarios, etc."></textarea>
                   </div>
 
-                  <div class="mb-3">
-                    <label class="form-label fw-semibold">Correo</label>
-                    <input
-                      name="correo"
-                      type="email"
-                      class="form-control"
-                      required
-                    />
+                  <!-- Resumen de cotización -->
+                  <div id="resumenCotizacion" class="p-3 mb-3" style="background:rgba(13,27,76,0.04); border-radius:14px; display:none;">
+                    <h6 class="fw-bold text-primario mb-2"><i class="bi bi-receipt me-2"></i>Desglose</h6>
+                    <div id="desgloseContent" style="font-size:0.88rem;"></div>
+                    <hr class="my-2" />
+                    <div class="d-flex justify-content-between align-items-center">
+                      <span class="fw-bold text-primario">Precio referencial:</span>
+                      <div class="text-end">
+                        <div class="fw-bold fs-5 text-primario" id="rangoPrecio"></div>
+                        <small class="text-muted">Sujeto a confirmación</small>
+                      </div>
+                    </div>
                   </div>
 
-                  <div class="mb-3">
-                    <label class="form-label fw-semibold"
-                      >Tipo de vehículo</label
-                    >
-                    <input
-                      name="tipo"
-                      class="form-control"
-                      th:value="${vehiculo.tipo}"
-                      readonly
-                    />
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label fw-semibold"
-                      >Fecha de inicio</label
-                    >
-                    <input
-                      name="fechaInicio"
-                      type="date"
-                      class="form-control"
-                      required
-                    />
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label fw-semibold"
-                      >Cantidad de personas</label
-                    >
-                    <input
-                      name="personas"
-                      type="number"
-                      min="1"
-                      class="form-control"
-                      required
-                    />
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label fw-semibold">Origen</label>
-                    <input
-                      name="origen"
-                      class="form-control"
-                      required
-                      placeholder="Ej: Trujillo"
-                    />
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label fw-semibold">Destino</label>
-                    <input
-                      name="destino"
-                      class="form-control"
-                      required
-                      placeholder="Ej: Chepén"
-                    />
-                  </div>
-
-                  <div class="mb-3">
-                    <label class="form-label fw-semibold">Mensaje</label>
-                    <textarea
-                      name="mensaje"
-                      class="form-control"
-                      rows="4"
-                      placeholder="Cuéntanos detalles del servicio"
-                    ></textarea>
-                  </div>
-
-                  <button class="btn btn-amarillo w-100 fw-bold" type="submit">
+                  <button class="btn btn-amarillo w-100 fw-bold" type="submit" id="btnEnviar">
                     <i class="bi bi-send-fill me-2"></i>Enviar solicitud
                   </button>
                 </form>
@@ -205,5 +208,148 @@
 
     <div th:replace="~{layout :: footer}"></div>
     <div th:replace="~{layout :: scripts}"></div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var COSTO_DIARIO = 180;
+        var COSTO_KM = 0.70;
+        var MARGEN = 0.40;
+        var COSTO_HORA_EXTRA = 25;
+        var COSTO_VIATICOS = 100;
+
+        // Mapa completo: destino -> { zona, km, nombre }
+        var MAPA_DESTINOS = {
+          // Urbano Corto (15 km)
+          'trujillo centro':   { zona: 'URBANO_CORTO', km: 15, nombre: 'Urbano Corto' },
+          // Urbano Largo (35 km)
+          'huanchaco':         { zona: 'URBANO_LARGO', km: 35, nombre: 'Urbano Largo' },
+          'el golf':           { zona: 'URBANO_LARGO', km: 35, nombre: 'Urbano Largo' },
+          'laredo':            { zona: 'URBANO_LARGO', km: 35, nombre: 'Urbano Largo' },
+          'flores de la victoria': { zona: 'URBANO_LARGO', km: 35, nombre: 'Urbano Largo' },
+          'porvenir':          { zona: 'URBANO_LARGO', km: 35, nombre: 'Urbano Largo' },
+          'loma':              { zona: 'URBANO_LARGO', km: 35, nombre: 'Urbano Largo' },
+          // Interprovincial Cercano (180 km)
+          'virú':              { zona: 'INTERPROVINCIAL_CERCANO', km: 180, nombre: 'Interprovincial Cercano' },
+          'viru':              { zona: 'INTERPROVINCIAL_CERCANO', km: 180, nombre: 'Interprovincial Cercano' },
+          'santiago de cao':   { zona: 'INTERPROVINCIAL_CERCANO', km: 180, nombre: 'Interprovincial Cercano' },
+          'magdalena de cao':  { zona: 'INTERPROVINCIAL_CERCANO', km: 180, nombre: 'Interprovincial Cercano' },
+          'pacasmayo':         { zona: 'INTERPROVINCIAL_CERCANO', km: 180, nombre: 'Interprovincial Cercano' },
+          'chepén':            { zona: 'INTERPROVINCIAL_CERCANO', km: 180, nombre: 'Interprovincial Cercano' },
+          'chepen':            { zona: 'INTERPROVINCIAL_CERCANO', km: 180, nombre: 'Interprovincial Cercano' },
+          // Interprovincial Largo (400 km)
+          'chiclayo':          { zona: 'INTERPROVINCIAL_LARGO', km: 400, nombre: 'Interprovincial Largo' },
+          'cajamarca':         { zona: 'INTERPROVINCIAL_LARGO', km: 400, nombre: 'Interprovincial Largo' },
+          'lima':              { zona: 'INTERPROVINCIAL_LARGO', km: 400, nombre: 'Interprovincial Largo' }
+        };
+
+        function getDescuentoDias(dias) {
+          if (dias >= 15) return { pct: 0.25, nombre: '25% (15 días)' };
+          if (dias >= 7)  return { pct: 0.18, nombre: '18% (7-14 días)' };
+          if (dias >= 3)  return { pct: 0.10, nombre: '10% (3-6 días)' };
+          return { pct: 0, nombre: 'Sin descuento (1-2 días)' };
+        }
+
+        function calcularDias(fi, ff) {
+          if (!fi || !ff) return 1;
+          var d = Math.ceil((new Date(ff + 'T00:00:00') - new Date(fi + 'T00:00:00')) / 86400000);
+          return d >= 1 ? d : 1;
+        }
+
+        function getDestinoInfo(destino) {
+          var key = (destino || '').toLowerCase().trim();
+          return MAPA_DESTINOS[key] || null;
+        }
+
+        function calcularPrecio() {
+          var destino = document.getElementById('destino').value;
+          var horas = parseInt(document.getElementById('horasPorDia').value) || 9;
+          var fi = document.getElementById('fechaInicio').value;
+          var ff = document.getElementById('fechaFin').value;
+          var dias = calcularDias(fi, ff);
+
+          var info = getDestinoInfo(destino);
+
+          // Actualizar zona info
+          var zonaInfo = document.getElementById('zonaInfo');
+          if (info) {
+            document.getElementById('zonaNombre').textContent = info.nombre;
+            document.getElementById('zonaKm').textContent = info.km;
+            zonaInfo.style.display = 'block';
+          } else {
+            zonaInfo.style.display = 'none';
+          }
+
+          document.getElementById('diasCalculados').value = dias;
+          document.getElementById('diasCalculadosHidden').value = dias;
+
+          if (!info) {
+            document.getElementById('resumenCotizacion').style.display = 'none';
+            return;
+          }
+
+          var desc = getDescuentoDias(dias);
+
+          // 1. Vehículo
+          var costoVehBase = COSTO_DIARIO * dias;
+          var descMonto = costoVehBase * desc.pct;
+          var costoVeh = costoVehBase - descMonto;
+
+          // 2. Combustible
+          var costoComb = COSTO_KM * info.km;
+
+          // 3. Horas extras
+          var horasExt = horas > 9 ? COSTO_HORA_EXTRA * dias : 0;
+
+          // 4. Viáticos (solo interprovincial largo)
+          var viaticos = info.zona === 'INTERPROVINCIAL_LARGO' ? COSTO_VIATICOS * dias : 0;
+
+          // 5. Subtotal + margen
+          var subtotal = costoVeh + costoComb + horasExt + viaticos;
+          var margen = subtotal * MARGEN;
+          var total = subtotal + margen;
+
+          // 6. Rango ±5%
+          var li = total * 0.95;
+          var ls = total * 1.05;
+
+          document.getElementById('precioReferencialHidden').value = Math.round(total * 100) / 100;
+
+          // Desglose
+          var h = '';
+          h += row('Vehículo (' + dias + ' × S/ ' + COSTO_DIARIO + ')', 'S/ ' + costoVehBase.toFixed(2));
+          if (desc.pct > 0) h += row('↳ Descuento ' + desc.nombre, '- S/ ' + descMonto.toFixed(2), true);
+          h += row('Combustible (' + info.km + ' km × S/ ' + COSTO_KM + ')', 'S/ ' + costoComb.toFixed(2));
+          if (horasExt > 0) h += row('Horas extras (' + (horas - 9) + 'h × ' + dias + 'd)', 'S/ ' + horasExt.toFixed(2));
+          if (viaticos > 0) h += row('Viáticos conductor (' + dias + ' días)', 'S/ ' + viaticos.toFixed(2));
+          h += row('Subtotal', 'S/ ' + subtotal.toFixed(2), false, true);
+          h += row('Margen comercial (40%)', 'S/ ' + margen.toFixed(2));
+
+          document.getElementById('desgloseContent').innerHTML = h;
+          document.getElementById('rangoPrecio').textContent = 'S/ ' + li.toFixed(2) + ' – S/ ' + ls.toFixed(2);
+          document.getElementById('resumenCotizacion').style.display = 'block';
+        }
+
+        function row(label, value, isGreen, isBold) {
+          var cls = isGreen ? 'text-success' : (isBold ? 'fw-bold text-primario' : 'text-muted');
+          var pad = (isGreen || isBold) ? 'ps-4' : '';
+          return '<div class="d-flex justify-content-between ' + pad + ' mb-1"><span class="' + cls + '">' + label + '</span><span class="fw-semibold ' + cls + '">' + value + '</span></div>';
+        }
+
+        // Eventos
+        document.getElementById('destino').addEventListener('change', calcularPrecio);
+        document.getElementById('horasPorDia').addEventListener('input', calcularPrecio);
+        document.getElementById('fechaInicio').addEventListener('change', calcularPrecio);
+        document.getElementById('fechaFin').addEventListener('change', calcularPrecio);
+
+        // Validación
+        document.getElementById('cotizacionForm').addEventListener('submit', function(e) {
+          var ok = true;
+          if (!document.getElementById('destino').value) { alert('Selecciona el destino.'); ok = false; }
+          else if (!document.getElementById('fechaInicio').value) { alert('Selecciona la fecha de inicio.'); ok = false; }
+          else if (!document.getElementById('personas').value || document.getElementById('personas').value < 1) { alert('Ingresa la cantidad de personas.'); ok = false; }
+          if (!ok) e.preventDefault();
+        });
+      });
+    </script>
   </body>
 </html>

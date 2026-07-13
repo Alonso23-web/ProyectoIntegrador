@@ -503,6 +503,15 @@
                   </a>
                 </li>
                 <li>
+                  <a class="dropdown-item d-flex align-items-center justify-content-between"
+                     href="/admin/solicitudes-alquiler">
+                    <span><i class="bi bi-bus-front me-2"></i>Solicitudes Alquiler</span>
+                    <span th:if="${adminNavData != null && adminNavData.solicitudesPendientes > 0}"
+                          class="badge" style="background: #dc3545; color: #fff; font-size: 0.6rem;"
+                          th:text="${adminNavData.solicitudesPendientes}"></span>
+                  </a>
+                </li>
+                <li>
                   <a class="dropdown-item" href="/admin/usuarios">
                     <i class="bi bi-people me-2"></i>Usuarios
                   </a>
