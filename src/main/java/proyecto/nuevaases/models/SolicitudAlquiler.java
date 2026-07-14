@@ -50,6 +50,10 @@ public class SolicitudAlquiler {
     @Column(columnDefinition = "TEXT")
     private String mensaje;
 
+    private Double precioReferencial;
+
+    private Integer horasPorDia;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehiculo_id")
     private Vehiculo vehiculo;

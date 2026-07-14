@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+  <head th:replace="~{layout :: head('Admin - Solicitudes de Alquiler')}"></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <section class="py-4 bg-light">
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <h2 class="fw-bold text-primario mb-1">
+              <i class="bi bi-bus-front me-2"></i>Solicitudes de Alquiler
+            </h2>
+            <p class="text-muted mb-0">Gestiona las solicitudes de cotización de alquiler de vehículos.</p>
+          </div>
+          <a href="/dashboard" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>Volver al Dashboard
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-4">
+      <div class="container">
+        <!-- Alertas -->
+        <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show" role="alert" style="border-radius: 12px;">
+          <i class="bi bi-check-circle me-2"></i><span th:text="${mensajeExito}"></span>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 12px;">
+          <i class="bi bi-exclamation-triangle me-2"></i><span th:text="${mensajeError}"></span>
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Tarjetas de resumen -->
+        <div class="row g-3 mb-4">
+          <div class="col-6 col-md-3">
+            <a href="/admin/solicitudes-alquiler?estado=PENDIENTE" class="text-decoration-none">
+              <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
+                <div class="card-body text-center">
+                  <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width:48px;height:48px;background:rgba(255,193,7,0.15);">
+                    <i class="bi bi-clock-history fs-4 text-warning"></i>
+                  </div>
+                  <h3 class="fw-bold mb-0" th:text="${pendientes}">0</h3>
+                  <small class="text-muted">Pendientes</small>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-6 col-md-3">
+            <a href="/admin/solicitudes-alquiler?estado=CONTACTADO" class="text-decoration-none">
+              <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
+                <div class="card-body text-center">
+                  <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width:48px;height:48px;background:rgba(13,110,253,0.15);">
+                    <i class="bi bi-telephone-outgoing fs-4 text-primary"></i>
+                  </div>
+                  <h3 class="fw-bold mb-0" th:text="${contactados}">0</h3>
+                  <small class="text-muted">Contactados</small>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-6 col-md-3">
+            <a href="/admin/solicitudes-alquiler?estado=CONFIRMADO" class="text-decoration-none">
+              <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
+                <div class="card-body text-center">
+                  <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width:48px;height:48px;background:rgba(25,135,84,0.15);">
+                    <i class="bi bi-check-circle fs-4 text-success"></i>
+                  </div>
+                  <h3 class="fw-bold mb-0" th:text="${confirmados}">0</h3>
+                  <small class="text-muted">Confirmados</small>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="col-6 col-md-3">
+            <a href="/admin/solicitudes-alquiler?estado=CANCELADO" class="text-decoration-none">
+              <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
+                <div class="card-body text-center">
+                  <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width:48px;height:48px;background:rgba(220,53,69,0.15);">
+                    <i class="bi bi-x-circle fs-4 text-danger"></i>
+                  </div>
+                  <h3 class="fw-bold mb-0" th:text="${cancelados}">0</h3>
+                  <small class="text-muted">Cancelados</small>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px;">
+          <div class="card-body">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <span class="fw-semibold text-primario"><i class="bi bi-funnel me-1"></i>Filtrar:</span>
+              <a href="/admin/solicitudes-alquiler" class="btn btn-sm" th:classappend="${filtroEstado == 'TODOS'} ? 'btn-primario' : 'btn-outline-secondary'" style="border-radius:20px;">Todos</a>
+              <a href="/admin/solicitudes-alquiler?estado=PENDIENTE" class="btn btn-sm" th:classappend="${filtroEstado == 'PENDIENTE'} ? 'btn-warning' : 'btn-outline-warning'" style="border-radius:20px;">Pendientes</a>
+              <a href="/admin/solicitudes-alquiler?estado=CONTACTADO" class="btn btn-sm" th:classappend="${filtroEstado == 'CONTACTADO'} ? 'btn-primary' : 'btn-outline-primary'" style="border-radius:20px;">Contactados</a>
+              <a href="/admin/solicitudes-alquiler?estado=CONFIRMADO" class="btn btn-sm" th:classappend="${filtroEstado == 'CONFIRMADO'} ? 'btn-success' : 'btn-outline-success'" style="border-radius:20px;">Confirmados</a>
+              <a href="/admin/solicitudes-alquiler?estado=CANCELADO" class="btn btn-sm" th:classappend="${filtroEstado == 'CANCELADO'} ? 'btn-danger' : 'btn-outline-danger'" style="border-radius:20px;">Cancelados</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de solicitudes -->
+        <div class="card border-0 shadow-sm" style="border-radius: 14px;">
+          <div class="card-body p-0">
+            <div th:if="${#lists.isEmpty(solicitudes)}" class="text-center py-5">
+              <i class="bi bi-inbox fs-1 text-muted"></i>
+              <h5 class="text-muted mt-3">No hay solicitudes</h5>
+              <p class="text-muted">No se encontraron solicitudes con el filtro seleccionado.</p>
+            </div>
+
+            <div class="table-responsive" th:unless="${#lists.isEmpty(solicitudes)}">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th class="ps-3" style="font-size:0.85rem;">Fecha</th>
+                    <th style="font-size:0.85rem;">Cliente</th>
+                    <th style="font-size:0.85rem;">Empresa</th>
+                    <th style="font-size:0.85rem;">Ruta</th>
+                    <th style="font-size:0.85rem;">Personas</th>
+                    <th style="font-size:0.85rem;">Fechas</th>
+                    <th style="font-size:0.85rem;">Precio Ref.</th>
+                    <th style="font-size:0.85rem;">Estado</th>
+                    <th class="text-center pe-3" style="font-size:0.85rem;">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="s : ${solicitudes}">
+                    <td class="ps-3">
+                      <small class="text-muted" th:text="${#temporals.format(s.fechaSolicitud, 'dd/MM/yyyy HH:mm')}"></small>
+                    </td>
+                    <td>
+                      <div class="fw-semibold" th:text="${s.nombreSolicitante}"></div>
+                      <small class="text-muted" th:text="${s.telefono}"></small>
+                    </td>
+                    <td>
+                      <span th:if="${s.empresa != null && !s.empresa.isEmpty()}" th:text="${s.empresa}"></span>
+                      <span th:unless="${s.empresa != null && !s.empresa.isEmpty()}" class="text-muted">-</span>
+                    </td>
+                    <td>
+                      <i class="bi bi-geo-alt text-amarillo me-1"></i>
+                      <span th:text="${(s.origen != null ? s.origen : '?') + ' → ' + (s.destino != null ? s.destino : '?')}"></span>
+                    </td>
+                    <td class="text-center" th:text="${s.cantidadPersonas != null ? s.cantidadPersonas : '-'}"></td>
+                    <td>
+                      <small class="text-muted" th:text="${s.fechaInicio != null ? #temporals.format(s.fechaInicio, 'dd/MM/yyyy') : '-'}"></small>
+                      <span th:if="${s.fechaFin != null}"> - </span>
+                      <small class="text-muted" th:text="${s.fechaFin != null ? #temporals.format(s.fechaFin, 'dd/MM/yyyy') : ''}"></small>
+                    </td>
+                    <td>
+                      <span th:if="${s.precioReferencial != null}" class="fw-bold text-primario" th:text="${'S/ ' + #numbers.formatDecimal(s.precioReferencial, 1, 2)}"></span>
+                      <span th:unless="${s.precioReferencial != null}" class="text-muted">Sin calcular</span>
+                    </td>
+                    <td>
+                      <span class="badge fw-semibold" style="border-radius:20px; font-size:0.75rem;"
+                            th:classappend="${s.estado == 'PENDIENTE'} ? 'bg-warning text-dark' : (${s.estado == 'CONTACTADO'} ? 'bg-primary' : (${s.estado == 'CONFIRMADO'} ? 'bg-success' : 'bg-danger'))"
+                            th:text="${s.estado}"></span>
+                    </td>
+                    <td class="text-center pe-3">
+                      <div class="d-flex align-items-center justify-content-center gap-1">
+                        <!-- WhatsApp -->
+                        <a th:href="'https://wa.me/51' + ${s.telefono} + '?text=' + ${'Hola ' + s.nombreSolicitante + ', te contactamos desde Nueva Ases Express sobre tu solicitud de alquiler de vehículo.'}"
+                           target="_blank" class="btn btn-sm btn-outline-success" title="WhatsApp"
+                           style="border-radius:8px; padding: 0.3rem 0.5rem;">
+                          <i class="bi bi-whatsapp"></i>
+                        </a>
+                        <!-- Email -->
+                        <a th:href="'mailto:' + ${s.correo} + '?subject=Solicitud de Alquiler - Nueva Ases Express&body=Hola ' + ${s.nombreSolicitante} + ',%0A%0ARecibimos tu solicitud de alquiler. Te contactaremos pronto con una propuesta.%0A%0ASaludos,%0ANueva Ases Express'"
+                           class="btn btn-sm btn-outline-primary" title="Email"
+                           style="border-radius:8px; padding: 0.3rem 0.5rem;">
+                          <i class="bi bi-envelope"></i>
+                        </a>
+                        <!-- Cambiar estado -->
+                        <div class="dropdown">
+                          <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                  data-bs-toggle="dropdown" title="Cambiar estado"
+                                  style="border-radius:8px; padding: 0.3rem 0.5rem;">
+                            <i class="bi bi-arrow-repeat"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end" style="border-radius:12px; min-width:160px;">
+                            <li><h6 class="dropdown-header small text-muted">Cambiar estado</h6></li>
+                            <li th:unless="${s.estado == 'PENDIENTE'}">
+                              <form th:action="@{/admin/solicitudes-alquiler/estado/{id}(id=${s.id})}" method="post" class="d-inline">
+                                <input type="hidden" name="_csrf" th:value="${_csrf?.token}" />
+                                <input type="hidden" name="estado" value="PENDIENTE" />
+                                <button type="submit" class="dropdown-item"><i class="bi bi-clock text-warning me-2"></i>Pendiente</button>
+                              </form>
+                            </li>
+                            <li th:unless="${s.estado == 'CONTACTADO'}">
+                              <form th:action="@{/admin/solicitudes-alquiler/estado/{id}(id=${s.id})}" method="post" class="d-inline">
+                                <input type="hidden" name="_csrf" th:value="${_csrf?.token}" />
+                                <input type="hidden" name="estado" value="CONTACTADO" />
+                                <button type="submit" class="dropdown-item"><i class="bi bi-telephone text-primary me-2"></i>Contactado</button>
+                              </form>
+                            </li>
+                            <li th:unless="${s.estado == 'CONFIRMADO'}">
+                              <form th:action="@{/admin/solicitudes-alquiler/estado/{id}(id=${s.id})}" method="post" class="d-inline">
+                                <input type="hidden" name="_csrf" th:value="${_csrf?.token}" />
+                                <input type="hidden" name="estado" value="CONFIRMADO" />
+                                <button type="submit" class="dropdown-item"><i class="bi bi-check-circle text-success me-2"></i>Confirmado</button>
+                              </form>
+                            </li>
+                            <li th:unless="${s.estado == 'CANCELADO'}">
+                              <form th:action="@{/admin/solicitudes-alquiler/estado/{id}(id=${s.id})}" method="post" class="d-inline">
+                                <input type="hidden" name="_csrf" th:value="${_csrf?.token}" />
+                                <input type="hidden" name="estado" value="CANCELADO" />
+                                <button type="submit" class="dropdown-item"><i class="bi bi-x-circle text-danger me-2"></i>Cancelado</button>
+                              </form>
+                            </li>
+                          </ul>
+                        </div>
+                        <!-- Eliminar -->
+                        <form th:action="@{/admin/solicitudes-alquiler/eliminar/{id}(id=${s.id})}" method="post"
+                              onsubmit="return confirm('¿Estás seguro de eliminar esta solicitud?');">
+                          <input type="hidden" name="_csrf" th:value="${_csrf?.token}" />
+                          <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar"
+                                  style="border-radius:8px; padding: 0.3rem 0.5rem;">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>

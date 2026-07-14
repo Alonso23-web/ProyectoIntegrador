@@ -47,6 +47,26 @@ public class SolicitudAlquilerServiceImpl implements ISolicitudAlquilerService {
         solicitudAlquilerRepository.save(entity);
     }
 
+    @Override
+    public long contarPorEstado(String estado) {
+        return solicitudAlquilerRepository.findByEstadoOrderByFechaSolicitudDesc(estado).size();
+    }
+
+    @Override
+    public List<SolicitudAlquilerDTO> listarPorEstado(String estado) {
+        return solicitudAlquilerRepository.findByEstadoOrderByFechaSolicitudDesc(estado).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void eliminar(Long id) {
+        if (!solicitudAlquilerRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Solicitud no encontrada con ID: " + id);
+        }
+        solicitudAlquilerRepository.deleteById(id);
+    }
+
     private SolicitudAlquilerDTO convertToDTO(SolicitudAlquiler entity) {
         SolicitudAlquilerDTO.SolicitudAlquilerDTOBuilder builder = SolicitudAlquilerDTO.builder()
                 .id(entity.getId())
@@ -61,6 +81,8 @@ public class SolicitudAlquilerServiceImpl implements ISolicitudAlquilerService {
                 .origen(entity.getOrigen())
                 .destino(entity.getDestino())
                 .mensaje(entity.getMensaje())
+                .precioReferencial(entity.getPrecioReferencial())
+                .horasPorDia(entity.getHorasPorDia())
                 .fechaSolicitud(entity.getFechaSolicitud())
                 .estado(entity.getEstado());
 
@@ -87,6 +109,8 @@ public class SolicitudAlquilerServiceImpl implements ISolicitudAlquilerService {
                 .origen(dto.getOrigen())
                 .destino(dto.getDestino())
                 .mensaje(dto.getMensaje())
+                .precioReferencial(dto.getPrecioReferencial())
+                .horasPorDia(dto.getHorasPorDia())
                 .estado(dto.getEstado() != null ? dto.getEstado() : "PENDIENTE");
 
         if (dto.getVehiculoId() != null) {

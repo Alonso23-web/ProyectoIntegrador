@@ -12,7 +12,6 @@ import proyecto.nuevaases.repositories.VehiculoRepository;
 import proyecto.nuevaases.services.ISolicitudAlquilerService;
 
 import java.util.*;
-import java.util.Locale;
 
 @Controller
 @RequestMapping("/alquiler")
@@ -24,11 +23,7 @@ public class AlquilerSolicitudController {
 
     @GetMapping
     public String index(
-            @RequestParam(required = false) String tipo,
-            @RequestParam(required = false) String fechaInicio,
-            @RequestParam(required = false) String fechaFin,
             @RequestParam(required = false) Integer personas,
-            @RequestParam(required = false) String ubicacion,
             Model model
     ) {
         List<Vehiculo> all = vehiculoRepository.findAll();
@@ -38,28 +33,16 @@ public class AlquilerSolicitudController {
             if (v.getEstado() == null || v.getEstado() != EstadoVehiculo.DISPONIBLE) {
                 continue;
             }
-
             boolean ok = true;
-
-            if (tipo != null && !tipo.isBlank()) {
-                String tipoVeh = v.getTipo().name();
-                ok = ok && tipoVeh.toLowerCase(Locale.ROOT).contains(tipo.toLowerCase(Locale.ROOT));
-            }
-
             if (personas != null && personas > 0) {
                 ok = ok && v.getCapacidad() >= personas;
             }
-
             if (ok) filtered.add(v);
         }
 
         model.addAttribute("vehiculos", filtered);
         Map<String, Object> param = new HashMap<>();
-        param.put("tipo", tipo);
-        param.put("fechaInicio", fechaInicio);
-        param.put("fechaFin", fechaFin);
         param.put("personas", personas);
-        param.put("ubicacion", ubicacion);
         model.addAttribute("param", param);
 
         return "alquiler/index";
@@ -106,9 +89,11 @@ public class AlquilerSolicitudController {
                 .fechaInicio(parseDate(params.get("fechaInicio")))
                 .fechaFin(parseDate(params.get("fechaFin")))
                 .cantidadPersonas(parseInt(params.get("personas")))
+                .horasPorDia(parseInt(params.get("horasPorDia")))
                 .origen(trim(params.get("origen")))
                 .destino(trim(params.get("destino")))
                 .mensaje(trim(params.get("mensaje")))
+                .precioReferencial(parseDouble(params.get("precioReferencial")))
                 .build();
 
         // Asignar vehículo si se envió el ID
@@ -150,6 +135,15 @@ public class AlquilerSolicitudController {
         if (s == null || s.isBlank()) return null;
         try {
             return Integer.parseInt(s);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private static Double parseDouble(String s) {
+        if (s == null || s.isBlank()) return null;
+        try {
+            return Double.parseDouble(s);
         } catch (NumberFormatException e) {
             return null;
         }

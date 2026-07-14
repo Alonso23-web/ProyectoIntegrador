@@ -1,8 +1,6 @@
 <!doctype html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-  <head
-    th:replace="~{layout :: head('Alquiler de Vehículos - Solicitud de Cotización')}"
-  ></head>
+  <head th:replace="~{layout :: head('Alquiler de Minivans - Solicitud de Cotización')}"></head>
   <body>
     <div th:replace="~{layout :: navbar}"></div>
 
@@ -10,48 +8,14 @@
       <div class="container">
         <div class="row align-items-center g-4">
           <div class="col-lg-7">
-            <h1 class="fw-bold mb-3">Alquiler de Vehículos</h1>
-            <p class="lead text-white-50 mb-0">
-              Simula un sistema profesional de alquiler para empresas, colegios
-              y eventos. En este módulo no hay compra directa: realizas una
-              <strong>solicitud de cotización</strong>.
-            </p>
+            <h1 class="fw-bold mb-3">Alquiler de Minivans con Chofer</h1>
+            <p class="lead text-white-50 mb-0">Explora nuestras minivans disponibles y solicita una cotización personalizada. El precio se calcula automáticamente según tu ruta, duración y tipo de servicio.</p>
           </div>
           <div class="col-lg-5">
-            <div
-              class="p-4 rounded-4"
-              style="
-                background: rgba(255, 255, 255, 0.1);
-                border: 1px solid rgba(255, 255, 255, 0.18);
-              "
-            >
-              <div class="d-flex align-items-center mb-3">
-                <i class="bi bi-send-check-fill fs-3 me-2 text-amarillo"></i>
-                <div>
-                  <div class="fw-bold">Respuesta rápida</div>
-                  <div class="small text-white-50">
-                    Te contactamos con una propuesta.
-                  </div>
-                </div>
-              </div>
-              <div class="d-flex align-items-center mb-3">
-                <i class="bi bi-geo-alt-fill fs-3 me-2 text-amarillo"></i>
-                <div>
-                  <div class="fw-bold">Cobertura local</div>
-                  <div class="small text-white-50">
-                    Trujillo y zonas cercanas.
-                  </div>
-                </div>
-              </div>
-              <div class="d-flex align-items-center">
-                <i class="bi bi-shield-check fs-3 me-2 text-amarillo"></i>
-                <div>
-                  <div class="fw-bold">Confiabilidad</div>
-                  <div class="small text-white-50">
-                    Servicios incluidos según unidad.
-                  </div>
-                </div>
-              </div>
+            <div class="p-4 rounded-4" style="background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18);">
+              <div class="d-flex align-items-center mb-3"><i class="bi bi-calculator-fill fs-3 me-2 text-amarillo"></i><div><div class="fw-bold">Cotización automática</div><div class="small text-white-50">Precio referencial en tiempo real.</div></div></div>
+              <div class="d-flex align-items-center mb-3"><i class="bi bi-geo-alt-fill fs-3 me-2 text-amarillo"></i><div><div class="fw-bold">Cobertura regional</div><div class="small text-white-50">Trujillo, playas, provincia y más.</div></div></div>
+              <div class="d-flex align-items-center"><i class="bi bi-whatsapp fs-3 me-2 text-amarillo"></i><div><div class="fw-bold">Contacto directo</div><div class="small text-white-50">Respuesta por WhatsApp o correo.</div></div></div>
             </div>
           </div>
         </div>
@@ -62,167 +26,65 @@
       <div class="container">
         <div class="row text-center mb-4">
           <div class="col-12">
-            <h2 class="fw-bold text-primario section-title">
-              Buscador de disponibilidad
-            </h2>
-            <p class="text-muted fs-5">
-              Filtra por tipo, fechas y ubicación para ver unidades disponibles.
-            </p>
+            <h2 class="fw-bold text-primario section-title">Encuentra tu minivan</h2>
+            <p class="text-muted fs-5">Indica la cantidad de pasajeros para ver opciones disponibles.</p>
           </div>
         </div>
 
         <form id="alquilerForm" th:action="@{/alquiler}" method="get" class="mb-4" novalidate>
+          <input type="hidden" name="tipo" value="MINIVAN" />
           <div class="card shadow-sm border-0">
             <div class="card-body p-4">
-              <div class="row g-3">
-                <div class="col-md-4">
+              <div class="row g-3 align-items-end">
+                <div class="col-md-5">
                   <label class="form-label fw-semibold">Tipo de vehículo</label>
-                  <input
-                    name="tipo"
-                    class="form-control"
-                    placeholder="Ej: Minivan, Bus, Camioneta"
-                    th:value="${param.tipo}"
-                  />
+                  <div class="form-control" style="background:#f8f9fa; cursor:default;">
+                    <i class="bi bi-bus-front me-2 text-amarillo"></i>
+                    <span class="fw-bold text-primario">Minivan</span>
+                    <span class="text-muted ms-2">(unidad estándar)</span>
+                  </div>
                 </div>
-
                 <div class="col-md-4">
-                  <label class="form-label fw-semibold">Fecha de inicio <span class="text-danger">*</span></label>
-                  <input
-                    id="fechaInicio"
-                    name="fechaInicio"
-                    type="date"
-                    class="form-control"
-                    th:value="${param.fechaInicio}"
-                  />
-                  <div class="invalid-feedback" id="error-fechaInicio"></div>
+                  <label class="form-label fw-semibold">Cantidad de personas</label>
+                  <input id="personas" name="personas" type="number" min="1" max="15" class="form-control" placeholder="Ej: 10" th:value="${param.personas}" />
                 </div>
-
-                <div class="col-md-4">
-                  <label class="form-label fw-semibold">Fecha fin <span class="text-danger">*</span></label>
-                  <input
-                    id="fechaFin"
-                    name="fechaFin"
-                    type="date"
-                    class="form-control"
-                    th:value="${param.fechaFin}"
-                  />
-                  <div class="invalid-feedback" id="error-fechaFin"></div>
-                </div>
-
-                <div class="col-md-3">
-                  <label class="form-label fw-semibold"
-                    >Cantidad de personas <span class="text-danger">*</span></label
-                  >
-                  <input
-                    id="personas"
-                    name="personas"
-                    type="number"
-                    min="1"
-                    max="15"
-                    class="form-control"
-                    placeholder="Ej: 15"
-                    th:value="${param.personas}"
-                  />
-                  <div class="invalid-feedback" id="error-personas"></div>
-                </div>
-
-                <div class="col-md-4">
-                  <label class="form-label fw-semibold">Ubicación</label>
-                  <input
-                    name="ubicacion"
-                    class="form-control"
-                    placeholder="Ej: Trujillo"
-                    th:value="${param.ubicacion}"
-                  />
-                </div>
-
-                <div class="col-md-5 d-grid align-items-end">
-                  <button class="btn btn-amarillo btn-lg fw-bold" type="submit" id="btnBuscar">
-                    <i class="bi bi-search me-2"></i>Buscar disponibilidad
-                  </button>
+                <div class="col-md-3 d-grid">
+                  <button class="btn btn-amarillo btn-lg fw-bold" type="submit"><i class="bi bi-search me-2"></i>Buscar</button>
                 </div>
               </div>
-
               <input type="hidden" name="_csrf" th:value="${_csrf?.token}" />
             </div>
           </div>
         </form>
 
         <div class="d-flex align-items-center justify-content-between mb-2">
-          <h4 class="fw-bold text-primario mb-0">
-            Vehículos disponibles (simulación)
-          </h4>
-          <div class="text-muted small" th:if="${#lists.isEmpty(vehiculos)}">
-            No hay resultados con los filtros actuales.
-          </div>
-          <div
-            class="text-muted small"
-            th:unless="${#lists.isEmpty(vehiculos)}"
-          >
-            Mostrando
-            <span
-              class="fw-bold"
-              th:text="${vehiculos.size() + ' unidades'}"
-            ></span>
-          </div>
+          <h4 class="fw-bold text-primario mb-0">Minivans disponibles</h4>
+          <div class="text-muted small" th:if="${#lists.isEmpty(vehiculos)}">No hay resultados.</div>
+          <div class="text-muted small" th:unless="${#lists.isEmpty(vehiculos)}">Mostrando <span class="fw-bold" th:text="${vehiculos.size() + ' unidades'}"></span></div>
         </div>
 
         <div class="row g-4">
           <div class="col-md-6 col-lg-4" th:each="v : ${vehiculos}">
             <div class="card h-100 shadow-sm border-0 card-servicio">
-              <img
-                class="card-img-top"
-                th:src="${v.imagen != null && !#strings.isEmpty(v.imagen) ? v.imagen : '/img/nuevaasesInicio.jpg'}"
-                alt="Imagen vehículo"
-                style="height: 190px; object-fit: cover"
-              />
+              <img class="card-img-top" th:src="${v.imagen != null && !#strings.isEmpty(v.imagen) ? v.imagen : '/img/nuevaasesInicio.jpg'}" alt="Imagen minivan" style="height:190px; object-fit:cover;" />
               <div class="card-body p-4">
                 <div class="d-flex align-items-start justify-content-between">
-                  <h5
-                    class="fw-bold text-primario mb-1"
-                    th:text="${v.marca != null ? v.marca + ' ' + v.modelo : v.tipo}"
-                  ></h5>
-                  <span
-                    class="badge rounded-pill text-bg-light-blue fw-semibold"
-                    th:text="${(v.capacidad != null ? v.capacidad : 'N/D') + ' pax'}"
-                  ></span>
+                  <h5 class="fw-bold text-primario mb-1" th:text="${v.marca != null ? v.marca + ' ' + v.modelo : 'Minivan'}"></h5>
+                  <span class="badge rounded-pill text-bg-light-blue fw-semibold" th:text="${(v.capacidad != null ? v.capacidad : 'N/D') + ' pax'}"></span>
                 </div>
-
-                <p
-                  class="text-muted mb-3"
-                  style="min-height: 44px"
-                  th:text="${v.marca != null ? v.marca + ' ' + v.modelo : 'Características referenciales disponibles.'}"
-                ></p>
-
-                <div
-                  class="d-flex align-items-center justify-content-between mb-3"
-                >
-                  <div class="text-muted small">Precio referencial</div>
-                <div
-                  class="fw-bold text-primario"
-                  th:text="${'S/ ' + (v.precioPorDia != null ? v.precioPorDia : 0) + ' /día'}"
-                ></div>
+                <p class="text-muted mb-3" style="min-height:44px;" th:text="${v.marca != null ? v.marca + ' ' + v.modelo : 'Minivan con conductor profesional.'}"></p>
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <div class="text-muted small">Precio base</div>
+                  <div class="fw-bold text-primario" th:text="${'S/ ' + (v.precioPorDia != null ? v.precioPorDia : 0) + ' /día'}"></div>
                 </div>
-
-                <a
-                  th:href="@{/alquiler/vehiculo/{id}(id=${v.id})}"
-                  class="btn btn-outline-amarillo w-100 fw-bold"
-                >
-                  <i class="bi bi-eye me-2"></i>Ver detalles
-                </a>
+                <a th:href="@{/alquiler/vehiculo/{id}(id=${v.id})}" class="btn btn-outline-amarillo w-100 fw-bold"><i class="bi bi-eye me-2"></i>Ver detalles y cotizar</a>
               </div>
             </div>
           </div>
-
-          <div
-            class="col-12 text-center py-5"
-            th:if="${#lists.isEmpty(vehiculos)}"
-          >
+          <div class="col-12 text-center py-5" th:if="${#lists.isEmpty(vehiculos)}">
             <i class="bi bi-car-front fs-1 text-muted"></i>
-            <h4 class="text-muted mt-3">No hay unidades disponibles</h4>
-            <p class="text-muted">
-              Prueba con otros filtros de tipo, personas o ubicación.
-            </p>
+            <h4 class="text-muted mt-3">No hay minivans disponibles</h4>
+            <p class="text-muted">Prueba con otra cantidad de personas.</p>
           </div>
         </div>
       </div>
@@ -230,111 +92,5 @@
 
     <div th:replace="~{layout :: footer}"></div>
     <div th:replace="~{layout :: scripts}"></div>
-
-    <style>
-      .invalid-feedback {
-        display: none;
-        color: #dc3545;
-        font-size: 0.85rem;
-        margin-top: 0.25rem;
-      }
-      .invalid-feedback.show {
-        display: block;
-      }
-      .form-control.is-invalid,
-      .form-select.is-invalid {
-        border-color: #dc3545 !important;
-        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15) !important;
-      }
-    </style>
-
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        var form = document.getElementById('alquilerForm');
-        if (!form) return;
-
-        function limpiarError(id) {
-          var input = document.getElementById(id);
-          var errorEl = document.getElementById('error-' + id);
-          if (input) input.classList.remove('is-invalid');
-          if (errorEl) {
-            errorEl.classList.remove('show');
-            errorEl.textContent = '';
-          }
-        }
-
-        function mostrarError(id, mensaje) {
-          var input = document.getElementById(id);
-          var errorEl = document.getElementById('error-' + id);
-          if (input) input.classList.add('is-invalid');
-          if (errorEl) {
-            errorEl.textContent = mensaje;
-            errorEl.classList.add('show');
-          }
-        }
-
-        function limpiarTodosErrores() {
-          ['fechaInicio', 'fechaFin', 'personas'].forEach(function(id) {
-            limpiarError(id);
-          });
-        }
-
-        // Limpiar errores en tiempo real
-        form.querySelectorAll('input').forEach(function(el) {
-          el.addEventListener('input', function() {
-            limpiarError(el.id);
-          });
-          el.addEventListener('change', function() {
-            limpiarError(el.id);
-          });
-        });
-
-        form.addEventListener('submit', function(e) {
-          limpiarTodosErrores();
-
-          var fechaInicio = document.getElementById('fechaInicio').value;
-          var fechaFin = document.getElementById('fechaFin').value;
-          var personas = document.getElementById('personas').value;
-          var valido = true;
-
-          // Validar fecha de inicio
-          if (!fechaInicio) {
-            mostrarError('fechaInicio', 'Selecciona una fecha de inicio.');
-            valido = false;
-          }
-
-          // Validar fecha de fin
-          if (!fechaFin) {
-            mostrarError('fechaFin', 'Selecciona una fecha de fin.');
-            valido = false;
-          }
-
-          // Validar que fecha fin no sea anterior a fecha inicio
-          if (fechaInicio && fechaFin && fechaFin < fechaInicio) {
-            mostrarError('fechaFin', 'La fecha de fin no puede ser anterior a la fecha de inicio.');
-            valido = false;
-          }
-
-          // Validar cantidad de personas
-          if (!personas || personas === '') {
-            mostrarError('personas', 'Ingresa la cantidad de personas.');
-            valido = false;
-          } else {
-            var numPersonas = parseInt(personas);
-            if (isNaN(numPersonas) || numPersonas < 1 || numPersonas > 15) {
-              mostrarError('personas', 'La cantidad debe estar entre 1 y 15 personas.');
-              valido = false;
-            }
-          }
-
-          if (!valido) {
-            e.preventDefault();
-            // Scroll al primer error
-            var firstError = document.querySelector('.is-invalid');
-            if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        });
-      });
-    </script>
   </body>
 </html>
