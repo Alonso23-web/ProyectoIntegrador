@@ -35,3 +35,6 @@ nul
 
 # Logs
 logs/
+
+# Database backups
+*.sql
