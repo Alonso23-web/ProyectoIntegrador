@@ -15,6 +15,7 @@ import proyecto.nuevaases.models.enums.Rol;
 import proyecto.nuevaases.repositories.UsuarioRepository;
 import proyecto.nuevaases.services.impl.UsuarioServiceImpl;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -82,6 +83,7 @@ class UsuarioServiceImplTest {
                 .id(1L)
                 .email("test@example.com")
                 .password("")
+                .rol(Rol.CLIENTE)
                 .activo(true)
                 .build();
 
@@ -177,5 +179,151 @@ class UsuarioServiceImplTest {
 
         // Assert
         assertFalse(existe);
+    }
+
+    // ========================================================================
+    // Business logic: existeDni
+    // ========================================================================
+
+    @Test
+    void existeDni_conDniExistente_debeRetornarTrue() {
+        when(usuarioRepository.existsByDni("12345678")).thenReturn(true);
+
+        boolean existe = usuarioService.existeDni("12345678");
+
+        assertTrue(existe);
+        verify(usuarioRepository, times(1)).existsByDni("12345678");
+    }
+
+    @Test
+    void existeDni_conDniNoExistente_debeRetornarFalse() {
+        when(usuarioRepository.existsByDni("00000000")).thenReturn(false);
+
+        boolean existe = usuarioService.existeDni("00000000");
+
+        assertFalse(existe);
+    }
+
+    // ========================================================================
+    // Business logic: cambiarEstadoActivo
+    // ========================================================================
+
+    @Test
+    void cambiarEstadoActivo_conIdValido_debeCambiarActivo() {
+        Usuario usuario = Usuario.builder()
+                .id(1L)
+                .email("user@example.com")
+                .activo(true)
+                .rol(Rol.CLIENTE)
+                .build();
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
+
+        UsuarioDTO resultado = usuarioService.cambiarEstadoActivo(1L, false);
+
+        assertNotNull(resultado);
+        assertFalse(resultado.isActivo());
+        verify(usuarioRepository, times(1)).save(argThat(u -> !u.isActivo()));
+    }
+
+    @Test
+    void cambiarEstadoActivo_conIdInvalido_debeLanzarExcepcion() {
+        when(usuarioRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> usuarioService.cambiarEstadoActivo(999L, true));
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    // ========================================================================
+    // Business logic: conductores
+    // ========================================================================
+
+    @Test
+    void contarConductoresActivos_debeRetornarConteo() {
+        when(usuarioRepository.countByRolAndEstadoPostulacion(Rol.CONDUCTOR, EstadoPostulacion.APROBADO))
+                .thenReturn(5L);
+
+        long conteo = usuarioService.contarConductoresActivos();
+
+        assertEquals(5L, conteo);
+        verify(usuarioRepository, times(1))
+                .countByRolAndEstadoPostulacion(Rol.CONDUCTOR, EstadoPostulacion.APROBADO);
+    }
+
+    @Test
+    void contarConductoresActivos_sinConductores_debeRetornarCero() {
+        when(usuarioRepository.countByRolAndEstadoPostulacion(Rol.CONDUCTOR, EstadoPostulacion.APROBADO))
+                .thenReturn(0L);
+
+        long conteo = usuarioService.contarConductoresActivos();
+
+        assertEquals(0L, conteo);
+    }
+
+    @Test
+    void listarConductoresPendientes_debeRetornarSoloPendientes() {
+        Usuario pendiente1 = Usuario.builder()
+                .id(1L).email("cond1@x.com").nombreCompleto("Conductor 1")
+                .rol(Rol.CONDUCTOR).estadoPostulacion(EstadoPostulacion.PENDIENTE).build();
+        Usuario pendiente2 = Usuario.builder()
+                .id(2L).email("cond2@x.com").nombreCompleto("Conductor 2")
+                .rol(Rol.CONDUCTOR).estadoPostulacion(EstadoPostulacion.PENDIENTE).build();
+
+        when(usuarioRepository.findByRolAndEstadoPostulacion(Rol.CONDUCTOR, EstadoPostulacion.PENDIENTE))
+                .thenReturn(List.of(pendiente1, pendiente2));
+
+        List<UsuarioDTO> resultados = usuarioService.listarConductoresPendientes();
+
+        assertEquals(2, resultados.size());
+        assertEquals("Conductor 1", resultados.get(0).getNombreCompleto());
+        verify(usuarioRepository, times(1))
+                .findByRolAndEstadoPostulacion(Rol.CONDUCTOR, EstadoPostulacion.PENDIENTE);
+    }
+
+    @Test
+    void listarConductoresPendientes_sinPendientes_debeRetornarListaVacia() {
+        when(usuarioRepository.findByRolAndEstadoPostulacion(Rol.CONDUCTOR, EstadoPostulacion.PENDIENTE))
+                .thenReturn(List.of());
+
+        List<UsuarioDTO> resultados = usuarioService.listarConductoresPendientes();
+
+        assertTrue(resultados.isEmpty());
+    }
+
+    @Test
+    void listarConductores_debeRetornarTodosLosConductores() {
+        Usuario cond1 = Usuario.builder().id(1L).email("c1@x.com").rol(Rol.CONDUCTOR).build();
+        Usuario cond2 = Usuario.builder().id(2L).email("c2@x.com").rol(Rol.CONDUCTOR).build();
+
+        when(usuarioRepository.findByRol(Rol.CONDUCTOR)).thenReturn(List.of(cond1, cond2));
+
+        List<UsuarioDTO> resultados = usuarioService.listarConductores();
+
+        assertEquals(2, resultados.size());
+    }
+
+    // ========================================================================
+    // eliminar
+    // ========================================================================
+
+    @Test
+    void eliminar_conIdValido_debeEliminar() {
+        when(usuarioRepository.existsById(1L)).thenReturn(true);
+        doNothing().when(usuarioRepository).deleteById(1L);
+
+        usuarioService.eliminar(1L);
+
+        verify(usuarioRepository, times(1)).existsById(1L);
+        verify(usuarioRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    void eliminar_conIdInvalido_debeLanzarExcepcion() {
+        when(usuarioRepository.existsById(999L)).thenReturn(false);
+
+        assertThrows(ResourceNotFoundException.class, () -> usuarioService.eliminar(999L));
+        verify(usuarioRepository, never()).deleteById(any());
     }
 }

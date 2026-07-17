@@ -170,7 +170,7 @@ class EncomiendaServiceImplTest {
         // Estado anterior en BD
         when(encomiendaRepository.findById(10L)).thenReturn(Optional.of(entityReservado));
 
-        // Guardada cambia de estado: REGISTRADO -> ENTREGADA
+        // Guardada cambia de estado: REGISTRADO -> ENTREGADO
         Encomienda guardada = Encomienda.builder()
                 .id(entityReservado.getId())
                 .codigoRastreo(entityReservado.getCodigoRastreo())
@@ -213,12 +213,12 @@ class EncomiendaServiceImplTest {
         EncomiendaDTO resultado = encomiendaService.guardar(input);
 
         assertNotNull(resultado);
-        assertEquals("ENTREGADA", resultado.getEstado());
+        assertEquals("ENTREGADO", resultado.getEstado());
 
         verify(historialEncomiendaService, times(1)).registrarCambio(
                 eq(10L),
                 eq("REGISTRADO"),
-                eq("ENTREGADA"),
+                eq("ENTREGADO"),
                 eq("admin@example.com"),
                 contains("Cambio de estado"));
     }
