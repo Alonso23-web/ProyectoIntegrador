@@ -253,16 +253,16 @@ class EncomiendaServiceImplTest {
 
     @Test
     void calcularPrecio_conPesoSinCargoExtra_debeRetornarRedondeado() {
-        // Trujillo-Chepén => 5.00, peso 10 (sin cargo), + manejo 1.50 => total 6.50
+        // Trujillo-Chepén => 5.00, peso 10 (sin cargo), + manejo 2.00 => total 7.00
         double precio = encomiendaService.calcularPrecio("Trujillo", "Chepén", 10.0);
-        assertEquals(6.50, precio);
+        assertEquals(7.00, precio);
     }
 
     @Test
     void calcularPrecio_conPesoConCargoExtra_debeRetornarRedondeado() {
-        // Trujillo-Chepén => 5.00, peso 12 => (12-10)*1.50=3.00, manejo 1.50 => 9.50
+        // Trujillo-Chepén => 5.00, peso 12 => (12-10)*1.50=3.00, manejo 2.00 => 10.00
         double precio = encomiendaService.calcularPrecio("Trujillo", "Chepén", 12.0);
-        assertEquals(9.50, precio);
+        assertEquals(10.00, precio);
     }
 
     @Test

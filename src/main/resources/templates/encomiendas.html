@@ -140,6 +140,9 @@
                     <option>Trujillo</option>
                     <option>Chepén</option>
                     <option>Pacasmayo</option>
+                    <option>San Pedro de Lloc</option>
+                    <option>Ciudad de Dios</option>
+                    <option>Guadalupe</option>
                   </select>
                 </div>
                 <div class="col-md-6">
@@ -148,6 +151,9 @@
                     <option>Chepén</option>
                     <option>Trujillo</option>
                     <option>Pacasmayo</option>
+                    <option>San Pedro de Lloc</option>
+                    <option>Ciudad de Dios</option>
+                    <option>Guadalupe</option>
                   </select>
                 </div>
 
@@ -200,6 +206,9 @@
                     <option>Trujillo</option>
                     <option>Chepén</option>
                     <option>Pacasmayo</option>
+                    <option>San Pedro de Lloc</option>
+                    <option>Ciudad de Dios</option>
+                    <option>Guadalupe</option>
                   </select>
                 </div>
                 <div class="col-md-6">
@@ -208,6 +217,9 @@
                     <option>Chepén</option>
                     <option>Trujillo</option>
                     <option>Pacasmayo</option>
+                    <option>San Pedro de Lloc</option>
+                    <option>Ciudad de Dios</option>
+                    <option>Guadalupe</option>
                   </select>
                 </div>
                 <div class="col-12">
@@ -405,14 +417,15 @@
           return 4.5;
         if (ruta === "chepen-pacasmayo" || ruta === "pacasmayo-chepen")
           return 3.5;
+        // San Pedro de Lloc - cercanas: Pacasmayo, Chepen
+        if (ruta === "san pedro de lloc-pacasmayo" || ruta === "pacasmayo-san pedro de lloc")
+          return 3.5;
+        if (ruta === "san pedro de lloc-chepen" || ruta === "chepen-san pedro de lloc")
+          return 3.5;
+        // Ciudad de Dios - cercanas: Chepen
+        if (ruta === "ciudad de dios-chepen" || ruta === "chepen-ciudad de dios")
+          return 3.5;
         return 5.0;
-      }
-
-      function calcularPrecio(origen, destino, peso) {
-        const tarifaBase = obtenerTarifaBase(origen, destino);
-        const cargoPeso = peso > 1 ? (peso - 1) * 1.5 : 0;
-        const total = tarifaBase + cargoPeso;
-        return Math.round(total * 100) / 100;
       }
 
       async function calcular() {
@@ -436,10 +449,10 @@
         }
 
         const tarifaBase = obtenerTarifaBase(origen, destino);
+        const cargoManejo = 2.0;
         const pesoNormalIncluido = 10.0;
         const cargoExtra =
           peso > pesoNormalIncluido ? (peso - pesoNormalIncluido) * 1.5 : 0;
-        const precioConPesoNormal = tarifaBase + 1.5;
 
         let total;
         try {
@@ -470,8 +483,8 @@
               <span>S/ ${tarifaBase.toFixed(2)}</span>
             </div>
             <div class="d-flex justify-content-between">
-              <span>Cargo por peso normal (hasta ${pesoNormalIncluido.toFixed(1)} kg)</span>
-              <span>S/ ${precioConPesoNormal.toFixed(2)}</span>
+              <span>Cargo de manejo</span>
+              <span>S/ ${cargoManejo.toFixed(2)}</span>
             </div>
             <div class="d-flex justify-content-between">
               <span>Cargo por peso extra${peso > pesoNormalIncluido ? " (" + (peso - pesoNormalIncluido).toFixed(1) + " kg × S/ 1.50)" : ""}</span>

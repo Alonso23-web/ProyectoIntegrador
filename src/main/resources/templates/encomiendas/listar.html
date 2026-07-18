@@ -333,7 +333,7 @@
                   />
                 </div>
                 <div class="form-text small text-muted">
-                  Cargo normal (1.50) + Cargo extra si excede 10 kg.
+                  Cargo de manejo (2.00) + Cargo extra si excede 10 kg.
                 </div>
               </div>
               <div class="col-md-3">
@@ -532,17 +532,12 @@
         }
       }
 
-      let precioCalculadoEnModal = null;
-
       function togglePrecioManual(e) {
         const manual = document.getElementById("modal-editar-precio-manual");
         manual.style.display = e.target.checked ? "" : "none";
         if (!e.target.checked) {
-          const precioPesado = document.getElementById(
-            "modal-editar-precio-por-peso",
-          ).value;
-          document.getElementById("modal-editar-precio-final").value =
-            precioPesado;
+          // Recalcular el precio final correctamente al desmarcar "Sobrescribir"
+          calcularPrecioParaModal({ soloMostrar: false });
         }
       }
 
@@ -568,6 +563,17 @@
           case "chepén-pacasmayo":
           case "pacasmayo-chepén":
             return 3.5;
+          // San Pedro de Lloc - cercanas: Pacasmayo, Chepén
+          case "san pedro de lloc-pacasmayo":
+          case "pacasmayo-san pedro de lloc":
+            return 3.5;
+          case "san pedro de lloc-chepén":
+          case "chepén-san pedro de lloc":
+            return 3.5;
+          // Ciudad de Dios - cercanas: Chepén
+          case "ciudad de dios-chepén":
+          case "chepén-ciudad de dios":
+            return 3.5;
           default:
             return 5.0;
         }
@@ -588,7 +594,6 @@
         if (!origen || !destino || !peso || peso <= 0) {
           document.getElementById("modal-editar-precio-por-peso").value = "";
           document.getElementById("modal-editar-precio-final").value = "";
-          precioCalculadoEnModal = null;
           return;
         }
         try {
@@ -604,25 +609,27 @@
           console.log("dataPrecio", data);
           const precioTotal = Number(data.precio);
 
-          // Desglose de precios siguiendo la lógica del cliente
+          // Desglose de precios CORREGIDO: coincide con la lógica del backend
+          // Backend: total = tarifaBase + cargoPeso + CARGO_MANEJO
+          //   donde cargoPeso = (peso > 10) ? (peso-10)*1.5 : 0
+          //        CARGO_MANEJO = 2.00
+          //        PESO_NORMAL_INCLUIDO = 10.0
           const tarifaBase = obtenerTarifaBase(origen, destino);
-          const cargoNormal = 1.5; // Cargo fijo por peso normal hasta 10 kg
+          const cargoManejo = 2.0;
           const pesoNormalIncluido = 10.0;
-          const precioConPesoNormal = tarifaBase + cargoNormal; // 6.50 para Trujillo-Chepén
           const cargoExtra =
             peso > pesoNormalIncluido ? (peso - pesoNormalIncluido) * 1.5 : 0;
 
-          // "Precio por peso" = precio con peso normal (6.50) + cargo extra si excede
-          const cargoPorPeso = precioConPesoNormal + cargoExtra;
+          // "Cargo por peso" = cargo manejo (2.00) + cargo extra si excede 10 kg
+          const cargoPorPeso = cargoManejo + cargoExtra;
           document.getElementById("modal-editar-precio-por-peso").value = isNaN(
             cargoPorPeso,
           )
             ? ""
             : cargoPorPeso.toFixed(2);
 
-          // "Precio final" = tarifa base + cargo por peso
+          // "Precio final" = tarifa base + cargo por peso (coincide con backend)
           const precioFinal = tarifaBase + cargoPorPeso;
-          precioCalculadoEnModal = precioFinal;
 
           if (!soloMostrar) {
             const sobrescribir = document.getElementById(
@@ -649,14 +656,12 @@
         const precioManual = parseFloat(
           document.getElementById("modal-editar-precio-manual").value,
         );
-        const precioFinal = parseFloat(
-          document.getElementById("modal-editar-precio-final").value,
-        );
         const peso = parseFloat(
           document.getElementById("modal-editar-peso").value,
         );
 
         try {
+          // 1. Asignar peso: el backend recalcula el precio automáticamente
           if (!isNaN(peso) && peso > 0) {
             const r2 = await fetch(`${API}/${encomiendaIdActual}/peso`, {
               method: "PATCH",
@@ -666,21 +671,18 @@
             if (!r2.ok) throw new Error();
           }
 
-          // Guardar el precio final (ya sea calculado o manual)
-          let precioAGuardar = precioFinal;
+          // 2. Solo sobrescribir precio si el admin marcó la opción manual
           if (sobrescribir && !isNaN(precioManual) && precioManual >= 0) {
-            precioAGuardar = precioManual;
-          }
-          if (!isNaN(precioAGuardar) && precioAGuardar >= 0) {
             const r1 = await fetch(`${API}/${encomiendaIdActual}/precio`, {
               method: "PATCH",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ precio: precioAGuardar }),
+              body: JSON.stringify({ precio: precioManual }),
             });
             if (!r1.ok) throw new Error();
           }
+          // Si no sobrescribe, el precio ya quedó calculado por el backend en el paso 1
 
-          // actualizar estado siempre
+          // 3. actualizar estado siempre
           const r3 = await fetch(`${API}/${encomiendaIdActual}/estado`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },

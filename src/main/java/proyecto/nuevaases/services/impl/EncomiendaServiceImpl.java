@@ -99,7 +99,7 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
                 .stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    private static final double CARGO_MANEJO = 1.50;
+    private static final double CARGO_MANEJO = 2.00;
     private static final double CARGO_PESO_EXTRA = 1.50;
     private static final double PRECIO_POR_KG = 1.50;
     private static final double PESO_NORMAL_INCLUIDO = 10.0;
@@ -124,6 +124,11 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
             case "trujillo-chepén", "chepén-trujillo" -> 5.00;
             case "trujillo-pacasmayo", "pacasmayo-trujillo" -> 4.50;
             case "chepén-pacasmayo", "pacasmayo-chepén" -> 3.50;
+            // San Pedro de Lloc - cercanas: Pacasmayo, Chepén
+            case "san pedro de lloc-pacasmayo", "pacasmayo-san pedro de lloc" -> 3.50;
+            case "san pedro de lloc-chepén", "chepén-san pedro de lloc" -> 3.50;
+            // Ciudad de Dios - cercanas: Chepén
+            case "ciudad de dios-chepén", "chepén-ciudad de dios" -> 3.50;
             default -> 5.00;
         };
     }
