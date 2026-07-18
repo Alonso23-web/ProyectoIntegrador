@@ -24,4 +24,5 @@ public class EncomiendaDTO {
     private String estado;
     private String observaciones;
     private String creadoPorEmail;
+    private Long viajeAsignadoId;
 }

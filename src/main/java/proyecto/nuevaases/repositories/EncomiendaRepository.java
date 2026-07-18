@@ -42,4 +42,7 @@ public interface EncomiendaRepository extends JpaRepository<Encomienda, Long> {
         @Modifying(clearAutomatically = true, flushAutomatically = true)
         @Query("UPDATE Encomienda e SET e.viajeAsignado = NULL WHERE e.viajeAsignado.id = :viajeId")
         int desvincularEncomiendas(@Param("viajeId") Long viajeId);
+
+        @Query("SELECT COUNT(e) FROM Encomienda e WHERE e.viajeAsignado.conductorEmail = :conductorEmail AND e.estado = :estado")
+        long countByViajeConductorEmailAndEstado(@Param("conductorEmail") String conductorEmail, @Param("estado") EstadoEncomienda estado);
 }

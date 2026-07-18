@@ -5,6 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import proyecto.nuevaases.dto.EncomiendaDTO;
+import proyecto.nuevaases.models.Viaje;
+import proyecto.nuevaases.models.enums.EstadoViaje;
+import proyecto.nuevaases.repositories.ViajeRepository;
 import proyecto.nuevaases.services.IEncomiendaService;
 import proyecto.nuevaases.services.IUsuarioService;
 
@@ -21,6 +24,7 @@ public class EncomiendaApiController {
 
     private final IEncomiendaService encomiendaService;
     private final IUsuarioService usuarioService;
+    private final ViajeRepository viajeRepository;
 
     @GetMapping
     public List<EncomiendaDTO> listar() {
@@ -119,6 +123,32 @@ public class EncomiendaApiController {
     public ResponseEntity<?> asignarPrecio(@PathVariable Long id, @RequestBody Map<String, Double> body) {
         EncomiendaDTO enc = encomiendaService.buscarPorId(id);
         enc.setPrecio(body.get("precio"));
+        return ResponseEntity.ok(encomiendaService.guardar(enc));
+    }
+
+    @GetMapping("/viajes-disponibles")
+    public ResponseEntity<?> viajesDisponibles() {
+        List<Viaje> viajes = viajeRepository.findByFecha(LocalDate.now());
+        var resultado = viajes.stream().map(v -> Map.of(
+                "id", v.getId(),
+                "origen", v.getOrigen(),
+                "destino", v.getDestino(),
+                "horaSalida", v.getHoraSalida(),
+                "conductorEmail", v.getConductorEmail() != null ? v.getConductorEmail() : "",
+                "estadoViaje", v.getEstadoViaje().name()
+        )).toList();
+        return ResponseEntity.ok(resultado);
+    }
+
+    @PatchMapping("/{id}/viaje")
+    public ResponseEntity<?> asignarViaje(@PathVariable Long id, @RequestBody Map<String, Long> body) {
+        EncomiendaDTO enc = encomiendaService.buscarPorId(id);
+        Long viajeId = body.get("viajeId");
+        if (viajeId == null || viajeId <= 0) {
+            enc.setViajeAsignadoId(null);
+        } else {
+            enc.setViajeAsignadoId(viajeId);
+        }
         return ResponseEntity.ok(encomiendaService.guardar(enc));
     }
 

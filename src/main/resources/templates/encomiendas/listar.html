@@ -162,7 +162,7 @@
                         <!-- Editar (admin modal) -->
                         <button
                           class="btn btn-sm btn-outline-secondary"
-                          th:attr="data-id=${enc.id}, data-codigo=${enc.codigoRastreo}, data-remitente=${enc.remitente}, data-dniremitente=${enc.dniRemitente}, data-destinatario=${enc.destinatario}, data-dnidestinatario=${enc.dniDestinatario}, data-origen=${enc.origen}, data-destino=${enc.destino}, data-peso=${enc.peso}, data-precio=${enc.precio}, data-fecha=${enc.fechaEnvio}, data-estado=${enc.estado}, data-observaciones=${enc.observaciones}"
+                          th:attr="data-id=${enc.id}, data-codigo=${enc.codigoRastreo}, data-remitente=${enc.remitente}, data-dniremitente=${enc.dniRemitente}, data-destinatario=${enc.destinatario}, data-dnidestinatario=${enc.dniDestinatario}, data-origen=${enc.origen}, data-destino=${enc.destino}, data-peso=${enc.peso}, data-precio=${enc.precio}, data-fecha=${enc.fechaEnvio}, data-estado=${enc.estado}, data-observaciones=${enc.observaciones}, data-viajeid=${enc.viajeAsignadoId}"
                           onclick="abrirModalEditarBtn(this)"
                           title="Editar (admin)"
                         >
@@ -550,6 +550,30 @@
                 </select>
               </div>
 
+              <!-- Asignar a viaje -->
+              <div class="col-md-12">
+                <hr class="my-2">
+                <h6 class="fw-bold text-primario mt-2 mb-3">
+                  <i class="bi bi-truck me-1"></i>Asignar a viaje de conductor
+                </h6>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Viaje disponible</label>
+                <select id="modal-editar-viaje" class="form-select">
+                  <option value="">Sin asignar</option>
+                </select>
+                <div class="form-text small text-muted">
+                  <i class="bi bi-info-circle me-1"></i>Solo se muestran viajes de hoy.
+                </div>
+              </div>
+              <div class="col-md-6" id="modal-editar-viaje-info">
+                <label class="form-label small">&nbsp;</label>
+                <div class="p-2 rounded-3 bg-light text-muted small">
+                  <i class="bi bi-arrow-left-right me-1"></i>
+                  <span id="modal-editar-viaje-detalle">Selecciona un viaje para ver los detalles</span>
+                </div>
+              </div>
+
               <div class="col-md-12">
                 <label class="form-label small">Observaciones </label>
                 <textarea
@@ -673,7 +697,13 @@
           false;
         document.getElementById("modal-editar-precio-manual").style.display =
           "none";
+        document.getElementById("modal-editar-viaje-detalle").textContent =
+          "Cargando viajes disponibles...";
         new bootstrap.Modal(document.getElementById("modalEditarAdmin")).show();
+
+        // Cargar viajes disponibles
+        const viajeActual = btn.dataset.viajeid || null;
+        cargarViajesDisponibles(viajeActual);
 
         // recalcular cuando cambie peso
         const pesoInput = document.getElementById("modal-editar-peso");
@@ -848,9 +878,17 @@
             });
             if (!r1.ok) throw new Error();
           }
-          // Si no sobrescribe, el precio ya quedó calculado por el backend en el paso 1
 
-          // 3. actualizar estado siempre
+          // 3. Asignar viaje
+          const viajeId = document.getElementById("modal-editar-viaje").value;
+          const r4 = await fetch(`${API}/${encomiendaIdActual}/viaje`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ viajeId: viajeId ? parseInt(viajeId) : null }),
+          });
+          if (!r4.ok) throw new Error();
+
+          // 4. actualizar estado siempre
           const r3 = await fetch(`${API}/${encomiendaIdActual}/estado`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
@@ -1030,6 +1068,74 @@
           console.error(e);
         }
       }
+
+      // === Viajes disponibles ===
+      let viajesDisponiblesCache = [];
+
+      async function cargarViajesDisponibles(viajeActualId) {
+        const select = document.getElementById("modal-editar-viaje");
+        const detalle = document.getElementById("modal-editar-viaje-detalle");
+        
+        select.innerHTML = '<option value="">Sin asignar</option>';
+        detalle.textContent = "Cargando viajes disponibles...";
+
+        try {
+          const resp = await fetch(`${API}/viajes-disponibles`);
+          if (!resp.ok) throw new Error();
+          viajesDisponiblesCache = await resp.json();
+
+          if (viajesDisponiblesCache.length === 0) {
+            detalle.textContent = "No hay viajes programados para hoy.";
+            select.innerHTML = '<option value="">No hay viajes disponibles</option>';
+            return;
+          }
+
+          select.innerHTML = '<option value="">Sin asignar</option>';
+          
+          viajesDisponiblesCache.forEach(v => {
+            const option = document.createElement("option");
+            option.value = v.id;
+            const conductor = v.conductorEmail || "Sin conductor";
+            option.textContent = `${v.origen} → ${v.destino} | ${v.horaSalida || "-"} | ${conductor}`;
+            select.appendChild(option);
+          });
+
+          // Seleccionar el viaje actual si existe
+          if (viajeActualId && viajeActualId !== "null" && viajeActualId !== "") {
+            const id = parseInt(viajeActualId);
+            if ([...select.options].some(o => parseInt(o.value) === id)) {
+              select.value = id;
+            }
+          }
+
+          // Mostrar detalle del viaje seleccionado
+          mostrarDetalleViaje(select.value);
+        } catch (e) {
+          console.error("Error cargando viajes", e);
+          detalle.textContent = "Error al cargar viajes.";
+          select.innerHTML = '<option value="">Error al cargar</option>';
+        }
+      }
+
+      function mostrarDetalleViaje(viajeId) {
+        const detalle = document.getElementById("modal-editar-viaje-detalle");
+        if (!viajeId || viajeId === "") {
+          detalle.textContent = "Sin viaje asignado";
+          return;
+        }
+        const viaje = viajesDisponiblesCache.find(v => v.id === parseInt(viajeId));
+        if (!viaje) {
+          detalle.textContent = "Viaje seleccionado";
+          return;
+        }
+        const conductor = viaje.conductorEmail || "Sin conductor";
+        detalle.textContent = `${viaje.origen} → ${viaje.destino} | ${viaje.horaSalida || "-"} | Conductor: ${conductor}`;
+      }
+
+      // Actualizar detalle al cambiar el select de viaje (usa caché, sin fetch extra)
+      document.getElementById("modal-editar-viaje").addEventListener("change", function() {
+        mostrarDetalleViaje(this.value);
+      });
 
       // Modal eliminar
       function confirmarEliminarBtn(btn) {

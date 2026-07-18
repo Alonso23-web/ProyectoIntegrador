@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 import proyecto.nuevaases.dto.EncomiendaDTO;
 import proyecto.nuevaases.exception.ResourceNotFoundException;
 import proyecto.nuevaases.models.Encomienda;
+import proyecto.nuevaases.models.Viaje;
 import proyecto.nuevaases.models.enums.EstadoEncomienda;
 import proyecto.nuevaases.repositories.EncomiendaRepository;
+import proyecto.nuevaases.repositories.ViajeRepository;
 import proyecto.nuevaases.services.IEncomiendaService;
 import proyecto.nuevaases.services.IHistorialEncomiendaService;
 
@@ -21,6 +23,7 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
 
     private final EncomiendaRepository encomiendaRepository;
     private final IHistorialEncomiendaService historialEncomiendaService;
+    private final ViajeRepository viajeRepository;
 
     @Override
     public List<EncomiendaDTO> listarTodos() {
@@ -148,10 +151,15 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
                 .fechaEstimadaEntrega(entity.getFechaEstimadaEntrega())
                 .estado(entity.getEstado().name())
                 .observaciones(entity.getObservaciones())
-                .creadoPorEmail(entity.getCreadoPorEmail()).build();
+                .creadoPorEmail(entity.getCreadoPorEmail())
+                .viajeAsignadoId(entity.getViajeAsignado() != null ? entity.getViajeAsignado().getId() : null).build();
     }
 
     private Encomienda convertToEntity(EncomiendaDTO dto) {
+        Viaje viaje = null;
+        if (dto.getViajeAsignadoId() != null && dto.getViajeAsignadoId() > 0) {
+            viaje = viajeRepository.findById(dto.getViajeAsignadoId()).orElse(null);
+        }
         return Encomienda.builder()
                 .id(dto.getId()).codigoRastreo(dto.getCodigoRastreo())
                 .remitente(dto.getRemitente()).dniRemitente(dto.getDniRemitente())
@@ -162,6 +170,7 @@ public class EncomiendaServiceImpl implements IEncomiendaService {
                 .fechaEstimadaEntrega(dto.getFechaEstimadaEntrega())
                 .estado(dto.getEstado() != null ? EstadoEncomienda.valueOf(dto.getEstado()) : EstadoEncomienda.REGISTRADO)
                 .observaciones(dto.getObservaciones())
-                .creadoPorEmail(dto.getCreadoPorEmail()).build();
+                .creadoPorEmail(dto.getCreadoPorEmail())
+                .viajeAsignado(viaje).build();
     }
 }

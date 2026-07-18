@@ -123,7 +123,7 @@ public class DashboardController {
                 .flatMap(v -> pasajeRepository.findByViajeAndEstadoIn(v, List.of(EstadoPasaje.FINALIZADO)).stream())
                 .count();
 
-            long totalEncomiendasCond = encomiendaRepository.countByCreadoPorEmail(conductorEmail);
+            long totalEncomiendasCond = encomiendaRepository.countByViajeConductorEmailAndEstado(conductorEmail, EstadoEncomienda.ENTREGADO);
 
             model.addAttribute("totalViajes", totalViajesCond);
             model.addAttribute("totalPasajeros", totalPasajerosCond);
