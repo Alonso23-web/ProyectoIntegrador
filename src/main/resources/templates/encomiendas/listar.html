@@ -25,9 +25,7 @@
           <button
             type="button"
             class="btn btn-amarillo fw-bold"
-            onclick="
-              alerta('header-alert', 'info', 'Funcionalidad en desarrollo')
-            "
+            onclick="abrirModalNueva()"
           >
             <i class="bi bi-plus-circle me-2"></i>Nueva Encomienda
           </button>
@@ -233,6 +231,176 @@
 
     <div th:replace="~{layout :: footer}"></div>
     <div th:replace="~{layout :: scripts}"></div>
+
+    <!-- Modal: Nueva Encomienda (Admin) -->
+    <div class="modal fade" id="modalNuevaEncomienda" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 border-0 shadow">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold text-primario">
+              <i class="bi bi-plus-circle me-2 text-amarillo"></i>Nueva Encomienda
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <!-- Buscador de cliente -->
+            <div class="mb-4 p-3 bg-light rounded-3">
+              <label class="form-label fw-semibold small mb-1"
+                ><i class="bi bi-search me-1"></i>Buscar cliente por correo o nombre</label
+              >
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="nueva-buscar-cliente"
+                  class="form-control"
+                  placeholder="Escribe correo o nombre del cliente..."
+                />
+                <button class="btn btn-outline-primario" onclick="buscarCliente()">
+                  <i class="bi bi-search"></i>
+                </button>
+              </div>
+              <div id="nueva-resultados-busqueda" class="mt-2" style="max-height: 150px; overflow-y: auto"></div>
+              <small class="text-muted"
+                >Si el cliente no aparece, llena los datos manualmente.</small
+              >
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-12">
+                <h6 class="fw-bold text-primario border-bottom pb-2 mb-3">
+                  <i class="bi bi-person me-1"></i>Datos del remitente
+                </h6>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Nombre completo *</label>
+                <input
+                  type="text"
+                  id="nueva-remitente"
+                  class="form-control"
+                  required
+                  oninput="this.value = this.value.replace(/\d/g, '')"
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">DNI *</label>
+                <input
+                  type="text"
+                  id="nueva-dni-remitente"
+                  class="form-control"
+                  required
+                  inputmode="numeric"
+                  pattern="\d{8}"
+                  maxlength="8"
+                  oninput="this.value = this.value.replace(/\D/g, '').slice(0, 8)"
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">Teléfono</label>
+                <input
+                  type="text"
+                  id="nueva-telefono-remitente"
+                  class="form-control"
+                  inputmode="numeric"
+                  maxlength="9"
+                  oninput="this.value = this.value.replace(/\D/g, '').slice(0, 9)"
+                />
+              </div>
+
+              <div class="col-md-12">
+                <h6 class="fw-bold text-primario border-bottom pb-2 mb-3 mt-2">
+                  <i class="bi bi-person-check me-1"></i>Datos del destinatario
+                </h6>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Nombre completo *</label>
+                <input
+                  type="text"
+                  id="nueva-destinatario"
+                  class="form-control"
+                  required
+                  oninput="this.value = this.value.replace(/\d/g, '')"
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">DNI *</label>
+                <input
+                  type="text"
+                  id="nueva-dni-destinatario"
+                  class="form-control"
+                  required
+                  inputmode="numeric"
+                  pattern="\d{8}"
+                  maxlength="8"
+                  oninput="this.value = this.value.replace(/\D/g, '').slice(0, 8)"
+                />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">Teléfono</label>
+                <input
+                  type="text"
+                  id="nueva-telefono-destinatario"
+                  class="form-control"
+                  inputmode="numeric"
+                  maxlength="9"
+                  oninput="this.value = this.value.replace(/\D/g, '').slice(0, 9)"
+                />
+              </div>
+
+              <div class="col-md-12">
+                <h6 class="fw-bold text-primario border-bottom pb-2 mb-3 mt-2">
+                  <i class="bi bi-arrow-left-right me-1"></i>Datos del envío
+                </h6>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Origen *</label>
+                <select id="nueva-origen" class="form-select" required>
+                  <option value="">Seleccionar...</option>
+                  <option>Trujillo</option>
+                  <option>Chepén</option>
+                  <option>Pacasmayo</option>
+                  <option>San Pedro de Lloc</option>
+                  <option>Ciudad de Dios</option>
+                  <option>Guadalupe</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Destino *</label>
+                <select id="nueva-destino" class="form-select" required>
+                  <option value="">Seleccionar...</option>
+                  <option>Trujillo</option>
+                  <option>Chepén</option>
+                  <option>Pacasmayo</option>
+                  <option>San Pedro de Lloc</option>
+                  <option>Ciudad de Dios</option>
+                  <option>Guadalupe</option>
+                </select>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Descripción</label>
+                <input
+                  type="text"
+                  id="nueva-descripcion"
+                  class="form-control"
+                  placeholder="Ropa, documentos..."
+                />
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-0">
+            <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              Cancelar
+            </button>
+            <button class="btn btn-amarillo fw-bold" onclick="registrarEncomiendaAdmin()">
+              <i class="bi bi-check-circle me-1"></i>Registrar encomienda
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Modal: Editar (Admin) -->
     <div class="modal fade" id="modalEditarAdmin" tabindex="-1">
@@ -700,6 +868,169 @@
         }
       }
 
+      // === Modal: Nueva Encomienda ===
+
+      function abrirModalNueva() {
+        // Limpiar formulario
+        document.getElementById("nueva-buscar-cliente").value = "";
+        document.getElementById("nueva-resultados-busqueda").innerHTML = "";
+        document.getElementById("nueva-remitente").value = "";
+        document.getElementById("nueva-dni-remitente").value = "";
+        document.getElementById("nueva-telefono-remitente").value = "";
+        document.getElementById("nueva-destinatario").value = "";
+        document.getElementById("nueva-dni-destinatario").value = "";
+        document.getElementById("nueva-telefono-destinatario").value = "";
+        document.getElementById("nueva-origen").value = "";
+        document.getElementById("nueva-destino").value = "";
+        document.getElementById("nueva-descripcion").value = "";
+        new bootstrap.Modal(document.getElementById("modalNuevaEncomienda")).show();
+
+        // Enfocar buscador después de abrir el modal
+        setTimeout(() => {
+          document.getElementById("nueva-buscar-cliente").focus();
+        }, 500);
+      }
+
+      // Buscar cliente al presionar Enter en el campo de búsqueda
+      document.getElementById("nueva-buscar-cliente").addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          buscarCliente();
+        }
+      });
+
+      let clienteSeleccionado = null;
+
+      async function buscarCliente() {
+        const q = document.getElementById("nueva-buscar-cliente").value.trim();
+        const contenedor = document.getElementById("nueva-resultados-busqueda");
+        if (!q || q.length < 2) {
+          contenedor.innerHTML =
+            '<small class="text-muted">Ingresa al menos 2 caracteres</small>';
+          return;
+        }
+        try {
+          contenedor.innerHTML =
+            '<div class="spinner-border spinner-border-sm me-2"></div> Buscando...';
+          const resp = await fetch(
+            `/api/usuarios/buscar?q=${encodeURIComponent(q)}`,
+          );
+          if (!resp.ok) throw new Error();
+          const resultados = await resp.json();
+          if (resultados.length === 0) {
+            contenedor.innerHTML = `
+              <div class="alert alert-info py-2 mb-0 small">
+                <i class="bi bi-info-circle me-1"></i>No se encontraron clientes. Puedes llenar los datos manualmente.
+              </div>
+            `;
+            return;
+          }
+          contenedor.innerHTML = resultados
+            .map(
+              (u) => `
+              <div
+                class="d-flex align-items-center justify-content-between p-2 rounded-3 resultado-cliente"
+                style="cursor: pointer;"
+                data-email="${u.email}"
+                data-nombre="${u.nombreCompleto}"
+                data-dni="${u.dni}"
+                data-telefono="${u.telefono || ""}"
+              >
+                <div>
+                  <strong>${u.nombreCompleto}</strong>
+                  <br><small class="text-muted">${u.email} | DNI: ${u.dni}</small>
+                </div>
+                <i class="bi bi-arrow-right-circle text-primario"></i>
+              </div>
+            `,
+            )
+            .join("");
+        } catch (e) {
+          contenedor.innerHTML =
+            '<div class="alert alert-danger py-2 mb-0 small">Error al buscar clientes.</div>';
+        }
+      }
+
+      function seleccionarCliente(email, nombre, dni, telefono) {
+        clienteSeleccionado = email;
+        document.getElementById("nueva-remitente").value = nombre;
+        document.getElementById("nueva-dni-remitente").value = dni;
+        if (telefono) {
+          document.getElementById("nueva-telefono-remitente").value = telefono;
+        }
+        document.getElementById("nueva-resultados-busqueda").innerHTML =
+          `<div class="alert alert-success py-2 mb-0 small">
+            <i class="bi bi-check-circle me-1"></i>Cliente seleccionado: <strong>${nombre}</strong>
+          </div>`;
+        // Enfocar siguiente campo
+        document.getElementById("nueva-destinatario").focus();
+      }
+
+      async function registrarEncomiendaAdmin() {
+        const remitente = document.getElementById("nueva-remitente").value.trim();
+        const dniRemitente = document.getElementById("nueva-dni-remitente").value.trim();
+        const telefonoRemitente = document.getElementById("nueva-telefono-remitente").value.trim();
+        const destinatario = document.getElementById("nueva-destinatario").value.trim();
+        const dniDestinatario = document.getElementById("nueva-dni-destinatario").value.trim();
+        const telefonoDestinatario = document.getElementById("nueva-telefono-destinatario").value.trim();
+        const origen = document.getElementById("nueva-origen").value;
+        const destino = document.getElementById("nueva-destino").value;
+        const descripcion = document.getElementById("nueva-descripcion").value.trim();
+
+        // Validaciones
+        if (!remitente || !dniRemitente || !destinatario || !dniDestinatario || !origen || !destino) {
+          alert("Completa todos los campos obligatorios.");
+          return;
+        }
+
+        if (origen === destino) {
+          alert("El origen y destino no pueden ser iguales.");
+          return;
+        }
+
+        const dniRegex = /^\d{8}$/;
+        if (!dniRegex.test(dniRemitente) || !dniRegex.test(dniDestinatario)) {
+          alert("Los DNI deben tener 8 dígitos numéricos.");
+          return;
+        }
+
+        try {
+          const body = {
+            remitente,
+            dniRemitente,
+            destinatario,
+            dniDestinatario,
+            origen,
+            destino,
+            descripcion,
+            observaciones: [telefonoRemitente, telefonoDestinatario].filter(Boolean).join(" / ") || "-",
+          };
+
+          // Si se seleccionó un cliente registrado, asociar la encomienda a su email
+          // para que aparezca en "Mis Registros" del cliente
+          if (clienteSeleccionado) {
+            body.creadoPorEmail = clienteSeleccionado;
+          }
+
+          const r = await fetch(API, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+
+          if (!r.ok) throw new Error();
+
+          const d = await r.json();
+          bootstrap.Modal.getInstance(
+            document.getElementById("modalNuevaEncomienda"),
+          ).hide();
+          location.reload();
+        } catch (e) {
+          alert("Error al registrar la encomienda. Intenta de nuevo.");
+          console.error(e);
+        }
+      }
+
       // Modal eliminar
       function confirmarEliminarBtn(btn) {
         encomiendaIdActual = btn.dataset.id;
@@ -722,6 +1053,27 @@
           alert("Error al eliminar. Intenta de nuevo.");
         }
       }
+
+      // Event delegation: clic en resultados de búsqueda de clientes
+      document.getElementById("nueva-resultados-busqueda").addEventListener("click", function (e) {
+        const div = e.target.closest(".resultado-cliente");
+        if (div) {
+          seleccionarCliente(
+            div.dataset.email,
+            div.dataset.nombre,
+            div.dataset.dni,
+            div.dataset.telefono || ""
+          );
+        }
+      });
+
+      // Limpiar cliente seleccionado al escribir en el buscador
+      document.getElementById("nueva-buscar-cliente").addEventListener("input", function () {
+        clienteSeleccionado = null;
+        if (!this.value.trim()) {
+          document.getElementById("nueva-resultados-busqueda").innerHTML = "";
+        }
+      });
     </script>
   </body>
 </html>

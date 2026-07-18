@@ -112,6 +112,14 @@ public class UsuarioServiceImpl implements IUsuarioService {
         usuarioRepository.deleteById(id);
     }
 
+    @Override
+    public List<UsuarioDTO> buscarClientes(String query) {
+        return usuarioRepository.findTop10ByEmailContainingOrNombreCompletoContaining(query, query)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     private UsuarioDTO convertToDTO(Usuario entity) {
         return UsuarioDTO.builder()
                 .id(entity.getId())

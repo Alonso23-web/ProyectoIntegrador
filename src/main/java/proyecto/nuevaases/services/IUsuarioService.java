@@ -23,4 +23,7 @@ public interface IUsuarioService {
     // ==================== User management (admin) ====================
     List<UsuarioDTO> listarTodosUsuarios();
     UsuarioDTO cambiarEstadoActivo(Long id, boolean activo);
+
+    // ==================== Búsqueda de clientes ====================
+    List<UsuarioDTO> buscarClientes(String query);
 }

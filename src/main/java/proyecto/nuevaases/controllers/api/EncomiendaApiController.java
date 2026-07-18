@@ -38,7 +38,11 @@ public class EncomiendaApiController {
     public ResponseEntity<?> registrar(@RequestBody EncomiendaDTO encomienda, Authentication authentication) {
         if (authentication != null && authentication.isAuthenticated()) {
             var email = authentication.getName();
-            encomienda.setCreadoPorEmail(email);
+            // Si el creadoPorEmail ya viene en el body (ej: admin registrando para un cliente),
+            // respetarlo. Si no, asignar el email del usuario autenticado.
+            if (encomienda.getCreadoPorEmail() == null || encomienda.getCreadoPorEmail().isBlank()) {
+                encomienda.setCreadoPorEmail(email);
+            }
             usuarioService.buscarPorEmail(email).ifPresent(usuario -> {
                 if (encomienda.getRemitente() == null || encomienda.getRemitente().isBlank()) {
                     encomienda.setRemitente(usuario.getNombreCompleto());

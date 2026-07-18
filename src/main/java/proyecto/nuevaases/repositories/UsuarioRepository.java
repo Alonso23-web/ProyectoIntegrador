@@ -22,5 +22,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     long countByRolAndActivo(Rol rol, boolean activo);
 
     List<Usuario> findByRol(Rol rol);
+
+    List<Usuario> findTop10ByEmailContainingOrNombreCompletoContaining(String email, String nombreCompleto);
 }
 
