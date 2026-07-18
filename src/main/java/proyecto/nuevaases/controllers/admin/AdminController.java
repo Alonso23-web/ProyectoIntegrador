@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import proyecto.nuevaases.dto.UsuarioDTO;
 import proyecto.nuevaases.repositories.ContactoMensajeRepository;
 import proyecto.nuevaases.repositories.EncomiendaRepository;
 import proyecto.nuevaases.repositories.PasajeRepository;
@@ -52,6 +53,43 @@ public class AdminController {
     public String listarUsuarios(Model model) {
         model.addAttribute("usuarios", usuarioService.listarTodosUsuarios());
         return "admin/usuarios";
+    }
+
+    @PostMapping("/usuarios/registrar")
+    public String registrarUsuario(
+            @RequestParam String nombreCompleto,
+            @RequestParam String email,
+            @RequestParam String dni,
+            @RequestParam String telefono,
+            @RequestParam String password,
+            @RequestParam(defaultValue = "CLIENTE") String rol,
+            RedirectAttributes redirectAttributes) {
+        try {
+            if (usuarioService.existeEmail(email)) {
+                redirectAttributes.addFlashAttribute("mensajeError", "El correo " + email + " ya está registrado.");
+                return "redirect:/admin/usuarios";
+            }
+            if (usuarioService.existeDni(dni)) {
+                redirectAttributes.addFlashAttribute("mensajeError", "El DNI " + dni + " ya está registrado.");
+                return "redirect:/admin/usuarios";
+            }
+
+            UsuarioDTO nuevoUsuario = UsuarioDTO.builder()
+                    .nombreCompleto(nombreCompleto)
+                    .email(email)
+                    .dni(dni)
+                    .telefono(telefono)
+                    .rol(rol)
+                    .activo(true)
+                    .build();
+
+            usuarioService.registrar(nuevoUsuario, password);
+            redirectAttributes.addFlashAttribute("mensajeExito",
+                    "Usuario " + nombreCompleto + " registrado exitosamente como " + rol);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al registrar usuario: " + e.getMessage());
+        }
+        return "redirect:/admin/usuarios";
     }
 
     @PostMapping("/usuarios/estado/{id}")

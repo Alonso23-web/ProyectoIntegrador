@@ -20,6 +20,9 @@
             </h4>
             <small class="text-muted">Administra clientes, conductores y administradores del sistema</small>
           </div>
+          <button type="button" class="btn btn-amarillo fw-bold" onclick="abrirModalNuevoUsuario()">
+            <i class="bi bi-person-plus me-2"></i>Nuevo Usuario
+          </button>
         </div>
 
         <!-- Flash messages -->
@@ -170,6 +173,66 @@
       </div>
     </section>
 
+    <!-- Modal: Nuevo Usuario -->
+    <div class="modal fade" id="modalNuevoUsuario" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title fw-bold text-primario">
+              <i class="bi bi-person-plus me-2 text-amarillo"></i>Nuevo Usuario
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <form th:action="@{/admin/usuarios/registrar}" method="post">
+            <div class="modal-body">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label fw-semibold small">Nombre completo *</label>
+                  <input type="text" name="nombreCompleto" class="form-control" required
+                    oninput="this.value = this.value.replace(/\d/g, '')" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Correo electrónico *</label>
+                  <input type="email" name="email" class="form-control" required />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Contraseña *</label>
+                  <input type="password" name="password" class="form-control" required minlength="6" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">DNI *</label>
+                  <input type="text" name="dni" class="form-control" required
+                    inputmode="numeric" pattern="\d{8}" maxlength="8"
+                    oninput="this.value = this.value.replace(/\D/g, '').slice(0, 8)" />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold small">Teléfono</label>
+                  <input type="text" name="telefono" class="form-control"
+                    inputmode="numeric" maxlength="9"
+                    oninput="this.value = this.value.replace(/\D/g, '').slice(0, 9)" />
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-semibold small">Rol</label>
+                  <select name="rol" class="form-select">
+                    <option value="CLIENTE" selected>Cliente</option>
+                    <option value="CONDUCTOR">Conductor</option>
+                    <option value="ADMINISTRADOR">Administrador</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer border-0">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-amarillo fw-bold">
+                <i class="bi bi-check-circle me-1"></i>Registrar usuario
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- Modal: Detalle de Usuario -->
     <div class="modal fade" id="modalDetalleUsuario" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
@@ -253,6 +316,10 @@
     </style>
 
     <script>
+      function abrirModalNuevoUsuario() {
+        new bootstrap.Modal(document.getElementById("modalNuevoUsuario")).show();
+      }
+
       document.getElementById("filtro-buscar").addEventListener("input", filtrar);
       document.getElementById("filtro-rol").addEventListener("change", filtrar);
       document.getElementById("filtro-estado").addEventListener("change", filtrar);
