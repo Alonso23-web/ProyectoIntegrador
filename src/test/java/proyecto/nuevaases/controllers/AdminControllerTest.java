@@ -10,9 +10,15 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.security.test.context.support.WithMockUser;
 
 import proyecto.nuevaases.controllers.admin.AdminController;
+import proyecto.nuevaases.repositories.ContactoMensajeRepository;
 import proyecto.nuevaases.repositories.EncomiendaRepository;
 import proyecto.nuevaases.repositories.PasajeRepository;
+import proyecto.nuevaases.repositories.SolicitudAlquilerRepository;
+import proyecto.nuevaases.repositories.UsuarioRepository;
+import proyecto.nuevaases.repositories.ViajeRepository;
 
+import proyecto.nuevaases.services.IContactoMensajeService;
+import proyecto.nuevaases.services.ISolicitudAlquilerService;
 import proyecto.nuevaases.services.IUsuarioService;
 
 import java.io.ByteArrayInputStream;
@@ -40,6 +46,24 @@ class AdminControllerTest {
 
     @MockBean
     IUsuarioService usuarioService;
+
+    @MockBean
+    ViajeRepository viajeRepository;
+
+    @MockBean
+    UsuarioRepository usuarioRepository;
+
+    @MockBean
+    ContactoMensajeRepository contactoMensajeRepository;
+
+    @MockBean
+    SolicitudAlquilerRepository solicitudAlquilerRepository;
+
+    @MockBean
+    IContactoMensajeService contactoMensajeService;
+
+    @MockBean
+    ISolicitudAlquilerService solicitudAlquilerService;
 
     @Test
     @WithMockUser(roles = "ADMINISTRADOR")
