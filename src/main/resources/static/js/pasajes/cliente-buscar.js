@@ -309,9 +309,9 @@ const pasajesUI = {
         if (btn) {
             btn.disabled = !tieneViaje || cantidad < 1;
             if (tieneViaje && cantidad > 0) {
-                btn.innerHTML = `<i class="bi bi-cart-check me-2"></i>Comprar pasaje — ${formatearPrecio(total)}`;
+                btn.innerHTML = `<i class="bi bi-cart-check me-2"></i>Reservar pasaje — ${formatearPrecio(total)}`;
             } else {
-                btn.innerHTML = `<i class="bi bi-cart-check me-2"></i>Comprar pasaje`;
+                btn.innerHTML = `<i class="bi bi-cart-check me-2"></i>Reservar pasaje`;
             }
         }
     },
@@ -402,7 +402,7 @@ const pasajesUI = {
             document.getElementById("boleto-area")?.scrollIntoView({ behavior: "smooth", block: "center" });
 
             this.setAlerta("compra-alert", "success",
-                `¡Compra exitosa! Se generaron ${codigos.length} boleto(s). Guarda tu(s) código(s) para abordar.`);
+                `¡Reserva exitosa! Se generaron ${codigos.length} boleto(s). Recuerda acercarte a nuestras oficinas para completar el pago.`);
 
         } catch (err) {
             console.error("Error en confirmarCompra:", err);

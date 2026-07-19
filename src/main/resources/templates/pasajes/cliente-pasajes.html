@@ -172,15 +172,17 @@
                       </div>
                     </div>
 
-                    <div class="text-muted small mb-3">
-                      <i class="bi bi-shield-check me-1" style="color: #f5a623;"></i>
-                      Precio fijo de <strong>S/ 12.00</strong> por pasajero.
-                      Los asientos se asignan al subir a la combi. No hay selección de asientos.
+                    <div class="alert alert-info d-flex align-items-start gap-2 mb-3" style="border-radius: 12px; border-left: 4px solid #f5a623;">
+                      <i class="bi bi-shield-check mt-1" style="color: #f5a623; font-size: 1.2rem;"></i>
+                      <div>
+                        <strong>Para tu seguridad, realiza tu reserva digital y finaliza el pago presencialmente en nuestras oficinas.</strong>
+                        <div class="small text-muted mt-1">Los asientos se asignan al subir a la combi. No hay selección de asientos.</div>
+                      </div>
                     </div>
 
                     <div class="d-grid gap-2">
                       <button class="btn btn-amarillo fw-bold btn-lg" id="btn-confirmar-compra" onclick="pasajesUI.confirmarCompra()" disabled>
-                        <i class="bi bi-cart-check me-2"></i>Comprar pasaje
+                        <i class="bi bi-cart-check me-2"></i>Reservar pasaje
                       </button>
                     </div>
 
@@ -189,8 +191,12 @@
                       <div class="card border-success bg-success bg-opacity-10" style="border-radius: 12px;">
                         <div class="card-body text-center p-4">
                           <i class="bi bi-check-circle-fill text-success fs-1 mb-2"></i>
-                          <h5 class="fw-bold text-success mb-2">¡Compra exitosa!</h5>
-                          <p class="small text-muted mb-2">Tus pasajes han sido reservados correctamente.</p>
+                          <h5 class="fw-bold text-success mb-2">¡Reserva exitosa!</h5>
+                          <p class="small text-muted mb-2">Tu reserva ha sido registrada correctamente.</p>
+                          <div class="alert alert-warning small mb-3" style="border-radius: 8px;">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                            Recuerda acercarte a nuestras oficinas para completar el pago.
+                          </div>
                           <div id="codigos-result">
                             <div class="small text-muted mb-2">Código(s) de boleto:</div>
                           </div>
@@ -262,7 +268,7 @@
                   <div class="mt-3 p-2 rounded" style="background: #f5a62315;">
                     <p class="small mb-0" style="color: #0d1b3e;">
                       <i class="bi bi-shield-check me-1" style="color: #f5a623;"></i>
-                      Precio fijo de <strong>S/ 12.00</strong> por pasajero.
+                      Reserva digital y pago presencial en nuestras oficinas.
                       Sin selección de asientos. El viaje sale al completar aforo.
                     </p>
                   </div>
