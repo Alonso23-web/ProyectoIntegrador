@@ -70,7 +70,7 @@
                   </div>
                 </div>
                 <div class="row">
-                  <div class="col-md-4 mb-3">
+                  <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Fecha de Viaje</label>
                     <input
                       type="date"
@@ -79,7 +79,7 @@
                       required
                     />
                   </div>
-                  <div class="col-md-4 mb-3">
+                  <div class="col-md-6 mb-3">
                     <label class="form-label fw-bold">Hora</label>
                     <select
                       class="form-select"
@@ -92,18 +92,9 @@
                       <option value="20:00">08:00 PM</option>
                     </select>
                   </div>
-                  <div class="col-md-4 mb-3">
-                    <label class="form-label fw-bold">Asiento</label>
-                    <input
-                      type="number"
-                      class="form-control"
-                      th:field="*{asiento}"
-                      required
-                    />
-                  </div>
                 </div>
                 <div class="row">
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-4 mb-3">
                     <label class="form-label fw-bold">Precio (S/) <span class="text-muted fw-normal">— Fijo S/ 12.00</span></label>
                     <input
                       type="number"
@@ -115,12 +106,19 @@
                       required
                     />
                   </div>
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-4 mb-3">
                     <label class="form-label fw-bold">Estado</label>
                     <select class="form-select" th:field="*{estado}" required>
                       <option value="RESERVADO">Reservado</option>
                       <option value="PAGADO">Pagado</option>
-                      <option value="CANCELADO">Cancelado</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label class="form-label fw-bold">Estado de Viaje</label>
+                    <select class="form-select" th:field="*{estadoViaje}">
+                      <option value="">Sin definir</option>
+                      <option value="EN_VIAJE">En Viaje</option>
+                      <option value="LLEGO">Lleg&oacute;</option>
                     </select>
                   </div>
                 </div>

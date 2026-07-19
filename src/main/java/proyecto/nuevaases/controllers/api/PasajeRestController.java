@@ -118,6 +118,7 @@ public class PasajeRestController {
 
         Map<String, Object> respuesta = new HashMap<>();
         respuesta.put("estado", dto.getEstado());
+        respuesta.put("estadoViaje", dto.getEstadoViaje());
         respuesta.put("origen", dto.getOrigen());
         respuesta.put("destino", dto.getDestino());
         respuesta.put("fecha", dto.getFechaViaje());

@@ -80,6 +80,19 @@ public class PasajeController {
         return "redirect:/pasajes";
     }
 
+    @PostMapping("/estado-viaje/{id}")
+    public String cambiarEstadoViaje(@PathVariable Long id, @RequestParam String estadoViaje, RedirectAttributes redirectAttributes) {
+        try {
+            PasajeDTO pasaje = pasajeService.buscarPorId(id);
+            pasaje.setEstadoViaje(estadoViaje);
+            pasajeService.guardar(pasaje);
+            redirectAttributes.addFlashAttribute("mensajeExito", "Estado de viaje actualizado a " + estadoViaje);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("mensajeError", "Error al actualizar estado de viaje: " + e.getMessage());
+        }
+        return "redirect:/pasajes";
+    }
+
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
         pasajeService.eliminar(id);

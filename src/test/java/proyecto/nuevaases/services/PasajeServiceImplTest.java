@@ -124,6 +124,7 @@ class PasajeServiceImplTest {
 
     @Test
     void guardar_conPasajeValido_debeGuardar() {
+        when(pasajeRepository.findById(1L)).thenReturn(Optional.of(pasaje));
         when(pasajeRepository.save(any(Pasaje.class))).thenReturn(pasaje);
 
         PasajeDTO resultado = pasajeService.guardar(pasajeDTO);

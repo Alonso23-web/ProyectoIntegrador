@@ -445,11 +445,6 @@ const pasajesUI = {
                     <td><span class="small">${escapeHtml(v.dni || "—")}</span></td>
                     <td><span class="small">${escapeHtml(v.origen)} → ${escapeHtml(v.destino)}</span></td>
                     <td><span class="small">${v.fechaViaje || "—"}</span></td>
-                    <td>
-                        <span class="badge ${v.estado === 'RESERVADO' ? 'bg-warning text-dark' : v.estado === 'PAGADO' ? 'bg-success' : v.estado === 'FINALIZADO' ? 'bg-info text-dark' : 'bg-secondary'} rounded-pill">
-                            ${escapeHtml(v.estado)}
-                        </span>
-                    </td>
                     <td><code class="small">${escapeHtml(v.codigoBoleto || "—")}</code></td>
                     <td class="fw-semibold small">${formatearPrecio(v.precio)}</td>
                 </tr>
@@ -464,7 +459,6 @@ const pasajesUI = {
                                 <th>DNI</th>
                                 <th>Ruta</th>
                                 <th>Fecha</th>
-                                <th>Estado</th>
                                 <th>Código</th>
                                 <th>Total</th>
                             </tr>
@@ -514,13 +508,22 @@ const pasajesUI = {
                 default: estadoBadge = "bg-secondary"; estadoColor = "#6c757d";
             }
 
+            let estadoViajeHtml = '';
+            if (d.estadoViaje) {
+                const evBadge = d.estadoViaje === 'EN_VIAJE'
+                    ? 'bg-warning text-dark'
+                    : d.estadoViaje === 'LLEGO' ? 'bg-success' : 'bg-secondary';
+                estadoViajeHtml = `<span class="badge ${evBadge} rounded-pill fs-6 px-3 py-2 ms-2">${escapeHtml(d.estadoViaje)}</span>`;
+            }
+
             container.innerHTML = `
                 <div class="card border-0 shadow-sm mt-3" style="border-radius: 16px;">
                     <div class="card-body p-4">
                         <div class="text-center mb-3">
-                            <i class="bi bi-ticket-perforated display-6" style="color: #f5a623;"></i>
+                            <i class="bi bi-ticket-perforating display-6" style="color: #f5a623;"></i>
                             <h5 class="fw-bold mt-2" style="color: #0d1b3e;">${escapeHtml(d.nombrePasajero)}</h5>
                             <span class="badge ${estadoBadge} rounded-pill fs-6 px-3 py-2">${escapeHtml(d.estado)}</span>
+                            ${estadoViajeHtml}
                         </div>
                         <div class="row g-2 small">
                             <div class="col-6"><span class="text-muted">Ruta</span><br><span class="fw-semibold">${escapeHtml(d.origen)} → ${escapeHtml(d.destino)}</span></div>

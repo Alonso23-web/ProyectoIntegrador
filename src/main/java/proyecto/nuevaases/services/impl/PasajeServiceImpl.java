@@ -8,6 +8,7 @@ import proyecto.nuevaases.exception.ResourceNotFoundException;
 import proyecto.nuevaases.models.Pasaje;
 import proyecto.nuevaases.models.Viaje;
 import proyecto.nuevaases.models.enums.EstadoPasaje;
+import proyecto.nuevaases.models.enums.EstadoPasajeViaje;
 import proyecto.nuevaases.repositories.PasajeRepository;
 import proyecto.nuevaases.repositories.ViajeRepository;
 import proyecto.nuevaases.services.IPasajeService;
@@ -44,16 +45,49 @@ public class PasajeServiceImpl implements IPasajeService {
 
     @Override
     public PasajeDTO guardar(PasajeDTO dto) {
-        Pasaje pasaje = convertToEntity(dto);
-        if (dto.getViajeId() != null) {
-            Viaje viaje = viajeRepository.findById(dto.getViajeId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Viaje no encontrado con ID: " + dto.getViajeId()));
-            pasaje.setViaje(viaje);
-            if (pasaje.getOrigen() == null) pasaje.setOrigen(viaje.getOrigen());
-            if (pasaje.getDestino() == null) pasaje.setDestino(viaje.getDestino());
-            if (pasaje.getFechaViaje() == null) pasaje.setFechaViaje(viaje.getFecha());
-            if (pasaje.getHoraViaje() == null) pasaje.setHoraViaje(viaje.getHoraSalida());
+        Pasaje pasaje;
+
+        if (dto.getId() != null) {
+            // Editing existing pasaje: fetch it first to preserve relationships
+            pasaje = pasajeRepository.findById(dto.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Pasaje no encontrado con ID: " + dto.getId()));
+
+            // Apply DTO fields
+            pasaje.setNombrePasajero(dto.getNombrePasajero());
+            pasaje.setDni(dto.getDni());
+            pasaje.setOrigen(dto.getOrigen());
+            pasaje.setDestino(dto.getDestino());
+            pasaje.setFechaViaje(dto.getFechaViaje());
+            pasaje.setHoraViaje(dto.getHoraViaje());
+            pasaje.setAsiento(dto.getAsiento() != null ? dto.getAsiento() : 0);
+            pasaje.setPrecio(dto.getPrecio() != null ? dto.getPrecio() : 0.0);
+            pasaje.setEstado(dto.getEstado() != null ? EstadoPasaje.valueOf(dto.getEstado()) : pasaje.getEstado());
+            pasaje.setCreadoPorEmail(dto.getCreadoPorEmail());
+
+            if (dto.getEstadoViaje() != null && !dto.getEstadoViaje().isEmpty()) {
+                pasaje.setEstadoViaje(EstadoPasajeViaje.valueOf(dto.getEstadoViaje()));
+            }
+
+            // Preserve viaje if not provided in DTO
+            if (dto.getViajeId() != null) {
+                Viaje viaje = viajeRepository.findById(dto.getViajeId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Viaje no encontrado con ID: " + dto.getViajeId()));
+                pasaje.setViaje(viaje);
+            }
+        } else {
+            // Creating new pasaje
+            pasaje = convertToEntity(dto);
+            if (dto.getViajeId() != null) {
+                Viaje viaje = viajeRepository.findById(dto.getViajeId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Viaje no encontrado con ID: " + dto.getViajeId()));
+                pasaje.setViaje(viaje);
+                if (pasaje.getOrigen() == null) pasaje.setOrigen(viaje.getOrigen());
+                if (pasaje.getDestino() == null) pasaje.setDestino(viaje.getDestino());
+                if (pasaje.getFechaViaje() == null) pasaje.setFechaViaje(viaje.getFecha());
+                if (pasaje.getHoraViaje() == null) pasaje.setHoraViaje(viaje.getHoraSalida());
+            }
         }
+
         return convertToDTO(pasajeRepository.save(pasaje));
     }
 
@@ -203,6 +237,7 @@ public class PasajeServiceImpl implements IPasajeService {
                 .asiento(entity.getAsiento())
                 .precio(entity.getPrecio())
                 .estado(entity.getEstado().name())
+                .estadoViaje(entity.getEstadoViaje() != null ? entity.getEstadoViaje().name() : null)
                 .creadoPorEmail(entity.getCreadoPorEmail())
                 .codigoBoleto(entity.getCodigoBoleto());
 
@@ -236,6 +271,8 @@ public class PasajeServiceImpl implements IPasajeService {
                 .asiento(dto.getAsiento() != null ? dto.getAsiento() : 0)
                 .precio(dto.getPrecio() != null ? dto.getPrecio() : 0.0)
                 .estado(dto.getEstado() != null ? EstadoPasaje.valueOf(dto.getEstado()) : EstadoPasaje.RESERVADO)
+                .estadoViaje(dto.getEstadoViaje() != null && !dto.getEstadoViaje().isEmpty()
+                        ? EstadoPasajeViaje.valueOf(dto.getEstadoViaje()) : null)
                 .creadoPorEmail(dto.getCreadoPorEmail())
                 .codigoBoleto(dto.getCodigoBoleto());
 

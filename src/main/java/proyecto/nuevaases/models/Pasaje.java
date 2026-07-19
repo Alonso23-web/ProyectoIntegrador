@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import proyecto.nuevaases.models.enums.EstadoPasaje;
+import proyecto.nuevaases.models.enums.EstadoPasajeViaje;
 import proyecto.nuevaases.models.enums.TipoPago;
 
 import java.time.LocalDate;
@@ -68,6 +69,9 @@ public class Pasaje {
 
     @Enumerated(EnumType.STRING)
     private TipoPago tipoPago;
+
+    @Enumerated(EnumType.STRING)
+    private EstadoPasajeViaje estadoViaje;
 
     @CreationTimestamp
     @Column(updatable = false)

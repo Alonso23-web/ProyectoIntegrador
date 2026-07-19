@@ -20,6 +20,7 @@ public class PasajeDTO {
     private Integer asiento;
     private Double precio;
     private String estado;
+    private String estadoViaje;
     private String creadoPorEmail;
     private String codigoBoleto;
 }

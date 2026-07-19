@@ -84,6 +84,7 @@
                     <th class="py-3 text-muted small fw-bold">ASIENTO</th>
                     <th class="py-3 text-muted small fw-bold">PRECIO</th>
                     <th class="py-3 text-muted small fw-bold">ESTADO</th>
+                    <th class="py-3 text-muted small fw-bold">ESTADO VIAJE</th>
                     <th class="py-3 text-muted small fw-bold" style="min-width: 140px">ACCIONES</th>
                   </tr>
                 </thead>
@@ -95,6 +96,9 @@
                     th:data-email="${p.creadoPorEmail}"
                     th:data-estado="${p.estado}"
                     th:data-fecha="${p.fechaViaje}"
+                    th:data-viaje-id="${p.viajeId}"
+                    th:data-usuario-email="${p.usuarioEmail}"
+                    th:data-estado-viaje="${p.estadoViaje}"
                   >
                     <td class="px-3">
                       <div class="fw-semibold" th:text="${p.nombrePasajero}">—</div>
@@ -122,6 +126,15 @@
                       ></span>
                     </td>
                     <td>
+                      <span
+                        class="badge-estado"
+                        th:if="${p.estadoViaje != null}"
+                        th:classappend="'badge-' + ${#strings.toLowerCase(p.estadoViaje)}"
+                        th:text="${p.estadoViaje}"
+                      ></span>
+                      <span th:if="${p.estadoViaje == null}" class="text-muted small">—</span>
+                    </td>
+                    <td>
                       <div class="d-flex gap-1">
                         <!-- Editar (modal) -->
                         <button
@@ -136,7 +149,10 @@
                             data-asiento=${p.asiento},
                             data-precio=${p.precio},
                             data-estado=${p.estado},
-                            data-email=${p.creadoPorEmail}"
+                            data-email=${p.creadoPorEmail},
+                            data-viaje-id=${p.viajeId},
+                            data-usuario-email=${p.usuarioEmail},
+                            data-estado-viaje=${p.estadoViaje}"
                           onclick="abrirModalEditar(this)"
                           title="Editar"
                         >
@@ -171,21 +187,34 @@
                                 </button>
                               </form>
                             </li>
+                          </ul>
+                        </div>
+                        <!-- Cambiar estado de viaje rápido -->
+                        <div class="dropdown">
+                          <button
+                            class="btn btn-sm btn-outline-info dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            title="Cambiar estado de viaje"
+                          >
+                            <i class="bi bi-geo-alt"></i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-end">
                             <li>
-                              <form th:action="@{'/pasajes/estado/' + ${p.id}}" method="post" style="display:inline">
-                                <input type="hidden" name="estado" value="CANCELADO" />
+                              <form th:action="@{'/pasajes/estado-viaje/' + ${p.id}}" method="post" style="display:inline">
+                                <input type="hidden" name="estadoViaje" value="EN_VIAJE" />
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                 <button type="submit" class="dropdown-item small">
-                                  <span class="badge-estado badge-cancelado me-2">CANCELADO</span> Marcar
+                                  <span class="badge-estado badge-en-viaje me-2">EN VIAJE</span> Marcar
                                 </button>
                               </form>
                             </li>
                             <li>
-                              <form th:action="@{'/pasajes/estado/' + ${p.id}}" method="post" style="display:inline">
-                                <input type="hidden" name="estado" value="FINALIZADO" />
+                              <form th:action="@{'/pasajes/estado-viaje/' + ${p.id}}" method="post" style="display:inline">
+                                <input type="hidden" name="estadoViaje" value="LLEGO" />
                                 <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                                 <button type="submit" class="dropdown-item small">
-                                  <span class="badge-estado badge-finalizado me-2">FINALIZADO</span> Marcar
+                                  <span class="badge-estado badge-llego me-2">LLEG&Oacute;</span> Marcar
                                 </button>
                               </form>
                             </li>
@@ -203,7 +232,7 @@
                     </td>
                   </tr>
                   <tr th:if="${#lists.size(pasajes) == 0}">
-                    <td colspan="9" class="text-center text-muted py-5">
+                    <td colspan="10" class="text-center text-muted py-5">
                       <i class="bi bi-inbox display-6 d-block mb-2"></i>
                       No hay pasajes registrados.
                     </td>
@@ -268,11 +297,19 @@
                   <select name="estado" id="modal-estado" class="form-select">
                     <option value="RESERVADO">Reservado</option>
                     <option value="PAGADO">Pagado</option>
-                    <option value="CANCELADO">Cancelado</option>
-                    <option value="FINALIZADO">Finalizado</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-semibold">Estado de Viaje</label>
+                  <select name="estadoViaje" id="modal-estado-viaje" class="form-select">
+                    <option value="">Sin definir</option>
+                    <option value="EN_VIAJE">En Viaje</option>
+                    <option value="LLEGO">Lleg&oacute;</option>
                   </select>
                 </div>
                 <input type="hidden" name="creadoPorEmail" id="modal-email" />
+                <input type="hidden" name="viajeId" id="modal-viaje-id" />
+                <input type="hidden" name="usuarioEmail" id="modal-usuario-email" />
               </div>
             </div>
             <div class="modal-footer border-0">
@@ -300,6 +337,8 @@
       .badge-pagado { background: #e6f4ea; color: #1e8e3e; }
       .badge-cancelado { background: #fce8e6; color: #d93025; }
       .badge-finalizado { background: #e8f0fe; color: #1967d2; }
+      .badge-en-viaje { background: #fff3e0; color: #e65100; }
+      .badge-llego { background: #e8f5e9; color: #2e7d32; }
       .badge-light-blue {
         background: rgba(13,27,62,0.08);
         color: #0d1b3e;
@@ -355,6 +394,9 @@
         document.getElementById("modal-precio").value = btn.dataset.precio || "12.00";
         document.getElementById("modal-estado").value = btn.dataset.estado || "RESERVADO";
         document.getElementById("modal-email").value = btn.dataset.email || "";
+        document.getElementById("modal-viaje-id").value = btn.dataset.viajeId || "";
+        document.getElementById("modal-usuario-email").value = btn.dataset.usuarioEmail || "";
+        document.getElementById("modal-estado-viaje").value = btn.dataset.estadoViaje || "";
 
         new bootstrap.Modal(document.getElementById("modalEditarPasaje")).show();
       }
