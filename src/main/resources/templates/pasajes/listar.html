@@ -276,18 +276,12 @@
                   <label class="form-label small fw-semibold">Destino</label>
                   <input type="text" name="destino" id="modal-destino" class="form-control" readonly />
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-12">
                   <label class="form-label small fw-semibold">Fecha viaje</label>
                   <input type="date" name="fechaViaje" id="modal-fecha" class="form-control" />
                 </div>
-                <div class="col-md-4">
-                  <label class="form-label small fw-semibold">Hora</label>
-                  <input type="text" name="horaViaje" id="modal-hora" class="form-control" placeholder="08:00" />
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label small fw-semibold">Asiento</label>
-                  <input type="number" name="asiento" id="modal-asiento" class="form-control" min="1" />
-                </div>
+                <input type="hidden" name="horaViaje" id="modal-hora" />
+                <input type="hidden" name="asiento" id="modal-asiento" />
                 <div class="col-md-6">
                   <label class="form-label small fw-semibold">Precio (S/)</label>
                   <input type="number" name="precio" id="modal-precio" class="form-control" step="0.50" />
