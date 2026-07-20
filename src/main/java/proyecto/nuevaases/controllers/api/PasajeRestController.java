@@ -62,28 +62,25 @@ public class PasajeRestController {
         for (Viaje v : viajes) {
             if (v.getEstadoViaje() != EstadoViaje.PROGRAMADO) continue;
 
+            // Solo mostrar viajes que tengan un conductor asignado
+            if (v.getConductorEmail() == null || v.getConductorEmail().isBlank()) continue;
+
             int ocupados = pasajeService.asientosOcupados(v).size();
             int disponibles = v.getTotalAsientos() - ocupados;
             if (disponibles <= 0) continue;
 
             Map<String, Object> viajeInfo = new HashMap<>();
             viajeInfo.put("viajeId", v.getId());
-            viajeInfo.put("horaSalida", v.getHoraSalida());
             viajeInfo.put("tipoBus", v.getTipoBus());
             viajeInfo.put("totalAsientos", v.getTotalAsientos());
             viajeInfo.put("ocupados", ocupados);
             viajeInfo.put("disponibles", disponibles);
             viajeInfo.put("precio", v.getPrecio());
 
-            // Buscar nombre del conductor si está asignado
-            if (v.getConductorEmail() != null && !v.getConductorEmail().isBlank()) {
-                viajeInfo.put("conductorEmail", v.getConductorEmail());
-                usuarioRepository.findByEmail(v.getConductorEmail())
-                        .ifPresent(u -> viajeInfo.put("conductorNombre", u.getNombreCompleto()));
-            } else {
-                viajeInfo.put("conductorEmail", "");
-                viajeInfo.put("conductorNombre", "Por asignar");
-            }
+            // Buscar nombre del conductor
+            viajeInfo.put("conductorEmail", v.getConductorEmail());
+            usuarioRepository.findByEmail(v.getConductorEmail())
+                    .ifPresent(u -> viajeInfo.put("conductorNombre", u.getNombreCompleto()));
 
             viajesDisponibles.add(viajeInfo);
         }

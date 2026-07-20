@@ -41,7 +41,7 @@ function getTodayStr() {
 
 const pasajesUI = {
     estado: {
-        viajeSeleccionado: null,  // { id, totalAsientos, ocupados, disponibles, precio, horaSalida, conductorNombre }
+        viajeSeleccionado: null,  // { id, totalAsientos, ocupados, disponibles, precio, conductorNombre }
         origen: "",
         destino: "",
         fecha: "",
@@ -210,10 +210,7 @@ const pasajesUI = {
                     <div class="card-body p-4">
                         <div class="d-flex justify-content-between align-items-start mb-3">
                             <div>
-                                <span class="badge bg-primario rounded-pill px-3 py-2">
-                                    <i class="bi bi-clock me-1"></i>${escapeHtml(v.horaSalida || "—")}
-                                </span>
-                                <span class="badge bg-secondary bg-opacity-10 text-dark rounded-pill px-3 py-2 ms-1">
+                                <span class="badge bg-secondary bg-opacity-10 text-dark rounded-pill px-3 py-2">
                                     <i class="bi bi-bus-front me-1"></i>${escapeHtml(v.tipoBus || "MINIVAN")}
                                 </span>
                             </div>
@@ -272,7 +269,6 @@ const pasajesUI = {
             ocupados: viajeData.ocupados,
             disponibles: viajeData.disponibles,
             precio: viajeData.precio,
-            horaEstimada: viajeData.horaSalida,
             conductorNombre: viajeData.conductorNombre,
         };
 
