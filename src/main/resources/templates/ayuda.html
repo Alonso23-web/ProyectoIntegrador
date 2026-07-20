@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+  <head th:replace="~{layout :: head('Ayuda - Nueva Ases Express')}"></head>
+  <body>
+    <div th:replace="~{layout :: navbar}"></div>
+
+    <!-- Page Header -->
+    <section class="bg-primario text-white py-5">
+      <div class="container text-center">
+        <h1 class="display-4 fw-bold mb-2"><i class="bi bi-question-circle me-2"></i>Centro de Ayuda</h1>
+        <p class="lead text-white-50 mb-0">
+          Encuentra respuestas a tus preguntas y aprende a usar la plataforma
+        </p>
+      </div>
+    </section>
+
+    <!-- Seccion para CLIENTES -->
+    <section class="py-5" sec:authorize="hasRole('CLIENTE')">
+      <div class="container">
+        <h2 class="fw-bold text-primario mb-4"><i class="bi bi-person me-2"></i>Ayuda para Clientes</h2>
+
+        <div class="accordion" id="ayudaCliente">
+          <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#cli1">
+                <i class="bi bi-ticket-perforated text-amarillo me-2"></i>¿Cómo comprar un pasaje?
+              </button>
+            </h2>
+            <div id="cli1" class="accordion-collapse collapse show" data-bs-parent="#ayudaCliente">
+              <div class="accordion-body text-muted">
+                <ol>
+                  <li class="mb-2">Inicia sesión con tu cuenta de cliente.</li>
+                  <li class="mb-2">Haz clic en <strong>Pasajes &gt; Comprar pasajes</strong> en el menú principal.</li>
+                  <li class="mb-2">Selecciona el origen, destino y fecha de tu viaje.</li>
+                  <li class="mb-2">Elige el asiento disponible que prefieras.</li>
+                  <li class="mb-2">Completa el pago según las instrucciones en pantalla.</li>
+                  <li>Recibirás un comprobante con los datos de tu pasaje.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#cli2">
+                <i class="bi bi-box-seam text-amarillo me-2"></i>¿Cómo enviar una encomienda?
+              </button>
+            </h2>
+            <div id="cli2" class="accordion-collapse collapse" data-bs-parent="#ayudaCliente">
+              <div class="accordion-body text-muted">
+                <ol>
+                  <li class="mb-2">Ve a <strong>Encomiendas &gt; Registrar envío</strong>.</li>
+                  <li class="mb-2">Ingresa los datos del remitente y destinatario.</li>
+                  <li class="mb-2">Describe el paquete (peso, dimensiones, contenido).</li>
+                  <li class="mb-2">Selecciona el destino y método de envío.</li>
+                  <li>Realiza el pago y guarda tu código de rastreo.</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#cli3">
+                <i class="bi bi-search text-amarillo me-2"></i>¿Cómo rastrear mi encomienda?
+              </button>
+            </h2>
+            <div id="cli3" class="accordion-collapse collapse" data-bs-parent="#ayudaCliente">
+              <div class="accordion-body text-muted">
+                <p>Ve a <strong>Encomiendas &gt; Rastrear encomienda</strong> e ingresa tu código de rastreo. Podrás ver el estado actual y la ubicación de tu envío en tiempo real.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#cli4">
+                <i class="bi bi-card-list text-amarillo me-2"></i>¿Cómo ver mis viajes y reservas?
+              </button>
+            </h2>
+            <div id="cli4" class="accordion-collapse collapse" data-bs-parent="#ayudaCliente">
+              <div class="accordion-body text-muted">
+                <p>En el menú ve a <strong>Pasajes &gt; Mis viajes</strong> para consultar todas tus reservas activas y pasadas. También puedes acceder desde tu Dashboard haciendo clic en <em>Mis reservas</em>.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#cli5">
+                <i class="bi bi-person-gear text-amarillo me-2"></i>¿Cómo editar mi perfil?
+              </button>
+            </h2>
+            <div id="cli5" class="accordion-collapse collapse" data-bs-parent="#ayudaCliente">
+              <div class="accordion-body text-muted">
+                <p>Haz clic en el ícono de tu perfil (esquina superior derecha) y selecciona <strong>Mi perfil</strong>. Allí podrás actualizar tus datos personales, contraseña y foto.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#cli6">
+                <i class="bi bi-credit-card text-amarillo me-2"></i>¿Qué métodos de pago aceptan?
+              </button>
+            </h2>
+            <div id="cli6" class="accordion-collapse collapse" data-bs-parent="#ayudaCliente">
+              <div class="accordion-body text-muted">
+                <p>Aceptamos pagos en efectivo, Yape, Plin y transferencia bancaria. Los detalles de pago se muestran al momento de confirmar tu compra o envío.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seccion para ADMINISTRADORES -->
+    <section class="py-5" sec:authorize="hasRole('ADMINISTRADOR')">
+      <div class="container">
+        <h2 class="fw-bold text-primario mb-4"><i class="bi bi-shield-lock me-2"></i>Ayuda para Administradores</h2>
+
+        <div class="accordion" id="ayudaAdmin">
+          <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#adm1">
+                <i class="bi bi-signpost-2 text-amarillo me-2"></i>¿Cómo gestionar viajes?
+              </button>
+            </h2>
+            <div id="adm1" class="accordion-collapse collapse show" data-bs-parent="#ayudaAdmin">
+              <div class="accordion-body text-muted">
+                <p>Dirígete a <strong>Operaciones &gt; Viajes</strong>. Desde allí puedes crear viajes individuales o masivos, asignar conductores, modificar horarios y cambiar el estado de cada viaje.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#adm2">
+                <i class="bi bi-person-badge text-amarillo me-2"></i>¿Cómo aprobar conductores?
+              </button>
+            </h2>
+            <div id="adm2" class="accordion-collapse collapse" data-bs-parent="#ayudaAdmin">
+              <div class="accordion-body text-muted">
+                <p>En el <strong>Dashboard</strong> se muestran las postulaciones pendientes de conductores. Puedes revisar sus documentos, aprobar o rechazar cada solicitud con un clic.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#adm3">
+                <i class="bi bi-truck text-amarillo me-2"></i>¿Cómo administrar vehículos?
+              </button>
+            </h2>
+            <div id="adm3" class="accordion-collapse collapse" data-bs-parent="#ayudaAdmin">
+              <div class="accordion-body text-muted">
+                <p>En <strong>Operaciones &gt; Vehículos</strong> puedes registrar nuevos vehículos, editar información, subir fotos y cambiar el estado (activo/mantenimiento) de cada unidad.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#adm4">
+                <i class="bi bi-file-earmark-bar-graph text-amarillo me-2"></i>¿Cómo generar reportes?
+              </button>
+            </h2>
+            <div id="adm4" class="accordion-collapse collapse" data-bs-parent="#ayudaAdmin">
+              <div class="accordion-body text-muted">
+                <p>Ve a <strong>Control &gt; Reportes</strong>. Puedes generar reportes de pasajes, ingresos, encomiendas y conductores. Los reportes se pueden exportar en formato Excel.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#adm5">
+                <i class="bi bi-bus-front text-amarillo me-2"></i>¿Cómo gestionar solicitudes de alquiler?
+              </button>
+            </h2>
+            <div id="adm5" class="accordion-collapse collapse" data-bs-parent="#ayudaAdmin">
+              <div class="accordion-body text-muted">
+                <p>En <strong>Control &gt; Solicitudes Alquiler</strong> se listan todas las solicitudes de alquiler de vehículos. Puedes aprobar o rechazar cada una y gestionar las condiciones del alquiler.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0 shadow-sm mb-3 rounded-3 overflow-hidden">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#adm6">
+                <i class="bi bi-people text-amarillo me-2"></i>¿Cómo administrar usuarios?
+              </button>
+            </h2>
+            <div id="adm6" class="accordion-collapse collapse" data-bs-parent="#ayudaAdmin">
+              <div class="accordion-body text-muted">
+                <p>En <strong>Control &gt; Usuarios</strong> puedes ver todos los usuarios registrados, buscar por nombre o email, y gestionar sus cuentas.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contacto de soporte (comun a ambos roles) -->
+    <section class="py-5 bg-light" sec:authorize="hasAnyRole('CLIENTE', 'ADMINISTRADOR')">
+      <div class="container text-center">
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-4 p-5">
+              <div class="icono-servicio mx-auto mb-3" style="background: linear-gradient(135deg, var(--color-secundario), var(--color-acento)); color: var(--color-primario);">
+                <i class="bi bi-headset"></i>
+              </div>
+              <h3 class="fw-bold text-primario mb-3">¿No encontraste lo que buscas?</h3>
+              <p class="text-muted mb-4">Nuestro equipo de soporte está disponible para ayudarte.</p>
+              <div class="row g-3 justify-content-center">
+                <div class="col-md-4">
+                  <div class="p-3 rounded-3" style="background: rgba(13, 27, 76, 0.04);">
+                    <i class="bi bi-telephone-fill fs-3 text-amarillo mb-2"></i>
+                    <h6 class="fw-bold text-primario mb-1">Teléfono</h6>
+                    <p class="text-muted mb-0 small">+51 999 888 777</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="p-3 rounded-3" style="background: rgba(13, 27, 76, 0.04);">
+                    <i class="bi bi-envelope-fill fs-3 text-amarillo mb-2"></i>
+                    <h6 class="fw-bold text-primario mb-1">Email</h6>
+                    <p class="text-muted mb-0 small">contacto@nuevaasesexpress.pe</p>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="p-3 rounded-3" style="background: rgba(13, 27, 76, 0.04);">
+                    <i class="bi bi-chat-dots-fill fs-3 text-amarillo mb-2"></i>
+                    <h6 class="fw-bold text-primario mb-1">Contacto</h6>
+                    <a href="/contacto" class="text-muted small text-decoration-none">Formulario de contacto</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div th:replace="~{layout :: footer}"></div>
+    <div th:replace="~{layout :: scripts}"></div>
+  </body>
+</html>
