@@ -10,11 +10,12 @@ import proyecto.nuevaases.exception.ResourceNotFoundException;
 import proyecto.nuevaases.models.Pasaje;
 import proyecto.nuevaases.models.Viaje;
 import proyecto.nuevaases.models.enums.EstadoViaje;
+import proyecto.nuevaases.repositories.UsuarioRepository;
 import proyecto.nuevaases.repositories.ViajeRepository;
 import proyecto.nuevaases.services.IPasajeService;
 
 import java.time.LocalDate;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,8 @@ import java.util.stream.Collectors;
 
 /**
  * Endpoints REST usados por cliente-buscar.js.
- * El cliente NO elige horario: busca por ruta + fecha, y el sistema
- * le asigna el viaje con cupos disponibles para ese día automáticamente.
+ * Muestra TODOS los viajes disponibles para la ruta y fecha seleccionada,
+ * con su conductor asignado. El cliente elige cuál le conviene.
  */
 @RestController
 @RequestMapping("/api/pasajes")
@@ -32,6 +33,7 @@ public class PasajeRestController {
 
     private final IPasajeService pasajeService;
     private final ViajeRepository viajeRepository;
+    private final UsuarioRepository usuarioRepository;
 
     // 1) Rutas disponibles, para llenar los selects de origen/destino
     @GetMapping("/rutas")
@@ -42,10 +44,9 @@ public class PasajeRestController {
                 .collect(Collectors.toList());
     }
 
-    // 2) Disponibilidad para una ruta y fecha: devuelve UN solo viaje (el que
-    //    tenga cupos), no una lista de horarios para elegir. Si hay varios
-    //    viajes programados ese día (por ejemplo porque el primero ya se llenó),
-    //    se toma el primero que aún tenga cupos disponibles.
+    // 2) Disponibilidad para una ruta y fecha:
+    //    Devuelve TODOS los viajes PROGRAMADOS con cupos disponibles,
+    //    cada uno con su información incluyendo el conductor asignado.
     @GetMapping("/disponibilidad")
     public ResponseEntity<Map<String, Object>> disponibilidad(
             @RequestParam String origen,
@@ -56,32 +57,40 @@ public class PasajeRestController {
 
         List<Viaje> viajes = viajeRepository.findByOrigenAndDestinoAndFecha(origen, destino, fechaViaje);
 
-        Viaje viajeConCupos = viajes.stream()
-                .filter(v -> v.getEstadoViaje() == EstadoViaje.PROGRAMADO)
-                .filter(v -> {
-                    int ocupados = pasajeService.asientosOcupados(v).size();
-                    return ocupados < v.getTotalAsientos();
-                })
-                .min(Comparator.comparing(Viaje::getId))
-                .orElse(null);
+        List<Map<String, Object>> viajesDisponibles = new ArrayList<>();
 
-        if (viajeConCupos == null) {
-            // No hay viaje disponible ese día: devolvemos un Map vacío
-            // para que el frontend pueda parsear la respuesta JSON correctamente.
-            return ResponseEntity.ok(new HashMap<>());
+        for (Viaje v : viajes) {
+            if (v.getEstadoViaje() != EstadoViaje.PROGRAMADO) continue;
+
+            int ocupados = pasajeService.asientosOcupados(v).size();
+            int disponibles = v.getTotalAsientos() - ocupados;
+            if (disponibles <= 0) continue;
+
+            Map<String, Object> viajeInfo = new HashMap<>();
+            viajeInfo.put("viajeId", v.getId());
+            viajeInfo.put("horaSalida", v.getHoraSalida());
+            viajeInfo.put("tipoBus", v.getTipoBus());
+            viajeInfo.put("totalAsientos", v.getTotalAsientos());
+            viajeInfo.put("ocupados", ocupados);
+            viajeInfo.put("disponibles", disponibles);
+            viajeInfo.put("precio", v.getPrecio());
+
+            // Buscar nombre del conductor si está asignado
+            if (v.getConductorEmail() != null && !v.getConductorEmail().isBlank()) {
+                viajeInfo.put("conductorEmail", v.getConductorEmail());
+                usuarioRepository.findByEmail(v.getConductorEmail())
+                        .ifPresent(u -> viajeInfo.put("conductorNombre", u.getNombreCompleto()));
+            } else {
+                viajeInfo.put("conductorEmail", "");
+                viajeInfo.put("conductorNombre", "Por asignar");
+            }
+
+            viajesDisponibles.add(viajeInfo);
         }
 
-        int ocupados = pasajeService.asientosOcupados(viajeConCupos).size();
-        int total = viajeConCupos.getTotalAsientos();
-
         Map<String, Object> respuesta = new HashMap<>();
-        respuesta.put("viajeId", viajeConCupos.getId());
-        respuesta.put("totalAsientos", total);
-        respuesta.put("ocupados", ocupados);
-        respuesta.put("disponibles", total - ocupados);
-        respuesta.put("precio", viajeConCupos.getPrecio());
-        // Se informa la hora estimada, pero el cliente no la elige.
-        respuesta.put("horaEstimada", viajeConCupos.getHoraSalida());
+        respuesta.put("hayDisponibilidad", !viajesDisponibles.isEmpty());
+        respuesta.put("viajes", viajesDisponibles);
 
         return ResponseEntity.ok(respuesta);
     }

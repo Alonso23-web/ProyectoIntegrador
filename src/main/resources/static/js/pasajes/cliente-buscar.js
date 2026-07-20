@@ -1,16 +1,15 @@
 /* ============================================================
    cliente-buscar.js — Nueva UI de compra de pasajes
    
-   Flujo simplificado:
+   Flujo actualizado:
    1. Ruta y fecha (origen, destino, fecha)
-   2. Cantidad de pasajeros (+/- botones)
-   3. Datos de cada pasajero (nombre + DNI)
-   4. Resumen y confirmación
+   2. Lista de viajes disponibles (cada uno con su conductor)
+   3. Cantidad de pasajeros (+/- botones)
+   4. Datos de cada pasajero (nombre + DNI)
+   5. Resumen y confirmación
    
+   El cliente ELIGE el viaje de la lista.
    NO hay mapa de asientos.
-   NO hay selector de horarios.
-   NO hay medidor de disponibilidad.
-   El viaje se asigna automáticamente.
    ============================================================ */
 
 const API_PASAJE = "/api/pasajes";
@@ -23,7 +22,7 @@ function escapeHtml(str) {
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
+        .replace(/\"/g, "&quot;")
         .replace(/'/g, "&#039;");
 }
 
@@ -42,11 +41,12 @@ function getTodayStr() {
 
 const pasajesUI = {
     estado: {
-        viajeSeleccionado: null,  // { id, totalAsientos, ocupados, disponibles, precio, horaEstimada }
+        viajeSeleccionado: null,  // { id, totalAsientos, ocupados, disponibles, precio, horaSalida, conductorNombre }
         origen: "",
         destino: "",
         fecha: "",
         cantidad: 1,
+        viajesDisponibles: [],    // Lista completa de viajes disponibles
     },
 
     // ─── Alertas ────────────────────────────────────────────
@@ -118,6 +118,7 @@ const pasajesUI = {
     resetearResultados() {
         document.getElementById("resultados-area")?.classList.add("d-none");
         this.estado.viajeSeleccionado = null;
+        this.estado.viajesDisponibles = [];
         document.getElementById("pasajerosContainer").innerHTML = "";
         this.clearAlerta("buscar-alert");
         this.clearAlerta("compra-alert");
@@ -128,6 +129,7 @@ const pasajesUI = {
     async buscarViajes(origen, destino, fecha) {
         this.clearAlerta("buscar-alert");
         this.estado.viajeSeleccionado = null;
+        this.estado.viajesDisponibles = [];
         document.getElementById("pasajerosContainer").innerHTML = "";
         document.getElementById("compra-alert").innerHTML = "";
 
@@ -138,7 +140,7 @@ const pasajesUI = {
             const r = await fetch(url);
             if (!r.ok) throw new Error(`Error HTTP ${r.status} al consultar disponibilidad`);
 
-            const viaje = await r.json();
+            const data = await r.json();
 
             this.estado.origen = origen;
             this.estado.destino = destino;
@@ -147,47 +149,30 @@ const pasajesUI = {
 
             document.getElementById("resultados-area")?.classList.remove("d-none");
 
-            if (!viaje || !viaje.viajeId) {
+            // Ocultar steps previos
+            document.getElementById("step2-card")?.classList.add("d-none");
+            document.getElementById("step3-card")?.classList.add("d-none");
+            document.getElementById("step4-card")?.classList.add("d-none");
+
+            if (!data.hayDisponibilidad || !data.viajes || data.viajes.length === 0) {
                 this.setAlerta("buscar-alert", "warning",
                     `No hay viajes disponibles para <strong>${escapeHtml(origen)} → ${escapeHtml(destino)}</strong> el <strong>${escapeHtml(fecha)}</strong>. Prueba con otra fecha.`);
-                document.getElementById("pasajerosContainer").innerHTML =
-                    '<div class="text-muted small text-center py-3"><i class="bi bi-info-circle me-1"></i>No hay viajes disponibles.</div>';
+                document.getElementById("viajesContainer").innerHTML =
+                    '<div class="text-muted small text-center py-4"><i class="bi bi-inbox me-2"></i>No hay viajes disponibles para esta fecha.</div>';
                 this.actualizarPanelResumen();
-                document.getElementById("step4-card")?.classList.add("d-none");
-                document.getElementById("step3-card")?.classList.add("d-none");
-                document.getElementById("step2-card")?.classList.add("d-none");
                 return;
             }
 
-            this.estado.viajeSeleccionado = {
-                id: viaje.viajeId,
-                totalAsientos: viaje.totalAsientos,
-                ocupados: viaje.ocupados,
-                disponibles: viaje.disponibles,
-                precio: viaje.precio,
-                horaEstimada: viaje.horaEstimada,
-            };
+            // Guardar la lista de viajes disponibles
+            this.estado.viajesDisponibles = data.viajes;
 
-            // Mostrar las cards de pasos 2-4
-            document.getElementById("step2-card")?.classList.remove("d-none");
-            document.getElementById("step3-card")?.classList.remove("d-none");
-            document.getElementById("step4-card")?.classList.remove("d-none");
-
-            // Actualizar cantidad máxima según disponibilidad
-            const disponibles = viaje.disponibles;
-            document.getElementById("cantidad").value = 1;
-            this.estado.cantidad = 1;
-            document.getElementById("cantidadDisplay").textContent = "1";
-
-            // Deshabilitar botón + si no hay suficientes disponibles
-            document.getElementById("btn-sumar").disabled = disponibles <= 1;
-
-            this.renderPasajerosInputs(1);
+            // Mostrar la card de selección de viaje y renderizar la lista
+            document.getElementById("step-viajes-card")?.classList.remove("d-none");
+            this.renderViajesDisponibles(data.viajes);
             this.actualizarPanelResumen();
 
-            // Mostrar notificación de éxito
             this.setAlerta("buscar-alert", "success",
-                `Viaje encontrado: <strong>${escapeHtml(origen)} → ${escapeHtml(destino)}</strong> — <strong>${disponibles} cupo(s)</strong> disponible(s). Completa los datos para reservar.`);
+                `Se encontraron <strong>${data.viajes.length} viaje(s)</strong> disponibles para <strong>${escapeHtml(origen)} → ${escapeHtml(destino)}</strong>. Elige el que prefieras.`);
 
         } catch (err) {
             console.error("Error en buscarViajes:", err);
@@ -197,6 +182,146 @@ const pasajesUI = {
         } finally {
             document.getElementById("buscar-loading")?.classList.add("d-none");
         }
+    },
+
+    // ─── Renderizar lista de viajes disponibles ─────────────
+
+    renderViajesDisponibles(viajes) {
+        const container = document.getElementById("viajesContainer");
+        if (!container) return;
+
+        if (!viajes || viajes.length === 0) {
+            container.innerHTML = '<div class="text-muted small text-center py-4"><i class="bi bi-inbox me-2"></i>No hay viajes disponibles.</div>';
+            return;
+        }
+
+        let html = `<div class="row g-3">`;
+
+        viajes.forEach((v, index) => {
+            const ocupacionPct = v.totalAsientos > 0 ? Math.round((v.ocupados / v.totalAsientos) * 100) : 0;
+            const tieneConductor = v.conductorNombre && v.conductorNombre !== "Por asignar";
+
+            html += `
+            <div class="col-md-6">
+                <div class="viaje-selectable card border-0 shadow-sm h-100"
+                     data-viaje-id="${v.viajeId}"
+                     style="border-radius: 16px; cursor: pointer; transition: all 0.25s ease;"
+                     onclick="pasajesUI.seleccionarViaje(${v.viajeId})">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span class="badge bg-primario rounded-pill px-3 py-2">
+                                    <i class="bi bi-clock me-1"></i>${escapeHtml(v.horaSalida || "—")}
+                                </span>
+                                <span class="badge bg-secondary bg-opacity-10 text-dark rounded-pill px-3 py-2 ms-1">
+                                    <i class="bi bi-bus-front me-1"></i>${escapeHtml(v.tipoBus || "MINIVAN")}
+                                </span>
+                            </div>
+                            <span class="fw-bold fs-5" style="color: #0d1b3e;">${formatearPrecio(v.precio)}</span>
+                        </div>
+
+                        <!-- Barra de ocupación -->
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between small mb-1">
+                                <span class="text-muted">Disponibles: <strong>${v.disponibles}</strong> / ${v.totalAsientos} asientos</span>
+                                <span class="${ocupacionPct >= 80 ? 'text-danger' : ocupacionPct >= 50 ? 'text-warning' : 'text-success'} fw-semibold">${ocupacionPct}% ocupado</span>
+                            </div>
+                            <div class="progress" style="height: 6px; border-radius: 4px;">
+                                <div class="progress-bar ${ocupacionPct >= 80 ? 'bg-danger' : ocupacionPct >= 50 ? 'bg-warning' : 'bg-success'}"
+                                     role="progressbar"
+                                     style="width: ${ocupacionPct}%"
+                                     aria-valuenow="${ocupacionPct}" aria-valuemin="0" aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Conductor -->
+                        <div class="d-flex align-items-center gap-2 small">
+                            <i class="bi bi-person-badge ${tieneConductor ? 'text-success' : 'text-muted'}"></i>
+                            <span class="${tieneConductor ? 'fw-semibold' : 'text-muted'}">
+                                ${tieneConductor ? escapeHtml(v.conductorNombre) : 'Sin conductor asignado'}
+                            </span>
+                        </div>
+
+                        <!-- Botón seleccionar -->
+                        <div class="mt-3 text-end">
+                            <button type="button" class="btn btn-outline-amarillo btn-sm fw-bold rounded-pill px-3 btn-seleccionar-viaje">
+                                <i class="bi bi-hand-index-thumb me-1"></i>Seleccionar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
+
+        html += `</div>`;
+        container.innerHTML = html;
+    },
+
+    // ─── Seleccionar un viaje de la lista ───────────────────
+
+    seleccionarViaje(viajeId) {
+        // Buscar el viaje en la lista
+        const viajeData = this.estado.viajesDisponibles.find(v => v.viajeId === viajeId);
+        if (!viajeData) return;
+
+        // Actualizar estado
+        this.estado.viajeSeleccionado = {
+            id: viajeData.viajeId,
+            totalAsientos: viajeData.totalAsientos,
+            ocupados: viajeData.ocupados,
+            disponibles: viajeData.disponibles,
+            precio: viajeData.precio,
+            horaEstimada: viajeData.horaSalida,
+            conductorNombre: viajeData.conductorNombre,
+        };
+
+        // Marcar visualmente la card seleccionada
+        document.querySelectorAll(".viaje-selectable").forEach(el => {
+            el.classList.remove("selected");
+            el.style.border = "";
+            el.style.boxShadow = "";
+            const btn = el.querySelector(".btn-seleccionar-viaje");
+            if (btn) {
+                btn.className = "btn btn-outline-amarillo btn-sm fw-bold rounded-pill px-3 btn-seleccionar-viaje";
+                btn.innerHTML = '<i class="bi bi-hand-index-thumb me-1"></i>Seleccionar';
+            }
+        });
+
+        const selectedCard = document.querySelector(`.viaje-selectable[data-viaje-id="${viajeId}"]`);
+        if (selectedCard) {
+            selectedCard.classList.add("selected");
+            selectedCard.style.border = "2px solid #f5a623";
+            selectedCard.style.boxShadow = "0 0 0 3px rgba(245,166,35,0.15)";
+            const btn = selectedCard.querySelector(".btn-seleccionar-viaje");
+            if (btn) {
+                btn.className = "btn btn-amarillo btn-sm fw-bold rounded-pill px-3 btn-seleccionar-viaje";
+                btn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Seleccionado';
+            }
+        }
+
+        // Resetear cantidad
+        this.estado.cantidad = 1;
+        document.getElementById("cantidad").value = 1;
+        document.getElementById("cantidadDisplay").textContent = "1";
+
+        // Mostrar los siguientes pasos
+        document.getElementById("step2-card")?.classList.remove("d-none");
+        document.getElementById("step3-card")?.classList.remove("d-none");
+        document.getElementById("step4-card")?.classList.remove("d-none");
+
+        // Actualizar cantidad máxima según disponibilidad
+        const disponibles = viajeData.disponibles;
+        document.getElementById("btn-restar").disabled = true;
+        document.getElementById("btn-sumar").disabled = disponibles <= 1;
+
+        this.renderPasajerosInputs(1);
+        this.actualizarPanelResumen();
+
+        // Scroll suave al paso 2
+        document.getElementById("step2-card")?.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        this.clearAlerta("compra-alert");
     },
 
     // ─── Cantidad de pasajeros (+/-) ───────────────────────
@@ -283,7 +408,9 @@ const pasajesUI = {
         const origen = this.estado.origen;
         const destino = this.estado.destino;
         const fecha = this.estado.fecha;
-        const total = cantidad * PRECIO_UNITARIO;
+        // Usar el precio real del viaje seleccionado (o el valor por defecto)
+        const precioUnitario = v && v.precio ? v.precio : PRECIO_UNITARIO;
+        const total = cantidad * precioUnitario;
         const tieneViaje = !!v;
 
         // Elementos del panel de resumen (columna derecha)
@@ -295,8 +422,20 @@ const pasajesUI = {
         setText("panel-ruta", tieneViaje ? `${origen} → ${destino}` : "—");
         setText("panel-fecha", tieneViaje ? fecha : "—");
         setText("panel-cantidad", tieneViaje ? `${cantidad} pasajero(s)` : "—");
-        setText("panel-detalle-precio", tieneViaje ? `${cantidad} × ${formatearPrecio(PRECIO_UNITARIO)}` : "—");
+        setText("panel-detalle-precio", tieneViaje ? `${cantidad} × ${formatearPrecio(precioUnitario)}` : "—");
         setText("panel-total", tieneViaje ? formatearPrecio(total) : "—");
+
+        // Conductor info en resumen
+        const conductorEl = document.getElementById("panel-conductor");
+        if (conductorEl) {
+            if (tieneViaje && v.conductorNombre) {
+                conductorEl.textContent = v.conductorNombre;
+                conductorEl.className = "fw-semibold small";
+            } else {
+                conductorEl.textContent = "—";
+                conductorEl.className = "fw-semibold small text-muted";
+            }
+        }
 
         // Resumen final (step 5)
         setText("resumen-ruta-final", tieneViaje ? `${origen} → ${destino}` : "—");
@@ -321,7 +460,7 @@ const pasajesUI = {
     async confirmarCompra() {
         const v = this.estado.viajeSeleccionado;
         if (!v) {
-            this.setAlerta("compra-alert", "danger", "No hay un viaje seleccionado.");
+            this.setAlerta("compra-alert", "danger", "Primero debes seleccionar un viaje de la lista.");
             return;
         }
 

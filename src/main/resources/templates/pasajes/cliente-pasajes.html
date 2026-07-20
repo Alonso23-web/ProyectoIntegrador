@@ -95,11 +95,31 @@
               <!-- ======== RESULTADOS (se muestra tras buscar) ======== -->
               <div id="resultados-area" class="d-none">
 
-                <!-- PASO 2: Cantidad de pasajeros -->
-                <div id="step2-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
+                <!-- PASO 2: Seleccionar viaje (NUEVO) -->
+                <div id="step-viajes-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
                   <div class="card-body p-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
                       <span class="step-circle">2</span>
+                      <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Seleccionar viaje</h5>
+                    </div>
+                    <p class="text-muted small mb-3">
+                      Estos son los viajes disponibles para tu ruta y fecha. Elige el que más te convenga.
+                      Cada viaje muestra su <strong>conductor asignado</strong> y la <strong>disponibilidad</strong> de asientos.
+                    </p>
+
+                    <div id="viajesContainer">
+                      <div class="text-muted small text-center py-4">
+                        <i class="bi bi-search me-2"></i>Busca viajes para ver las opciones disponibles.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- PASO 3: Cantidad de pasajeros -->
+                <div id="step2-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
+                  <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                      <span class="step-circle">3</span>
                       <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Cantidad de pasajeros</h5>
                     </div>
                     <p class="text-muted small mb-3">
@@ -124,11 +144,11 @@
                   </div>
                 </div>
 
-                <!-- PASO 3: Datos de cada pasajero -->
+                <!-- PASO 4: Datos de cada pasajero -->
                 <div id="step3-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
                   <div class="card-body p-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                      <span class="step-circle">3</span>
+                      <span class="step-circle">4</span>
                       <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Datos de cada pasajero</h5>
                     </div>
 
@@ -136,7 +156,7 @@
 
                     <div id="pasajerosContainer">
                       <div class="text-muted small text-center py-3">
-                        <i class="bi bi-hand-index-thumb me-1"></i>Elige la cantidad de pasajeros para registrar sus datos
+                        <i class="bi bi-hand-index-thumb me-1"></i>Selecciona un viaje y la cantidad de pasajeros para registrar sus datos
                       </div>
                     </div>
 
@@ -144,11 +164,11 @@
                   </div>
                 </div>
 
-                <!-- PASO 4: Resumen y confirmación -->
+                <!-- PASO 5: Resumen y confirmación -->
                 <div id="step4-card" class="card shadow-sm border-0 mb-3 d-none" style="border-radius: 16px;">
                   <div class="card-body p-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
-                      <span class="step-circle">4</span>
+                      <span class="step-circle">5</span>
                       <h5 class="fw-bold mb-0" style="color: #0d1b3e;">Resumen y confirmación</h5>
                     </div>
 
@@ -235,6 +255,14 @@
                   <div class="mb-3">
                     <div class="text-muted small text-uppercase fw-semibold">Fecha</div>
                     <div class="fw-semibold small" id="panel-fecha">—</div>
+                  </div>
+
+                  <hr class="my-2" />
+
+                  <!-- Conductor -->
+                  <div class="mb-3">
+                    <div class="text-muted small text-uppercase fw-semibold">Conductor</div>
+                    <div class="fw-semibold small" id="panel-conductor">—</div>
                   </div>
 
                   <hr class="my-2" />
