@@ -84,32 +84,12 @@
                   </div>
                 </div>
 
-                <hr class="my-4" />
-
-                <!-- SECCION 2: Horarios -->
-                <div class="mb-4">
-                  <h5 class="fw-bold mb-3" style="color: #0d1b3e;">
-                    <span class="badge me-2 rounded-pill" style="background:#f5a623; color:#1a0f00;">2</span>
-                    Horarios
-                  </h5>
-                  <p class="text-muted small mb-3">Selecciona los horarios de salida.</p>
-
-                  <div class="d-flex flex-wrap gap-3" id="horarios-container">
-                    <div th:each="h : ${horarios}" class="form-check">
-                      <input type="checkbox" name="horarios" th:value="${h}" class="form-check-input horario-check"
-                             th:id="'hora-' + ${h}" checked />
-                      <label class="form-check-label fw-semibold" th:for="'hora-' + ${h}" th:text="${h}"></label>
-                    </div>
-                  </div>
-
-                  <div id="horarios-alert" class="mt-2 d-none">
-                    <div class="alert alert-warning small py-2 mb-0">Selecciona al menos un horario.</div>
-                  </div>
-                </div>
+                <!-- Hora oculta: los carros no tienen horario fijo, se crea un viaje por día -->
+                <input type="hidden" name="horarios" value="00:00" />
 
                 <hr class="my-4" />
 
-                <!-- SECCION 3: Configuracion del vehiculo -->
+                <!-- SECCION 2: Configuracion del vehiculo -->
                 <div class="mb-4">
                   <h5 class="fw-bold mb-3" style="color: #0d1b3e;">
                     <span class="badge me-2 rounded-pill" style="background:#f5a623; color:#1a0f00;">3</span>
@@ -138,7 +118,7 @@
 
                 <hr class="my-4" />
 
-                <!-- SECCION 4: Asignacion (opcional) -->
+                <!-- SECCION 3: Asignacion (opcional) -->
                 <div class="mb-4">
                   <h5 class="fw-bold mb-3" style="color: #0d1b3e;">
                     <span class="badge me-2 rounded-pill" style="background:#f5a623; color:#1a0f00;">4</span>
@@ -233,14 +213,6 @@
                 <div class="d-flex gap-2">
                   <span class="badge rounded-pill mt-1" style="background: #0d1b3e; min-width: 22px;">3</span>
                   <div>
-                    <strong>Horarios</strong>
-                    <p class="text-muted mb-0">Selecciona las horas de salida. Se creara un viaje por cada hora elegida.</p>
-                  </div>
-                </div>
-
-                <div class="d-flex gap-2">
-                  <span class="badge rounded-pill mt-1" style="background: #0d1b3e; min-width: 22px;">4</span>
-                  <div>
                     <strong>Asignacion opcional</strong>
                     <p class="text-muted mb-0">Puedes asignar conductor y vehiculo ahora o hacerlo despues editando cada viaje.</p>
                   </div>
@@ -270,13 +242,12 @@
           const origen = document.querySelector('input[name="origen"]').value.trim();
           const destino = document.querySelector('input[name="destino"]').value.trim();
           const generarInverso = document.querySelector('#generarInverso').checked;
-          const horariosSel = document.querySelectorAll('.horario-check:checked');
           const totalAsientos = parseInt(document.querySelector('input[name="totalAsientos"]').value) || 0;
           const precio = parseFloat(document.querySelector('input[name="precio"]').value) || 0;
 
           const container = document.getElementById('resumen-generacion');
 
-          if (!fechaInicio || !fechaFin || !origen || !destino || horariosSel.length === 0) {
+          if (!fechaInicio || !fechaFin || !origen || !destino) {
             container.innerHTML = '<span class="text-muted">Completa todos los campos para ver el resumen.</span>';
             return;
           }
@@ -292,17 +263,13 @@
           }
 
           const rutasPorDia = generarInverso ? 2 : 1;
-          const totalViajes = diffDays * horariosSel.length * rutasPorDia;
+          const totalViajes = diffDays * rutasPorDia;
           const ingresoPotencial = totalViajes * totalAsientos * precio;
 
           let html = `
             <div class="d-flex justify-content-between mb-1">
               <span>Dias:</span>
               <strong>${diffDays} dia(s)</strong>
-            </div>
-            <div class="d-flex justify-content-between mb-1">
-              <span>Horarios por dia:</span>
-              <strong>${horariosSel.length}</strong>
             </div>
             <div class="d-flex justify-content-between mb-1">
               <span>Rutas por dia:</span>
@@ -336,23 +303,6 @@
             const origen = document.querySelector('input[name="origen"]').value.trim() || 'Origen';
             const destino = document.querySelector('input[name="destino"]').value.trim() || 'Destino';
             document.getElementById('ruta-inversa-preview').textContent = destino + ' > ' + origen;
-          });
-        });
-
-        document.querySelector('form').addEventListener('submit', function(e) {
-          const checked = document.querySelectorAll('.horario-check:checked');
-          if (checked.length === 0) {
-            e.preventDefault();
-            document.getElementById('horarios-alert').classList.remove('d-none');
-          }
-        });
-
-        document.querySelectorAll('.horario-check').forEach(cb => {
-          cb.addEventListener('change', function() {
-            const checked = document.querySelectorAll('.horario-check:checked');
-            if (checked.length > 0) {
-              document.getElementById('horarios-alert').classList.add('d-none');
-            }
           });
         });
 

@@ -78,7 +78,7 @@
         margin-top: 0.5rem;
       }
 
-      /* ========== COUNTDOWN ========== */
+      /* ========== CARD DE BIENVENIDA / ESTADO ========== */
       .cond-countdown {
         background: white;
         border-radius: 20px;
@@ -91,64 +91,6 @@
         flex-wrap: wrap;
         gap: 1rem;
         border-left: 4px solid var(--cond-gold);
-      }
-      .cond-countdown-info {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-      .cond-countdown-info .cd-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
-        background: #fef7e0;
-        color: #e37400;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.3rem;
-      }
-      .cond-countdown-info .cd-text h6 {
-        font-weight: 700;
-        color: var(--cond-blue);
-        margin-bottom: 0.15rem;
-      }
-      .cond-countdown-info .cd-text small {
-        color: #94a3b8;
-        font-size: 0.82rem;
-      }
-      .cond-countdown-timer {
-        display: flex;
-        gap: 0.8rem;
-        align-items: center;
-      }
-      .cond-countdown-timer .cd-unit {
-        text-align: center;
-      }
-      .cond-countdown-timer .cd-unit .cd-num {
-        background: var(--cond-blue);
-        color: white;
-        font-weight: 800;
-        font-size: 1.8rem;
-        padding: 0.3rem 0.7rem;
-        border-radius: 12px;
-        min-width: 55px;
-        display: inline-block;
-      }
-      .cond-countdown-timer .cd-unit .cd-label {
-        font-size: 0.6rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #94a3b8;
-        font-weight: 600;
-        display: block;
-        margin-top: 0.2rem;
-      }
-      .cond-countdown-timer .cd-sep {
-        font-size: 2rem;
-        font-weight: 800;
-        color: var(--cond-gold);
-        margin-top: -0.5rem;
       }
       .cond-countdown-sinviaje {
         color: #94a3b8;
@@ -420,34 +362,18 @@
           </div>
         </div>
 
-        <!-- ========== COUNTDOWN ========== -->
-        <div id="countdown-container" class="cond-countdown" th:if="${#lists.size(viajesConPasajeros) > 0}">
-          <div class="cond-countdown-info">
-            <div class="cd-icon"><i class="bi bi-clock-fill"></i></div>
-            <div class="cd-text">
-              <h6 id="cd-titulo">Próximo viaje</h6>
-              <small id="cd-ruta" th:text="${viajesConPasajeros[0].viaje.origen + ' → ' + viajesConPasajeros[0].viaje.destino}">—</small>
-            </div>
-          </div>
-          <div class="cond-countdown-timer" id="cd-timer">
-            <div class="cd-unit">
-              <span class="cd-num" id="cd-hours">00</span>
-              <span class="cd-label">Horas</span>
-            </div>
-            <span class="cd-sep">:</span>
-            <div class="cd-unit">
-              <span class="cd-num" id="cd-minutes">00</span>
-              <span class="cd-label">Minutos</span>
-            </div>
-            <span class="cd-sep">:</span>
-            <div class="cd-unit">
-              <span class="cd-num" id="cd-seconds">00</span>
-              <span class="cd-label">Segundos</span>
+        <!-- ========== BIENVENIDA CON VIAJES ASIGNADOS ========== -->
+        <div th:if="${#lists.size(viajesConPasajeros) > 0}" class="cond-countdown">
+          <div class="cond-countdown-sinviaje">
+            <i class="bi bi-check-circle fs-2" style="color:#1e8e3e;"></i>
+            <div>
+              <strong style="color:var(--cond-blue);">Tienes ${#lists.size(viajesConPasajeros)} viaje(s) asignado(s) para hoy</strong>
+              <br><small class="text-muted">Revisa los detalles de cada viaje y gestiona tus pasajeros.</small>
             </div>
           </div>
         </div>
 
-        <!-- ========== COUNTDOWN SIN VIAJES ========== -->
+        <!-- ========== SIN VIAJES ========== -->
         <div th:if="${#lists.size(viajesConPasajeros) == 0}" class="cond-countdown">
           <div class="cond-countdown-sinviaje">
             <i class="bi bi-calendar-check fs-2" style="color:#94a3b8;"></i>
@@ -512,10 +438,6 @@
 
             <!-- Detalles -->
             <div class="vc-details">
-              <span class="vc-detail-item">
-                <i class="bi bi-clock"></i>
-                <span th:text="${item.viaje.horaSalida}">08:00</span>
-              </span>
               <span class="vc-detail-item">
                 <i class="bi bi-people"></i>
                 <span th:text="${item.pasajerosCount}">0</span> pasajeros
@@ -604,7 +526,6 @@
     </style>
 
     <script>
-      // ========== COUNTDOWN ==========
       document.addEventListener('DOMContentLoaded', function() {
         // Auto-ocultar alertas flash
         document.querySelectorAll('.cond-alert').forEach(function(el) {
@@ -614,84 +535,7 @@
             setTimeout(function() { el.style.display = 'none'; }, 500);
           }, 5000);
         });
-
-        // Countdown timer
-        iniciarCountdown();
       });
-
-      function iniciarCountdown() {
-        var viajes = [];
-        // Recopilar datos de viajes desde el DOM
-        var cards = document.querySelectorAll('.cond-viaje-card');
-        cards.forEach(function(card) {
-          var rutaEl = card.querySelector('.vc-ruta');
-          var ruta = rutaEl ? rutaEl.textContent.trim() : '';
-          var horaEl = card.querySelector('.vc-detail-item .bi-clock');
-          var hora = horaEl ? horaEl.parentElement.textContent.trim() : '';
-          if (hora) {
-            var partesHora = hora.split(':');
-            if (partesHora.length === 2) {
-              var now = new Date();
-              var tripDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
-                parseInt(partesHora[0]), parseInt(partesHora[1]));
-              viajes.push({ ruta: ruta, time: tripDate, horaStr: hora });
-            }
-          }
-        });
-
-        if (viajes.length === 0) return;
-
-        // Ordenar por hora
-        viajes.sort(function(a, b) { return a.time - b.time; });
-
-        // Encontrar el próximo viaje (el primero cuya hora no haya pasado)
-        var now = new Date();
-        var nextTrip = null;
-        for (var i = 0; i < viajes.length; i++) {
-          if (viajes[i].time > now) {
-            nextTrip = viajes[i];
-            break;
-          }
-        }
-        // Si todos pasaron, mostrar el último
-        if (!nextTrip && viajes.length > 0) {
-          nextTrip = viajes[viajes.length - 1];
-        }
-
-        if (!nextTrip) return;
-
-        // Actualizar info del countdown
-        var tituloEl = document.getElementById('cd-titulo');
-        var rutaEl = document.getElementById('cd-ruta');
-        if (tituloEl) tituloEl.textContent = 'Próximo viaje';
-        if (rutaEl) rutaEl.textContent = nextTrip.ruta;
-
-        // Actualizar countdown cada segundo
-        function updateCountdown() {
-          var now = new Date();
-          var diff = nextTrip.time - now;
-
-          if (diff <= 0) {
-            // Ya pasó la hora del viaje
-            document.getElementById('cd-hours').textContent = '00';
-            document.getElementById('cd-minutes').textContent = '00';
-            document.getElementById('cd-seconds').textContent = '00';
-            if (tituloEl) tituloEl.textContent = '¡Hora del viaje!';
-            return;
-          }
-
-          var hours = Math.floor(diff / (1000 * 60 * 60));
-          var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          var seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-          document.getElementById('cd-hours').textContent = String(hours).padStart(2, '0');
-          document.getElementById('cd-minutes').textContent = String(minutes).padStart(2, '0');
-          document.getElementById('cd-seconds').textContent = String(seconds).padStart(2, '0');
-        }
-
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
-      }
 
       // ========== TOGGLE PASAJEROS ==========
       function togglePasajeros(btn) {

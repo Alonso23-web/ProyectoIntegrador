@@ -69,7 +69,6 @@
                     <th>ID</th>
                     <th>Ruta</th>
                     <th>Fecha</th>
-                    <th>Hora</th>
                     <th>Tipo</th>
                     <th>Asientos</th>
                     <th>Precio</th>
@@ -94,7 +93,6 @@
                       <span class="fw-semibold" th:text="${v.destino}"></span>
                     </td>
                     <td th:text="${v.fecha}"></td>
-                    <td><span class="badge bg-light text-dark border" th:text="${v.horaSalida}"></span></td>
                     <td>
                       <span class="badge"
                             th:classappend="${v.tipoBus == 'BUS' ? 'bg-primary' : (v.tipoBus == 'MINIVAN' ? 'bg-info' : 'bg-secondary')}"

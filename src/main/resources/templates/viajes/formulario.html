@@ -49,7 +49,7 @@
                 </div>
 
                 <div class="row">
-                  <div class="col-md-6 mb-3">
+                  <div class="col-md-12 mb-3">
                     <label class="form-label fw-bold">Fecha</label>
                     <input
                       type="date"
@@ -58,17 +58,9 @@
                       required
                     />
                   </div>
-                  <div class="col-md-6 mb-3">
-                    <label class="form-label fw-bold">Hora de Salida</label>
-                    <select class="form-select" th:field="*{horaSalida}" required>
-                      <option value="">Seleccionar hora</option>
-                      <option value="08:00">08:00 AM</option>
-                      <option value="12:00">12:00 PM</option>
-                      <option value="16:00">04:00 PM</option>
-                      <option value="20:00">08:00 PM</option>
-                    </select>
-                  </div>
                 </div>
+                <!-- Hora oculta con valor por defecto (los carros no tienen horario fijo) -->
+                <input type="hidden" name="horaSalida" value="00:00" />
 
                 <div class="row">
                   <div class="col-md-4 mb-3">

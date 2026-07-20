@@ -95,7 +95,6 @@ public class ViajeController {
     @GetMapping("/generar-masivo")
     public String generarMasivoForm(Model model) {
         cargarDatosAsignacion(model);
-        model.addAttribute("horarios", List.of("08:00", "10:00", "13:00", "16:00"));
         return "viajes/generar-masivo";
     }
 
