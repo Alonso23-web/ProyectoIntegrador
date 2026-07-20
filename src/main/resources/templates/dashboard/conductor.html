@@ -78,27 +78,7 @@
         margin-top: 0.5rem;
       }
 
-      /* ========== CARD DE BIENVENIDA / ESTADO ========== */
-      .cond-countdown {
-        background: white;
-        border-radius: 20px;
-        padding: 1.5rem 2rem;
-        box-shadow: 0 4px 20px rgba(13,27,62,0.08);
-        margin-bottom: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-        gap: 1rem;
-        border-left: 4px solid var(--cond-gold);
-      }
-      .cond-countdown-sinviaje {
-        color: #94a3b8;
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
+
 
       /* ========== STATS ========== */
       .cond-stats {
@@ -362,27 +342,7 @@
           </div>
         </div>
 
-        <!-- ========== BIENVENIDA CON VIAJES ASIGNADOS ========== -->
-        <div th:if="${#lists.size(viajesConPasajeros) > 0}" class="cond-countdown">
-          <div class="cond-countdown-sinviaje">
-            <i class="bi bi-check-circle fs-2" style="color:#1e8e3e;"></i>
-            <div>
-              <strong style="color:var(--cond-blue);">Tienes ${#lists.size(viajesConPasajeros)} viaje(s) asignado(s) para hoy</strong>
-              <br><small class="text-muted">Revisa los detalles de cada viaje y gestiona tus pasajeros.</small>
-            </div>
-          </div>
-        </div>
 
-        <!-- ========== SIN VIAJES ========== -->
-        <div th:if="${#lists.size(viajesConPasajeros) == 0}" class="cond-countdown">
-          <div class="cond-countdown-sinviaje">
-            <i class="bi bi-calendar-check fs-2" style="color:#94a3b8;"></i>
-            <div>
-              <strong style="color:var(--cond-blue);">Sin viajes asignados para hoy</strong>
-              <br><small class="text-muted">Disfruta tu día libre. Los nuevos viajes aparecerán aquí cuando el administrador te los asigne.</small>
-            </div>
-          </div>
-        </div>
 
         <!-- ========== STATS ========== -->
         <h5 class="cond-section-title">
