@@ -188,7 +188,7 @@ public class RegistroController {
 
     private String guardarArchivo(MultipartFile archivo) {
         try {
-            String uploadDir = "src/main/resources/static/uploads/documentos/";
+            String uploadDir = "./uploads/documentos/";
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);

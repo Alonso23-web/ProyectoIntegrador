@@ -25,7 +25,7 @@ public class VehiculoController {
 
     private final IVehiculoService vehiculoService;
 
-    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/vehiculos/";
+    private static final String UPLOAD_DIR = "./uploads/vehiculos/";
 
     @GetMapping
     public String listar(Model model) {
